@@ -21,6 +21,10 @@ interface Props {
   title?: string;
   /** Default: "kayıt" — singular noun used in tooltip ("12 kayıt") */
   unitLabel?: string;
+  /** Format the bin midpoint shown in the tooltip header. Defaults to TRY. */
+  formatValue?: (value: number) => string;
+  /** Format the X-axis tick labels. Defaults to compact TRY (10 B / 50 B). */
+  formatAxis?: (value: number) => string;
 }
 
 interface Bin {
@@ -29,7 +33,7 @@ interface Bin {
   count: number;
 }
 
-function buildBins(amounts: number[]): Bin[] {
+function buildBins(amounts: number[], axisFormat: (n: number) => string): Bin[] {
   if (amounts.length === 0) return [];
 
   const sorted = [...amounts].sort((a, b) => a - b);
@@ -53,7 +57,7 @@ function buildBins(amounts: number[]): Bin[] {
   const bins: Bin[] = [];
   for (let edge = startEdge; edge < max + niceWidth; edge += niceWidth) {
     bins.push({
-      label: formatCompact(edge),
+      label: axisFormat(edge),
       midpoint: edge + niceWidth / 2,
       count: 0,
     });
@@ -79,8 +83,10 @@ export function AmountHistogram({
   scopeLabel,
   title = "Dağılım",
   unitLabel = "kayıt",
+  formatValue = formatTRY,
+  formatAxis = formatCompact,
 }: Props) {
-  const bins = React.useMemo(() => buildBins(amounts), [amounts]);
+  const bins = React.useMemo(() => buildBins(amounts, formatAxis), [amounts, formatAxis]);
 
   if (bins.length < 3) {
     return null;
@@ -126,7 +132,7 @@ export function AmountHistogram({
               }
               labelFormatter={(_label: unknown, payload: ReadonlyArray<{ payload?: Bin }>) => {
                 const bin = payload?.[0]?.payload;
-                return bin ? `~${formatTRY(bin.midpoint)}` : "";
+                return bin ? `~${formatValue(bin.midpoint)}` : "";
               }}
             />
             <Bar dataKey="count" fill="var(--primary)" radius={[4, 4, 0, 0]} />

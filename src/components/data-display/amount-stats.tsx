@@ -14,20 +14,23 @@ export interface AmountStats {
 interface Props {
   stats: AmountStats;
   scopeLabel?: string;
+  /** Format value cells (e.g. "₺28.000" or "78 Mbps"). Defaults to TRY. */
+  formatValue?: (value: number) => string;
 }
 
 /**
  * Generic five-bucket stats panel — the same layout works for salary, rent,
  * utility bills, anything monetary. Pass `scopeLabel` to caption the grid.
  */
-export function AmountStatsPanel({ stats, scopeLabel }: Props) {
+export function AmountStatsPanel({ stats, scopeLabel, formatValue = formatTRY }: Props) {
   const empty = stats.count === 0;
+  const fmt = (n: number | null | undefined) => (n == null ? "–" : formatValue(n));
   const items: { label: string; value: string; emphasize?: boolean }[] = [
     { label: "Veri sayısı", value: formatNumber(stats.count) },
-    { label: "Medyan", value: empty ? "–" : formatTRY(stats.median), emphasize: true },
-    { label: "Ortalama", value: empty ? "–" : formatTRY(stats.avg) },
-    { label: "Alt %25", value: empty ? "–" : formatTRY(stats.p25) },
-    { label: "Üst %75", value: empty ? "–" : formatTRY(stats.p75) },
+    { label: "Medyan", value: empty ? "–" : fmt(stats.median), emphasize: true },
+    { label: "Ortalama", value: empty ? "–" : fmt(stats.avg) },
+    { label: "Alt %25", value: empty ? "–" : fmt(stats.p25) },
+    { label: "Üst %75", value: empty ? "–" : fmt(stats.p75) },
   ];
 
   return (

@@ -219,5 +219,12 @@ export function buildRentScope(citySlug?: string): string {
   return `rent:c/${citySlug}`;
 }
 
+export function buildInternetScope(ispSlug?: string, citySlug?: string): string {
+  const parts = ["internet"];
+  if (citySlug) parts.push(`c/${citySlug}`);
+  if (ispSlug) parts.push(`i/${ispSlug}`);
+  return parts.length === 1 ? "internet:all" : parts.join(":");
+}
+
 // Backward-compat alias — older callers using the salary-specific name.
 export const getOrGenerateSalaryInsight = getOrGenerateInsight;

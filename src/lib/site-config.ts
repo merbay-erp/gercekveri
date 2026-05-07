@@ -67,7 +67,7 @@ export const categories: CategoryDef[] = [
     longDescription:
       "Türk Telekom, Superonline, Vodafone, TurkNet — paket hızı yerine gerçekte ölçülen hız, ping ve kesinti sıklığı.",
     icon: Wifi,
-    status: "soon",
+    status: "live",
     accent: "from-violet-500/20 to-violet-500/5",
     sortOrder: 3,
   },
@@ -126,8 +126,10 @@ export const footerNav = {
   product: [
     { label: "Maaşlar", href: "/maaslar" },
     { label: "Kiralar", href: "/kira" },
+    { label: "İnternet sağlayıcıları", href: "/internet" },
     { label: "Maaş paylaş", href: "/maaslar/yeni" },
     { label: "Kira paylaş", href: "/kira/yeni" },
+    { label: "İnternet paylaş", href: "/internet/yeni" },
   ],
   legal: [
     { label: "Gizlilik Politikası", href: "/gizlilik" },
