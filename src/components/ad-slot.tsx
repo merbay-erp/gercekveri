@@ -28,6 +28,11 @@ const formatHeights: Record<NonNullable<AdSlotProps["format"]>, string> = {
 export function AdSlot({ slotKey, format = "responsive", className }: AdSlotProps) {
   const height = formatHeights[format];
   const isDev = process.env.NODE_ENV !== "production";
+  const adsenseEnabled = Boolean(process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID);
+
+  // Production'da AdSense ID yoksa hiç render etme — boş gri kart kullanıcıyı
+  // yoruyor. AdSense onayı + env eklenince otomatik gösterime girer.
+  if (!isDev && !adsenseEnabled) return null;
 
   return (
     <div

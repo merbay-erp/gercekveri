@@ -75,6 +75,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/istatistikler", 0.6, "daily"),
     u("/harita", 0.7, "daily"),
     u("/hakkinda", 0.4, "monthly"),
+    u("/sss", 0.5, "monthly"),
   ];
 
   const positionEntries = positions.map((slug) => u(`/maaslar/${slug}`, 0.7, "weekly"));
