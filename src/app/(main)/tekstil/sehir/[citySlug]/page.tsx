@@ -15,7 +15,7 @@ import {
   topTekstilCitySlugs,
 } from "@/modules/tekstil/server/queries";
 import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
-import { formatTRY, formatNumber } from "@/lib/money";
+import { formatNumber } from "@/lib/money";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -100,7 +100,6 @@ export default async function TekstilCityPage({ params }: { params: Params }) {
             scopeLabel={`${city.name} tekstil fiyat dağılımı`}
             title="Fiyat dağılımı"
             unitLabel="paylaşım"
-            formatValue={(n) => formatTRY(n)}
           />
         ) : null}
 

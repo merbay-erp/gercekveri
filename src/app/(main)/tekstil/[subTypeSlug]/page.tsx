@@ -20,7 +20,7 @@ import {
   defaultUnitFor,
   unitLabels,
 } from "@/modules/tekstil/config";
-import { formatTRY, formatNumber } from "@/lib/money";
+import { formatNumber } from "@/lib/money";
 
 export const revalidate = 60;
 export const dynamicParams = false;
@@ -104,7 +104,6 @@ export default async function TekstilSubTypePage({ params }: { params: Params })
             scopeLabel={`Türkiye geneli ${label.toLowerCase()} fiyat dağılımı`}
             title={`${label} fiyat dağılımı`}
             unitLabel="paylaşım"
-            formatValue={(n) => formatTRY(n)}
           />
         ) : null}
 

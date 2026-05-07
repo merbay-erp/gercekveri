@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, ShieldCheck, BarChart3, MapPin, Briefcase } from "lucide-react";
+import { ArrowRight, Sparkles, ShieldCheck, MapPin, Briefcase } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -18,6 +18,17 @@ import { positionNameFromSlug } from "@/modules/maas/position-resolver";
 import { findCityBySlug } from "@/lib/cities";
 import { buildSearchIndex } from "@/lib/search-index";
 import { GlobalSearch } from "@/components/search/global-search";
+import { HeroLiveCounters } from "@/components/home/hero-live-counters";
+import { LiveTrendsPanel } from "@/components/home/live-trends-panel";
+import { AmountAiInsightLarge } from "@/components/data-display/amount-ai-insight-large";
+import { getPublicStatsOverview } from "@/lib/public-stats";
+import {
+  getCategoryDeltas,
+  getRecentSubmissions,
+  getTrendingCities,
+  getCoverageCounts,
+} from "@/lib/recent-activity";
+import { buildSalaryScope, getOrGenerateInsight } from "@/services/ai/insights";
 
 export const revalidate = 60;
 
@@ -63,7 +74,32 @@ async function getHomepageStats() {
 }
 
 export default async function HomePage() {
-  const stats = await getHomepageStats();
+  const [
+    stats,
+    publicOverview,
+    categoryDeltas,
+    trendingCities,
+    recentSubmissions,
+    coverage,
+  ] = await Promise.all([
+    getHomepageStats(),
+    getPublicStatsOverview().catch(() => null),
+    getCategoryDeltas().catch(() => []),
+    getTrendingCities().catch(() => []),
+    getRecentSubmissions(8).catch(() => []),
+    getCoverageCounts().catch(() => ({ cities: 0, districts: 0 })),
+  ]);
+
+  const headlineInsight = publicOverview
+    ? await getOrGenerateInsight({
+        scope: buildSalaryScope(),
+        scopeLabel: "Türkiye geneli — anonim veri",
+        stats: stats.generalStats,
+        nounSingular: "maaş",
+        nounPlural: "Türkiye genelinde paylaşılan maaşlar",
+      }).catch(() => null)
+    : null;
+
   const searchEntries = buildSearchIndex();
 
   return (
@@ -97,21 +133,42 @@ export default async function HomePage() {
               <GlobalSearch entries={searchEntries} variant="hero" />
             </div>
 
-            <div className="flex flex-wrap gap-x-8 gap-y-2 pt-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-emerald-500" /> %100 anonim
+            <div className="pt-2">
+              <HeroLiveCounters
+                totalApproved={publicOverview?.totalApproved ?? 0}
+                totalLast24h={publicOverview?.totalLast24h ?? 0}
+                cities={coverage.cities}
+                districts={coverage.districts}
+                lastSubmissionAt={publicOverview?.lastSubmissionAt ?? null}
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> %100 anonim
               </span>
-              <span className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-sky-500" />
-                {formatNumber(stats.salaryCount)} maaş · {formatNumber(stats.rentCount)} kira paylaşımı
-              </span>
-              <span className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-500" /> AI özetler — yakında
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" /> AI özetler aktif
               </span>
             </div>
           </div>
         </div>
       </section>
+
+      {headlineInsight ? (
+        <section className="container mx-auto px-4 pt-12">
+          <AmountAiInsightLarge
+            insight={headlineInsight}
+            cta={{ href: "/istatistikler", label: "Tüm istatistikler" }}
+          />
+        </section>
+      ) : null}
+
+      <LiveTrendsPanel
+        categoryDeltas={categoryDeltas}
+        trendingCities={trendingCities}
+        recentSubmissions={recentSubmissions}
+      />
 
       {/* POPULAR LINKS — surfaces SEO pages directly on the home for crawl
           discovery + repeat-visit retention */}
