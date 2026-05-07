@@ -94,11 +94,11 @@ export async function fetchEvds(opts: EvdsFetchOptions): Promise<EvdsResult> {
   const seriesArr = normalizeSeries(opts.series);
   const seriesParam = seriesArr.join("-"); // EVDS dash-separated istiyor
 
-  // EVDS path-style query pattern. 5 Nisan 2024 sonrası key SADECE HTTP
-  // header'da kabul edilir; URL'de key varsa anasayfaya redirect eder.
-  const url = `${BASE_URL}/series=${seriesParam}&startDate=${opts.startDate}&endDate=${opts.endDate}&type=json&frequency=${opts.frequency ?? "5"}&aggregationTypes=${opts.aggregationTypes ?? "avg"}&formulas=${opts.formulas ?? 0}`;
+  // EVDS path-style query pattern. Nisan 2024 sonrası key header'da olmalı,
+  // ama bazı endpoint'ler URL'de de kabul ediyor — ikisini de gönder.
+  const url = `${BASE_URL}/series=${seriesParam}&startDate=${opts.startDate}&endDate=${opts.endDate}&type=json&frequency=${opts.frequency ?? "5"}&aggregationTypes=${opts.aggregationTypes ?? "avg"}&formulas=${opts.formulas ?? 0}&key=${encodeURIComponent(key)}`;
 
-  const debug = {
+  const debug: { url: string; keyPrefix: string; keyLength: number; redirectTo?: string } = {
     url,
     keyPrefix: key.slice(0, 4) + "…",
     keyLength: key.length,
@@ -123,6 +123,19 @@ export async function fetchEvds(opts: EvdsFetchOptions): Promise<EvdsResult> {
       status: 0,
       series: {},
       error: err instanceof Error ? err.message : "fetch failed",
+      debug,
+    };
+  }
+
+  // Redirect — büyük olasılıkla auth/abonelik problemi. Location header'ı
+  // teşhis için kritik (login sayfası mı, abonelik sayfası mı, vs.).
+  if (response.status >= 300 && response.status < 400) {
+    debug.redirectTo = response.headers.get("location") ?? "(yok)";
+    return {
+      ok: false,
+      status: response.status,
+      series: {},
+      error: `HTTP ${response.status} → ${debug.redirectTo}`,
       debug,
     };
   }
