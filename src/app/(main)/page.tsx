@@ -1,0 +1,175 @@
+import Link from "next/link";
+import { ArrowRight, Sparkles, ShieldCheck, BarChart3 } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { AdSlot } from "@/components/ad-slot";
+import { categories, siteConfig } from "@/lib/site-config";
+import { db } from "@/lib/db";
+import { formatNumber } from "@/lib/money";
+
+export const revalidate = 60;
+
+async function getHomepageStats() {
+  try {
+    const [salaryCount] = await Promise.all([
+      db.submission.count({ where: { type: "SALARY", status: "APPROVED" } }),
+    ]);
+    return { salaryCount };
+  } catch {
+    return { salaryCount: 0 };
+  }
+}
+
+export default async function HomePage() {
+  const stats = await getHomepageStats();
+
+  return (
+    <>
+      {/* HERO */}
+      <section className="relative overflow-hidden border-b border-border/40">
+        <div className="container mx-auto px-4 py-20 sm:py-28">
+          <div className="max-w-3xl space-y-6">
+            <Badge variant="secondary" className="font-normal">
+              <Sparkles className="mr-1.5 h-3 w-3" /> Beta — yeni veri kaynağı
+            </Badge>
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">
+              Türkiye'nin{" "}
+              <span className="bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent">
+                gerçek verisi.
+              </span>
+            </h1>
+            <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl">
+              {siteConfig.description}
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link href="/maaslar/yeni" className={buttonVariants({ size: "lg" })}>
+                Verini paylaş <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+              <Link href="/maaslar" className={buttonVariants({ size: "lg", variant: "outline" })}>
+                Maaşları gör
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap gap-x-8 gap-y-2 pt-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-500" /> %100 anonim
+              </span>
+              <span className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-sky-500" /> {formatNumber(stats.salaryCount)} maaş paylaşımı
+              </span>
+              <span className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber-500" /> AI özetler — yakında
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CATEGORIES */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="mb-8 flex items-end justify-between">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Veri kategorileri</h2>
+            <p className="text-muted-foreground">Türkiye'nin gerçek hayat verileri, tek bir yerde.</p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {categories.map((cat) => {
+            const Icon = cat.icon;
+            const isLive = cat.status === "live";
+            const href = `/${cat.slug}`;
+            const Wrapper = isLive ? Link : "div";
+            const wrapperProps = isLive ? { href } : {};
+
+            return (
+              <Wrapper
+                key={cat.slug}
+                {...(wrapperProps as { href: string })}
+                className={
+                  isLive
+                    ? "group block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xl"
+                    : ""
+                }
+              >
+                <Card
+                  className={`relative h-full overflow-hidden p-6 transition ${
+                    isLive ? "group-hover:border-foreground/30 group-hover:shadow-md" : "opacity-70"
+                  }`}
+                >
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${cat.accent} pointer-events-none opacity-60`}
+                    aria-hidden
+                  />
+                  <div className="relative space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="grid h-10 w-10 place-items-center rounded-lg bg-foreground/5 backdrop-blur">
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      {isLive ? null : (
+                        <Badge variant="outline" className="font-normal">
+                          Yakında
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-medium">{cat.pluralName}</h3>
+                      <p className="text-sm text-muted-foreground">{cat.shortDescription}</p>
+                    </div>
+                    {isLive ? (
+                      <p className="flex items-center gap-1 text-sm font-medium text-foreground">
+                        Keşfet <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                      </p>
+                    ) : null}
+                  </div>
+                </Card>
+              </Wrapper>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="mb-10 max-w-2xl space-y-1">
+          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Nasıl çalışıyor?</h2>
+          <p className="text-muted-foreground">
+            Üç adım. Üyelik, e-posta, kişisel bilgi yok.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            {
+              step: "01",
+              title: "Verini paylaş",
+              body: "Maaşını, kiranı veya internet hızını anonim olarak gönder. 30 saniye sürer.",
+            },
+            {
+              step: "02",
+              title: "Topluluğu güçlendir",
+              body: "Veri arttıkça medyan, ortalama ve trendler kesinleşir. Herkese fayda.",
+            },
+            {
+              step: "03",
+              title: "Karşılaştır, karar ver",
+              body: "Şehrindeki ortalamayla kendini kıyasla. Pazarlık ve karar için somut veri.",
+            },
+          ].map((card) => (
+            <Card key={card.step} className="p-6">
+              <p className="font-mono text-xs text-muted-foreground">{card.step}</p>
+              <h3 className="mt-2 font-medium">{card.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{card.body}</p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 pb-16">
+        <AdSlot slotKey="homepage-bottom" format="responsive" />
+      </div>
+    </>
+  );
+}

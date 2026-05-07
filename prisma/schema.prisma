@@ -1,0 +1,367 @@
+// gercekveri.com — anonymous Turkish real-data platform
+// learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum SubmissionType {
+  SALARY
+  RENT
+  INTERNET
+  AIDAT
+  UTILITY
+  TEXTILE
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
+}
+
+enum CurrencyCode {
+  TRY
+  USD
+  EUR
+  GBP
+}
+
+enum WorkMode {
+  ONSITE
+  HYBRID
+  REMOTE
+}
+
+enum CompanySize {
+  SOLO       // 1
+  MICRO      // 2-9
+  SMALL      // 10-49
+  MEDIUM     // 50-249
+  LARGE      // 250-999
+  ENTERPRISE // 1000+
+}
+
+enum VoteType {
+  HELPFUL
+  UNHELPFUL
+}
+
+enum ReportReason {
+  FAKE
+  SPAM
+  OFFENSIVE
+  DUPLICATE
+  OTHER
+}
+
+enum AdminRole {
+  ADMIN
+  MODERATOR
+}
+
+// =============================================================================
+// GEOGRAPHY
+// =============================================================================
+
+model City {
+  id          Int          @id @default(autoincrement())
+  slug        String       @unique
+  name        String
+  plate       Int          @unique // 01-81 plate code
+  region      String? // Marmara, Ege, ...
+  population  Int?
+  districts   District[]
+  submissions Submission[]
+
+  @@index([slug])
+}
+
+model District {
+  id          Int          @id @default(autoincrement())
+  cityId      Int
+  city        City         @relation(fields: [cityId], references: [id])
+  slug        String
+  name        String
+  submissions Submission[]
+
+  @@unique([cityId, slug])
+  @@index([cityId])
+}
+
+// =============================================================================
+// CATEGORIES
+// =============================================================================
+
+model Category {
+  id          Int             @id @default(autoincrement())
+  type        SubmissionType  @unique
+  slug        String          @unique
+  name        String
+  pluralName  String
+  description String?
+  icon        String?
+  isActive    Boolean         @default(true)
+  sortOrder   Int             @default(0)
+  fields      CategoryField[]
+  submissions Submission[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([slug])
+}
+
+model CategoryField {
+  id         Int      @id @default(autoincrement())
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  key        String
+  label      String
+  helpText   String?
+  type       String // "text" | "number" | "select" | "boolean" | "enum"
+  required   Boolean  @default(false)
+  options    Json? // for select/enum
+  validation Json? // {min, max, pattern}
+  sortOrder  Int      @default(0)
+  isFacet    Boolean  @default(false) // exposed as filter on listing pages
+
+  @@unique([categoryId, key])
+}
+
+// =============================================================================
+// SUBMISSIONS — the heart of the platform
+// =============================================================================
+
+model Submission {
+  id       String         @id @default(cuid())
+  publicId String         @unique @default(cuid()) // shorter public-facing id
+  type     SubmissionType
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+
+  // Geography
+  city       City?     @relation(fields: [cityId], references: [id])
+  cityId     Int?
+  district   District? @relation(fields: [districtId], references: [id])
+  districtId Int?
+
+  // Core typed fields (the most-queried ones)
+  amount   Decimal?     @db.Decimal(14, 2)
+  currency CurrencyCode @default(TRY)
+
+  // Flexible per-category data
+  data Json
+
+  // Trust & moderation
+  status       SubmissionStatus @default(PENDING)
+  trustScore   Int              @default(50) // 0-100
+  qualityScore Int              @default(50) // 0-100
+
+  // Counters (denormalized for performance)
+  helpfulCount   Int @default(0)
+  unhelpfulCount Int @default(0)
+  reportCount    Int @default(0)
+  viewCount      Int @default(0)
+
+  // Anonymity (no PII!)
+  ipHash      String? // sha256 of (ip + secret), used for rate-limit / spam
+  fingerprint String? // hashed browser fingerprint
+  userAgent   String?
+  country     String? // derived from IP geo
+
+  // Timestamps
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  approvedAt DateTime?
+
+  votes   SubmissionVote[]
+  reports SubmissionReport[]
+
+  @@index([type, status, createdAt(sort: Desc)])
+  @@index([cityId, type, status])
+  @@index([categoryId, status])
+  @@index([publicId])
+  @@index([ipHash, createdAt])
+}
+
+model SubmissionVote {
+  id           String     @id @default(cuid())
+  submissionId String
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  type         VoteType
+  voterHash    String
+  createdAt    DateTime   @default(now())
+
+  @@unique([submissionId, voterHash])
+  @@index([submissionId])
+}
+
+model SubmissionReport {
+  id           String       @id @default(cuid())
+  submissionId String
+  submission   Submission   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  reason       ReportReason
+  details      String?
+  reporterHash String
+  resolved     Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+
+  @@index([submissionId])
+  @@index([resolved])
+}
+
+// =============================================================================
+// AI INSIGHT ENGINE
+// =============================================================================
+
+model AiSummary {
+  id         String    @id @default(cuid())
+  scope      String // e.g. "salary:bursa:yazilimci"
+  language   String    @default("tr")
+  title      String?
+  body       String    @db.Text
+  bullets    Json? // structured insights
+  inputCount Int // submissions analyzed
+  modelName  String
+  promptHash String
+  validUntil DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([scope, language])
+  @@index([scope])
+}
+
+// =============================================================================
+// SEO ENGINE
+// =============================================================================
+
+model SeoPage {
+  id          String    @id @default(cuid())
+  path        String    @unique // e.g. "/maaslar/yazilimci/bursa"
+  title       String
+  description String?
+  type        String // "category" | "city" | "city_position" | etc.
+  data        Json // page-specific data
+  isPublished Boolean   @default(true)
+  visitCount  Int       @default(0)
+  lastBuiltAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([path])
+  @@index([type, isPublished])
+}
+
+// =============================================================================
+// ANALYTICS
+// =============================================================================
+
+model AnalyticsSnapshot {
+  id        String   @id @default(cuid())
+  scope     String // "salary:bursa:yazilimci"
+  period    String // "2026-05" or "all-time"
+  count     Int
+  avg       Decimal? @db.Decimal(14, 2)
+  median    Decimal? @db.Decimal(14, 2)
+  p25       Decimal? @db.Decimal(14, 2)
+  p75       Decimal? @db.Decimal(14, 2)
+  p90       Decimal? @db.Decimal(14, 2)
+  min       Decimal? @db.Decimal(14, 2)
+  max       Decimal? @db.Decimal(14, 2)
+  data      Json? // distribution, breakdowns
+  createdAt DateTime @default(now())
+
+  @@unique([scope, period])
+  @@index([scope])
+}
+
+model Trend {
+  id                 String   @id @default(cuid())
+  scope              String
+  period             String
+  changePercent      Decimal? @db.Decimal(8, 2)
+  direction          String? // "up" | "down" | "stable"
+  significance       String? // "low" | "medium" | "high"
+  baselineSnapshotId String?
+  currentSnapshotId  String?
+  createdAt          DateTime @default(now())
+
+  @@unique([scope, period])
+  @@index([scope])
+}
+
+// =============================================================================
+// MODERATION & ADMIN
+// =============================================================================
+
+model ModerationLog {
+  id           String   @id @default(cuid())
+  submissionId String?
+  action       String // "auto-approve" | "auto-reject" | "manual-..."
+  reason       String?
+  actor        String // "system" | "ai" | "admin:<id>"
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  @@index([submissionId])
+  @@index([action, createdAt])
+}
+
+model AdSlot {
+  id          String   @id @default(cuid())
+  key         String   @unique // "homepage-top", "list-inline-1"
+  description String?
+  isActive    Boolean  @default(true)
+  network     String   @default("adsense")
+  unitId      String?
+  format      String? // "leaderboard" | "rectangle" | "responsive"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     String // "system" | "user:<hash>" | "admin:<id>"
+  action    String
+  entity    String?
+  entityId  String?
+  metadata  Json?
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([actor, createdAt])
+  @@index([action, createdAt])
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String?
+  role         AdminRole @default(MODERATOR)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model RateLimitBucket {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  count     Int      @default(0)
+  resetsAt  DateTime
+  createdAt DateTime @default(now())
+
+  @@index([resetsAt])
+}
