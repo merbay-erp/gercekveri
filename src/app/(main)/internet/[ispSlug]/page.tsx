@@ -13,7 +13,7 @@ import {
   listInternetSubmissions,
   getInternetStats,
 } from "@/modules/internet/server/queries";
-import { isps, ispsBySlug } from "@/modules/internet/config";
+import { isps, ispsBySlug, formatMbps } from "@/modules/internet/config";
 import type { IspSlug } from "@/modules/internet/types";
 import { buildInternetScope, getOrGenerateInsight } from "@/services/ai/insights";
 
@@ -76,7 +76,8 @@ export default async function IspPage({ params }: { params: Params }) {
       max: stats.medianRealSpeed ? Math.round(stats.medianRealSpeed * 2.5) : null,
     },
     nounSingular: "internet hızı",
-    nounPlural: `${isp.name} ölçümleri`,
+    nounPlural: `${isp.name} hız ölçümleri (Mbps cinsinden)`,
+    formatValue: (n) => formatMbps(n),
   }).catch(() => null);
 
   return (

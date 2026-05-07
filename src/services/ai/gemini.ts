@@ -50,12 +50,16 @@ export interface GenerateAmountInsightInput {
   p75: number;
   min: number;
   max: number;
-  /** Singular form of what's being measured: "maaş" / "kira" / "fatura" */
+  /** Singular form of what's being measured: "maaş" / "kira" / "internet hızı" */
   nounSingular: string;
-  /** Plural / context noun: "maaşlar" / "kira ilanları" / "faturalar" */
+  /** Plural / context noun: "maaşlar" / "kira ilanları" / "internet ölçümleri" */
   nounPlural: string;
-  /** Cadence — defaults to "/ay" for monthly amounts */
-  unitSuffix?: string;
+  /**
+   * Format function for the number values shown to the model. Defaults to
+   * Turkish-locale TRY (₺75.000). Pass a Mbps/ms/etc. formatter for non-money
+   * scopes — without this the model assumes prices and the summary is wrong.
+   */
+  formatValue?: (n: number) => string;
 }
 
 /**
@@ -103,31 +107,32 @@ export async function generateAmountInsight(
   }
 }
 
-function buildPrompt(input: GenerateAmountInsightInput): string {
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("tr-TR", {
-      style: "currency",
-      currency: "TRY",
-      maximumFractionDigits: 0,
-    }).format(n);
+function defaultTryFormat(n: number): string {
+  return new Intl.NumberFormat("tr-TR", {
+    style: "currency",
+    currency: "TRY",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
 
-  const unitSuffix = input.unitSuffix ?? "/ay";
+function buildPrompt(input: GenerateAmountInsightInput): string {
+  const fmt = input.formatValue ?? defaultTryFormat;
 
   return `Sen Türkiye'deki ${input.nounPlural} verisini analiz eden, dürüst ve sade konuşan bir veri analistisisin. Aşağıdaki istatistikler için kısa bir Türkçe özet yaz.
 
 Kapsam: ${input.scopeLabel}
 Veri sayısı: ${input.count}
-Medyan: ${fmt(input.median)} ${unitSuffix}
-Ortalama: ${fmt(input.avg)} ${unitSuffix}
-Alt çeyrek (P25): ${fmt(input.p25)} ${unitSuffix}
-Üst çeyrek (P75): ${fmt(input.p75)} ${unitSuffix}
-Minimum: ${fmt(input.min)} ${unitSuffix}
-Maksimum: ${fmt(input.max)} ${unitSuffix}
+Medyan: ${fmt(input.median)}
+Ortalama: ${fmt(input.avg)}
+Alt çeyrek (P25): ${fmt(input.p25)}
+Üst çeyrek (P75): ${fmt(input.p75)}
+Minimum: ${fmt(input.min)}
+Maksimum: ${fmt(input.max)}
 
 Kurallar:
 - Sadece veriden çıkanı söyle, varsayım yapma.
 - Sayıları aynen kullan; uydurma rakam ekleme.
-- "${input.nounSingular}" kelimesini doğal yerlerde kullan.
+- "${input.nounSingular}" kelimesini doğal yerlerde kullan; başka türden bir ölçü gibi yorumlama (örn. para birimine çevirme).
 - Özet kısa, doğal, doğrudan olsun (3-4 cümle).
 - "Yaklaşık", "ortalama olarak" gibi muğlak ifadelerden kaçın; rakamı söyle.
 - Bullet'lar kısa, net olsun (en fazla 12 kelime).

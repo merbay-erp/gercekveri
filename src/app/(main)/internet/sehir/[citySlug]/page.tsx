@@ -18,6 +18,7 @@ import {
 } from "@/modules/internet/server/queries";
 import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
 import { formatNumber } from "@/lib/money";
+import { formatMbps } from "@/modules/internet/config";
 import { buildInternetScope, getOrGenerateInsight } from "@/services/ai/insights";
 
 export const revalidate = 60;
@@ -77,7 +78,8 @@ export default async function InternetCityPage({ params }: { params: Params }) {
       max: stats.medianRealSpeed ? Math.round(stats.medianRealSpeed * 2.5) : null,
     },
     nounSingular: "internet hızı",
-    nounPlural: `${city.name} internet ölçümleri`,
+    nounPlural: `${city.name} internet hız ölçümleri (Mbps cinsinden)`,
+    formatValue: (n) => formatMbps(n),
   }).catch(() => null);
 
   return (

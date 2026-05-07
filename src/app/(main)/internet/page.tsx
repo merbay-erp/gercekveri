@@ -14,7 +14,7 @@ import {
   getInternetStats,
   getIspRollups,
 } from "@/modules/internet/server/queries";
-import { internetModule } from "@/modules/internet/config";
+import { internetModule, formatMbps } from "@/modules/internet/config";
 import { buildInternetScope, getOrGenerateInsight } from "@/services/ai/insights";
 
 export const revalidate = 60;
@@ -57,7 +57,8 @@ export default async function InternetPage() {
       max: stats.medianRealSpeed ? Math.round(stats.medianRealSpeed * 2.5) : null,
     },
     nounSingular: "internet hızı",
-    nounPlural: "internet ölçümleri",
+    nounPlural: "internet ölçümleri (Mbps cinsinden)",
+    formatValue: (n) => formatMbps(n),
   }).catch(() => null);
 
   return (
