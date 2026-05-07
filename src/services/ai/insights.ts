@@ -10,7 +10,10 @@ import { generateSalaryInsight, GEMINI_MODEL, type SalaryInsightOutput } from ".
 
 const PROMPT_VERSION = "v1-2026-05";
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-const MIN_DATA_FOR_INSIGHT = 5;
+// Threshold tuned for early-stage volume — 3 keeps insights honest while
+// letting the feature surface as soon as a scope has any signal. Phase 3
+// raises this to 10+ once daily volume justifies stricter floors.
+const MIN_DATA_FOR_INSIGHT = 3;
 
 interface ScopeStats {
   count: number;
