@@ -147,6 +147,7 @@ export const footerNav = {
   about: [
     { label: "Hakkında", href: "/hakkinda" },
     { label: "İstatistikler", href: "/istatistikler" },
+    { label: "Veri haritası", href: "/harita" },
     { label: "İletişim", href: "/iletisim" },
     { label: "SSS", href: "/sss" },
   ],

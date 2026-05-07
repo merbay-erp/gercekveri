@@ -61,6 +61,7 @@ const STATIC_PAGES: Array<{ label: string; href: string; hint?: string }> = [
   { label: "Tekstil", href: "/tekstil", hint: "Üretim fiyatları" },
   { label: "İnternet", href: "/internet", hint: "Sağlayıcı bazında gerçek hız" },
   { label: "İstatistikler", href: "/istatistikler", hint: "Canlı sayaçlar" },
+  { label: "Veri haritası", href: "/harita", hint: "81 il × 6 kategori ısı haritası" },
   { label: "Hakkında", href: "/hakkinda" },
 ];
 

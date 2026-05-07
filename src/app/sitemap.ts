@@ -73,6 +73,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/karsilastir/fatura", 0.7, "weekly"),
     u("/karsilastir/tekstil", 0.7, "weekly"),
     u("/istatistikler", 0.6, "daily"),
+    u("/harita", 0.7, "daily"),
     u("/hakkinda", 0.4, "monthly"),
   ];
 
