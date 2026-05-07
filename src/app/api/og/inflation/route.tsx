@@ -4,6 +4,7 @@ import { findCityBySlug } from "@/lib/cities";
 import { getRentInflationStats } from "@/modules/kira/server/queries";
 import { siteConfig } from "@/lib/site-config";
 import { ogFormatTRY as fmtTry } from "@/lib/og-format";
+import { computeRealityScore } from "@/lib/reality-score";
 
 export const runtime = "nodejs";
 
@@ -147,6 +148,20 @@ async function render(req: Request) {
               {stats.pairCount}
             </span>
           </div>
+          {(() => {
+            const r = computeRealityScore(stats.inflationPct);
+            if (!r) return null;
+            const c =
+              r.level === "ok" ? "#10b981" : r.level === "warn" ? "#f59e0b" : "#f43f5e";
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <span style={{ color: "#a3a3a3" }}>Gerçeklik</span>
+                <span style={{ fontSize: 36, fontWeight: 600, color: c }}>
+                  {`${r.score}/100`}
+                </span>
+              </div>
+            );
+          })()}
         </div>
 
         <div style={{ marginTop: 16, fontSize: 18, color: "#a3a3a3" }}>

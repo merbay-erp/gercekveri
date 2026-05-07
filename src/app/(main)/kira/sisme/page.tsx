@@ -10,6 +10,7 @@ import {
   getTopInflationCities,
 } from "@/modules/kira/server/queries";
 import { siteConfig } from "@/lib/site-config";
+import { computeRealityScore } from "@/lib/reality-score";
 import { formatNumber, formatTRY } from "@/lib/money";
 
 export const revalidate = 300;
@@ -82,13 +83,14 @@ export default async function KiraSismePage() {
         ) : (
           <Card className="overflow-hidden">
             <div className="overflow-x-auto">
-            <table className="w-full min-w-[560px] text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="border-b bg-muted/30">
                 <tr>
                   <Th>Şehir</Th>
                   <Th>İlan medyanı</Th>
                   <Th>Gerçek medyanı</Th>
                   <Th align="right">Şişkinlik</Th>
+                  <Th align="right">Gerçeklik</Th>
                   <Th align="right">Eşleşme</Th>
                 </tr>
               </thead>
@@ -128,6 +130,23 @@ export default async function KiraSismePage() {
                       >
                         {c.inflationPct > 0 ? "+" : ""}%{c.inflationPct}
                       </span>
+                    </Td>
+                    <Td align="right">
+                      {(() => {
+                        const r = computeRealityScore(c.inflationPct);
+                        if (!r) return null;
+                        const cls =
+                          r.level === "ok"
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : r.level === "warn"
+                              ? "text-amber-600 dark:text-amber-400"
+                              : "text-rose-600 dark:text-rose-400";
+                        return (
+                          <span className={`font-semibold tabular-nums ${cls}`}>
+                            {r.score}/100
+                          </span>
+                        );
+                      })()}
                     </Td>
                     <Td align="right">
                       <span className="text-xs text-muted-foreground tabular-nums">

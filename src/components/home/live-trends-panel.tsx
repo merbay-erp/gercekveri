@@ -11,11 +11,15 @@ import type {
   RecentSubmissionItem,
   TrendingCity,
 } from "@/lib/recent-activity";
+import type { CityMedianDelta } from "@/lib/realtime-deltas";
 
 interface Props {
   categoryDeltas: CategoryDelta[];
   trendingCities: TrendingCity[];
   recentSubmissions: RecentSubmissionItem[];
+  /** "Bu hafta yükselen/düşen" şehir hareketleri — medyan değer bazlı */
+  rising?: CityMedianDelta[];
+  falling?: CityMedianDelta[];
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -40,6 +44,8 @@ export function LiveTrendsPanel({
   categoryDeltas,
   trendingCities,
   recentSubmissions,
+  rising = [],
+  falling = [],
 }: Props) {
   // Filter out categories with no activity in either window — empty rows
   // make the panel feel sparse rather than alive.
@@ -47,6 +53,7 @@ export function LiveTrendsPanel({
     (d) => d.thisPeriod > 0 || d.prevPeriod > 0,
   );
   const hasSignal = visibleDeltas.length > 0 || trendingCities.length > 0;
+  const hasMovers = rising.length > 0 || falling.length > 0;
 
   return (
     <section className="container mx-auto px-4 py-12">
@@ -119,7 +126,7 @@ export function LiveTrendsPanel({
                 <>
                   <div className="my-4 border-t" />
                   <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Yükselişte
+                    Aktivite yükselişte
                   </div>
                   <ul className="grid gap-1.5">
                     {trendingCities.map((c) => (
@@ -139,6 +146,61 @@ export function LiveTrendsPanel({
                       </li>
                     ))}
                   </ul>
+                </>
+              ) : null}
+
+              {hasMovers ? (
+                <>
+                  <div className="my-4 border-t" />
+                  <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Bu hafta fiyat hareketi (medyan)
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {rising.length > 0 ? (
+                      <div>
+                        <p className="mb-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
+                          📈 Yükselen
+                        </p>
+                        <ul className="grid gap-1">
+                          {rising.map((m) => (
+                            <li
+                              key={`r-${m.type}:${m.citySlug}`}
+                              className="flex items-center justify-between rounded-md border border-rose-500/20 bg-rose-500/5 px-2.5 py-1.5 text-xs"
+                            >
+                              <span className="truncate font-medium">
+                                {m.cityName} {TYPE_LABELS[m.type]?.toLowerCase()}
+                              </span>
+                              <span className="shrink-0 font-semibold tabular-nums text-rose-600 dark:text-rose-400">
+                                +%{m.deltaPct}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    {falling.length > 0 ? (
+                      <div>
+                        <p className="mb-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                          📉 Düşen
+                        </p>
+                        <ul className="grid gap-1">
+                          {falling.map((m) => (
+                            <li
+                              key={`f-${m.type}:${m.citySlug}`}
+                              className="flex items-center justify-between rounded-md border border-emerald-500/20 bg-emerald-500/5 px-2.5 py-1.5 text-xs"
+                            >
+                              <span className="truncate font-medium">
+                                {m.cityName} {TYPE_LABELS[m.type]?.toLowerCase()}
+                              </span>
+                              <span className="shrink-0 font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
+                                %{m.deltaPct}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </div>
                 </>
               ) : null}
             </>

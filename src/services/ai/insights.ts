@@ -8,7 +8,7 @@ import { generateAmountInsight, GEMINI_MODEL } from "./gemini";
  * The `promptHash` field invalidates cache when prompt structure changes.
  */
 
-const PROMPT_VERSION = "v2-2026-05-formatvalue";
+const PROMPT_VERSION = "v3-2026-05-temporal";
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 // 30-minute negative cache: when generation fails (rate limit, API down)
 // we still write to AiSummary with empty body so the next request can

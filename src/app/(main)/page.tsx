@@ -28,6 +28,7 @@ import {
   getTrendingCities,
   getCoverageCounts,
 } from "@/lib/recent-activity";
+import { getTopCityMovers } from "@/lib/realtime-deltas";
 import { buildSalaryScope, getOrGenerateInsight } from "@/services/ai/insights";
 
 export const revalidate = 60;
@@ -81,6 +82,7 @@ export default async function HomePage() {
     trendingCities,
     recentSubmissions,
     coverage,
+    movers,
   ] = await Promise.all([
     getHomepageStats(),
     getPublicStatsOverview().catch(() => null),
@@ -88,6 +90,7 @@ export default async function HomePage() {
     getTrendingCities().catch(() => []),
     getRecentSubmissions(8).catch(() => []),
     getCoverageCounts().catch(() => ({ cities: 0, districts: 0 })),
+    getTopCityMovers({ limit: 4 }).catch(() => ({ rising: [], falling: [] })),
   ]);
 
   const headlineInsight = publicOverview
@@ -168,6 +171,8 @@ export default async function HomePage() {
         categoryDeltas={categoryDeltas}
         trendingCities={trendingCities}
         recentSubmissions={recentSubmissions}
+        rising={movers.rising}
+        falling={movers.falling}
       />
 
       {/* POPULAR LINKS — surfaces SEO pages directly on the home for crawl

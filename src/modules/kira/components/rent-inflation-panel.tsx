@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Flame, ArrowRight } from "lucide-react";
+import { Flame, ArrowRight, Target } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatTRY, formatNumber } from "@/lib/money";
+import { computeRealityScore } from "@/lib/reality-score";
 import type { RentInflationStats } from "../server/queries";
 
 interface Props {
@@ -66,6 +67,8 @@ export function RentInflationPanel({ stats, scopeLabel, shareHref }: Props) {
     ? `İlan fiyatı, gerçek kiradan %${stats.inflationPct} fazla.`
     : `İlan fiyatı, gerçek kiradan %${Math.abs(stats.inflationPct ?? 0)} düşük — nadir durum.`;
 
+  const reality = computeRealityScore(stats.inflationPct ?? null);
+
   return (
     <Card className={`relative overflow-hidden p-6 sm:p-8 ${toneAccent}`}>
       <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-rose-500/10 blur-3xl" />
@@ -89,17 +92,39 @@ export function RentInflationPanel({ stats, scopeLabel, shareHref }: Props) {
               {scopeLabel} · {formatNumber(stats.pairCount)} eşleşmiş paylaşım
             </p>
           </div>
-          <Badge
-            variant="secondary"
-            className={`ml-auto font-semibold tabular-nums ${toneNumber}`}
-          >
-            {positive ? "+" : ""}%{stats.inflationPct}
-          </Badge>
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            {reality ? (
+              <Badge
+                variant="outline"
+                className={`gap-1 font-semibold tabular-nums ${
+                  reality.level === "ok"
+                    ? "border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
+                    : reality.level === "warn"
+                      ? "border-amber-500/40 text-amber-600 dark:text-amber-400"
+                      : "border-rose-500/40 text-rose-600 dark:text-rose-400"
+                }`}
+                title={reality.message}
+              >
+                <Target className="h-3 w-3" />
+                Gerçeklik {reality.score}/100
+              </Badge>
+            ) : null}
+            <Badge
+              variant="secondary"
+              className={`font-semibold tabular-nums ${toneNumber}`}
+            >
+              {positive ? "+" : ""}%{stats.inflationPct}
+            </Badge>
+          </div>
         </div>
 
         <h3 className="mb-4 text-xl font-semibold leading-snug sm:text-2xl">
           {headline}
         </h3>
+
+        {reality ? (
+          <p className="mb-4 text-sm text-muted-foreground">{reality.message}</p>
+        ) : null}
 
         <div className="grid gap-3 sm:grid-cols-2">
           <Stat

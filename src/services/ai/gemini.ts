@@ -117,29 +117,37 @@ function defaultTryFormat(n: number): string {
 
 function buildPrompt(input: GenerateAmountInsightInput): string {
   const fmt = input.formatValue ?? defaultTryFormat;
+  const spread = input.p75 - input.p25;
+  const spreadPct = input.median > 0 ? Math.round((spread / input.median) * 100) : 0;
+  const meanVsMedian =
+    input.median > 0
+      ? Math.round(((input.avg - input.median) / input.median) * 100)
+      : 0;
 
-  return `Sen Türkiye'deki ${input.nounPlural} verisini analiz eden, dürüst ve sade konuşan bir veri analistisisin. Aşağıdaki istatistikler için kısa bir Türkçe özet yaz.
+  return `Sen Türkiye'deki ${input.nounPlural} verisini analiz eden bir veri analistisin. Bir piyasa analisti gibi yaz — hikaye anlat, sayılara ses ver. Hedef: insanı durdurup okutsun, şıma değil yorum versin.
 
-Kapsam: ${input.scopeLabel}
-Veri sayısı: ${input.count}
-Medyan: ${fmt(input.median)}
-Ortalama: ${fmt(input.avg)}
-Alt çeyrek (P25): ${fmt(input.p25)}
-Üst çeyrek (P75): ${fmt(input.p75)}
-Minimum: ${fmt(input.min)}
-Maksimum: ${fmt(input.max)}
+KAPSAM: ${input.scopeLabel}
+SAYI: ${input.count} paylaşım
+MEDYAN: ${fmt(input.median)}
+ORTALAMA: ${fmt(input.avg)} (medyandan %${meanVsMedian} ${meanVsMedian >= 0 ? "yüksek" : "düşük"})
+ÇEYREKLİK ARALIK: ${fmt(input.p25)} – ${fmt(input.p75)} (medyanın %${spreadPct}'i kadar)
+MIN: ${fmt(input.min)}
+MAX: ${fmt(input.max)}
 
-Kurallar:
-- Sadece veriden çıkanı söyle, varsayım yapma.
-- Sayıları aynen kullan; uydurma rakam ekleme.
-- "${input.nounSingular}" kelimesini doğal yerlerde kullan; başka türden bir ölçü gibi yorumlama (örn. para birimine çevirme).
-- Özet kısa, doğal, doğrudan olsun (3-4 cümle).
-- "Yaklaşık", "ortalama olarak" gibi muğlak ifadelerden kaçın; rakamı söyle.
-- Bullet'lar kısa, net olsun (en fazla 12 kelime).
-- Türkçe karakterleri doğru kullan.
-- Veri sayısı azsa (10'un altı) bunu uyarı olarak ilk cümlede belirt.
+YAZIM KURALI:
+- Title (35-65 karakter): bir gözlem, bir cümle, somut ("Kadıköy 1+1 medyanı 38.000 TL'ye oturdu" gibi). Soru işareti yok, sıfat enflasyonu yok.
+- Body (3-4 cümle): pasif/sıkıcı tablo dili yok. Aktif fiil, somut karşılaştırma, dağılım yorumu. "Veriden ne çıkıyor", "neyi gözden kaçırma" tarzı.
+  Örnek ton: "Bursa Nilüfer'de 2+1 segmenti 3+1'i sıkıştırıyor — ikisi de 25.000 bandında. Üst çeyrek 32.000'e çıkmış, lüks ilanların etkisi belli."
+- Bullets (3-5 madde, her biri 8-15 kelime):
+  • dağılımdan bir gözlem (örn. "P75 ile medyan arasında %X aralık — homojen değil")
+  • aykırı değer sinyali (max ile median oranı)
+  • veri kalite uyarısı (eğer count<10 ise mutlaka)
+- "${input.nounSingular}" kelimesini doğru bağlamda kullan; başka birime çevirme (mbps'i TRY göstermek vb.).
+- "Yaklaşık", "ortalama olarak", "genel olarak" gibi muğlak kelime YASAK.
+- Sayıları AYNEN kullan, yorum ekle ama uydurma.
+- Veri çok azsa (count<10) ilk bullet'ta açıkça uyar; ama yine yorum yap.
 
-JSON çıktı ver: { title, body, bullets[] }`;
+JSON: { title, body, bullets[] }`;
 }
 
 // Backward-compat alias — older callers can keep using the salary-specific name.
