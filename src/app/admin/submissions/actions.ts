@@ -78,6 +78,66 @@ export async function rejectSubmission(
   return { ok: true };
 }
 
+export interface BulkFilter {
+  type?: string;
+  status?: string;
+  lowQuality?: boolean;
+}
+
+export type BulkResult = { ok: true; count: number } | { ok: false; error: string };
+
+const VALID_TARGET_STATUSES = new Set(["APPROVED", "REJECTED", "FLAGGED"]);
+
+export async function bulkUpdateSubmissions(
+  filter: BulkFilter,
+  targetStatus: "APPROVED" | "REJECTED" | "FLAGGED",
+): Promise<BulkResult> {
+  let admin;
+  try {
+    admin = await requireAdmin();
+  } catch {
+    return { ok: false, error: "Yetkisiz." };
+  }
+  if (!VALID_TARGET_STATUSES.has(targetStatus)) {
+    return { ok: false, error: "Geçersiz hedef durum." };
+  }
+
+  const where = {
+    ...(filter.type ? { type: filter.type as "SALARY" } : {}),
+    ...(filter.status ? { status: filter.status as "APPROVED" } : {}),
+    ...(filter.lowQuality ? { qualityScore: { lt: 30 } } : {}),
+    // Defensive guard: never let bulk touch already-target rows.
+    NOT: { status: targetStatus as "APPROVED" },
+  };
+
+  const rows = await db.submission.findMany({ where, select: { id: true } });
+  if (rows.length === 0) return { ok: true, count: 0 };
+  // Cap to prevent runaway operations — admin can repeat if needed.
+  const ids = rows.slice(0, 500).map((r) => r.id);
+
+  await db.$transaction([
+    db.submission.updateMany({
+      where: { id: { in: ids } },
+      data: {
+        status: targetStatus,
+        ...(targetStatus === "APPROVED" ? { approvedAt: new Date() } : {}),
+      },
+    }),
+    db.moderationLog.createMany({
+      data: ids.map((id) => ({
+        submissionId: id,
+        action: `bulk-${targetStatus.toLowerCase()}`,
+        reason: `filter: ${JSON.stringify(filter)}`,
+        actor: `admin:${admin.id}`,
+      })),
+    }),
+  ]);
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/submissions");
+  return { ok: true, count: ids.length };
+}
+
 export async function flagSubmission(
   publicId: string,
   reason: string | null,

@@ -16,6 +16,8 @@ import {
 import { topRentCitySlugs, getRentStats } from "@/modules/kira/server/queries";
 import { positionNameFromSlug } from "@/modules/maas/position-resolver";
 import { findCityBySlug } from "@/lib/cities";
+import { buildSearchIndex } from "@/lib/search-index";
+import { GlobalSearch } from "@/components/search/global-search";
 
 export const revalidate = 60;
 
@@ -62,6 +64,7 @@ async function getHomepageStats() {
 
 export default async function HomePage() {
   const stats = await getHomepageStats();
+  const searchEntries = buildSearchIndex();
 
   return (
     <>
@@ -88,6 +91,10 @@ export default async function HomePage() {
               <Link href="/maaslar/yeni" className={buttonVariants({ size: "lg", variant: "outline" })}>
                 Verini paylaş
               </Link>
+            </div>
+
+            <div className="pt-2">
+              <GlobalSearch entries={searchEntries} variant="hero" />
             </div>
 
             <div className="flex flex-wrap gap-x-8 gap-y-2 pt-4 text-sm text-muted-foreground">

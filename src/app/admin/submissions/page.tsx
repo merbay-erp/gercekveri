@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/admin-auth";
 import { formatNumber } from "@/lib/money";
+import { BulkToolbar } from "./bulk-toolbar";
 
 export const dynamic = "force-dynamic";
 
@@ -118,6 +119,16 @@ export default async function AdminSubmissionsPage({
           )}
         </div>
       </Card>
+
+      {(type || status || lowQuality) && total > 0 ? (
+        <div className="mb-6">
+          <BulkToolbar
+            filter={{ type, status, lowQuality }}
+            matchingCount={total}
+            currentStatus={status}
+          />
+        </div>
+      ) : null}
 
       {rows.length === 0 ? (
         <Card className="p-10 text-center">

@@ -4,6 +4,9 @@ import {
   LayoutDashboard,
   ShieldCheck,
   ClipboardCheck,
+  Sparkles,
+  ScrollText,
+  UserCog,
   LogOut,
 } from "lucide-react";
 
@@ -19,6 +22,9 @@ export const metadata: Metadata = {
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/submissions", label: "Paylaşımlar", icon: ClipboardCheck },
+  { href: "/admin/insights", label: "AI özetler", icon: Sparkles },
+  { href: "/admin/audit", label: "Audit", icon: ScrollText },
+  { href: "/admin/profile", label: "Profil", icon: UserCog },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

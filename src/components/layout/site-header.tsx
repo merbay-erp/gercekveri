@@ -3,10 +3,13 @@ import { Database, Plus } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { GlobalSearch } from "@/components/search/global-search";
 import { mainNav, siteConfig } from "@/lib/site-config";
+import { buildSearchIndex } from "@/lib/search-index";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
+  const searchEntries = buildSearchIndex();
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
@@ -35,6 +38,9 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          <div className="hidden md:block">
+            <GlobalSearch entries={searchEntries} variant="pill" />
+          </div>
           <Link
             href="/maaslar/yeni"
             className={cn(buttonVariants({ size: "sm" }), "hidden md:inline-flex")}
