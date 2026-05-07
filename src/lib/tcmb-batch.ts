@@ -21,20 +21,15 @@ interface SeriesSpec {
 }
 
 const SERIES: SeriesSpec[] = [
-  // Döviz + faiz (günlük)
+  // Döviz + faiz (günlük) — EVDS3'te 200 + 305-427 datapoint canlı
   { code: "TP.DK.USD.S", label: "USD/TL (satış)", frequency: "1", computeYoY: false },
   { code: "TP.DK.EUR.S", label: "EUR/TL (satış)", frequency: "1", computeYoY: false },
   { code: "TP.APIFON4", label: "TCMB politika faizi (AOFM)", frequency: "1", computeYoY: false },
   // Enflasyon (aylık) — reality score için kritik
   { code: "TP.FE.OKTG01", label: "TÜFE genel endeks", frequency: "5", computeYoY: true },
-  // Konut fiyat endeksleri (aylık) — kira sayfaları için
-  // PDF: KFE-Tablo.pdf — TP.KFE01 / TP.YKFE01 / TP.HKFE01 doğrulandı,
-  // şehir kırılımları (.02/.03/.04) tahmin — batch test ile teyit edilir.
-  { code: "TP.HKFE01", label: "Hedonik Konut Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
-  { code: "TP.HKFE02", label: "Hedonik Konut Fiyat Endeksi (İstanbul)", frequency: "5", computeYoY: true },
-  { code: "TP.HKFE03", label: "Hedonik Konut Fiyat Endeksi (Ankara)", frequency: "5", computeYoY: true },
-  { code: "TP.HKFE04", label: "Hedonik Konut Fiyat Endeksi (İzmir)", frequency: "5", computeYoY: true },
-  { code: "TP.YKFE01", label: "Yeni Konutlar Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
+  // NOT: TP.HKFE01-04 + TP.YKFE01 batch test'te empty/400 döndü.
+  // Pattern muhtemelen yanlış — gerçek kod araştırılıyor (TP.HKFE-NSA,
+  // TP.HKFE-SA gibi alternatifler denenecek). Şimdilik çıkarıldı.
 ];
 
 function formatTcmbDate(d: Date): string {
@@ -61,10 +56,11 @@ export interface SeriesResult {
  * alanını günceller, eski değeri ezmez.
  */
 async function refreshOne(spec: SeriesSpec): Promise<SeriesResult> {
-  // Aylık seriler için 13 ay, günlükler için 14 ay (yıllık değişim için
-  // bir parça tampon)
+  // 24 ay tampon. EVDS3 tarih aralığını sıkı yorumluyor (13 ay isteğe 9 nokta
+  // dönmüştü) — yıllık değişim hesabı için en az 13 nokta lazım, geniş
+  // pencere açmak güvenli.
   const today = new Date();
-  const startMonths = spec.frequency === "5" ? 13 : 14;
+  const startMonths = 24;
   const startDate = new Date(today);
   startDate.setMonth(startDate.getMonth() - startMonths);
 
