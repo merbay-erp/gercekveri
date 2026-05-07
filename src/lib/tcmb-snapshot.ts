@@ -72,7 +72,11 @@ export interface HousingIndexSnapshot {
 // Her şehrin konut fiyat endeksi kendi bölgesinin verisini görür.
 // Tek-il bölgeler (İstanbul, Ankara, İzmir) salt o ili kapsar; diğerleri
 // birden fazla ili gruplar (örn. TR41 = Bursa+Eskişehir+Bilecik).
-const CITY_KFE_MAP: Record<string, { code: string; cityName: string }> = (() => {
+//
+// Aynı map iki yerde lazım: getHousingIndex (kira sayfası paneli) ve
+// konut-karne.ts (city-level karne sayfası). Bu yüzden CITY_KFE_LOOKUP
+// adıyla export ediliyor.
+export const CITY_KFE_LOOKUP: Record<string, { code: string; cityName: string }> = (() => {
   const groups: Array<{ code: string; cityName: string; slugs: string[] }> = [
     { code: "TP.KFE.TR10", cityName: "İstanbul", slugs: ["istanbul"] },
     { code: "TP.KFE.TR21", cityName: "Tekirdağ-Edirne-Kırklareli", slugs: ["tekirdag", "edirne", "kirklareli"] },
@@ -116,7 +120,7 @@ const CITY_KFE_MAP: Record<string, { code: string; cityName: string }> = (() => 
 export async function getHousingIndex(
   citySlug?: string,
 ): Promise<HousingIndexSnapshot | null> {
-  const cityEntry = citySlug ? CITY_KFE_MAP[citySlug] : undefined;
+  const cityEntry = citySlug ? CITY_KFE_LOOKUP[citySlug] : undefined;
   const code = cityEntry?.code ?? "TP.KFE.TR";
 
   const row = await db.tcmbSnapshot.findUnique({

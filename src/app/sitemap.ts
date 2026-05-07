@@ -10,7 +10,7 @@ import { subTypes as tekstilSubTypes, subTypeSlugs as tekstilSubTypeSlugs } from
 import { topInternetCitySlugs } from "@/modules/internet/server/queries";
 import { curatedPositionSlugs } from "@/modules/maas/position-resolver";
 import { isps } from "@/modules/internet/config";
-import { featuredCitySlugs } from "@/lib/cities";
+import { featuredCitySlugs, cities } from "@/lib/cities";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gercekveri.com";
 
@@ -76,7 +76,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/harita", 0.7, "daily"),
     u("/hakkinda", 0.4, "monthly"),
     u("/sss", 0.5, "monthly"),
+    u("/konut-enflasyon", 0.85, "daily"),
   ];
+
+  const konutCityEntries = cities.map((c) =>
+    u(`/konut-enflasyon/${c.slug}`, 0.65, "weekly"),
+  );
 
   const positionEntries = positions.map((slug) => u(`/maaslar/${slug}`, 0.7, "weekly"));
   const salaryCityEntries = salaryCitySet.map((slug) => u(`/maaslar/sehir/${slug}`, 0.7, "weekly"));
@@ -115,6 +120,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...tekstilCityEntries,
     ...ispEntries,
     ...internetCityEntries,
+    ...konutCityEntries,
     ...crossEntries,
   ];
 }

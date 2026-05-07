@@ -21,7 +21,9 @@ import { GlobalSearch } from "@/components/search/global-search";
 import { HeroLiveCounters } from "@/components/home/hero-live-counters";
 import { LiveTicker } from "@/components/home/live-ticker";
 import { TcmbPulse } from "@/components/home/tcmb-pulse";
+import { KonutKarneTable } from "@/components/data-display/konut-karne-table";
 import { getTcmbPulseItems } from "@/lib/tcmb-snapshot";
+import { getKonutKarne } from "@/lib/konut-karne";
 import { LiveTrendsPanel } from "@/components/home/live-trends-panel";
 import { AmountAiInsightLarge } from "@/components/data-display/amount-ai-insight-large";
 import { getPublicStatsOverview } from "@/lib/public-stats";
@@ -87,6 +89,7 @@ export default async function HomePage() {
     coverage,
     movers,
     tcmbPulseItems,
+    konutKarne,
   ] = await Promise.all([
     getHomepageStats(),
     getPublicStatsOverview().catch(() => null),
@@ -96,6 +99,7 @@ export default async function HomePage() {
     getCoverageCounts().catch(() => ({ cities: 0, districts: 0 })),
     getTopCityMovers({ limit: 4 }).catch(() => ({ rising: [], falling: [] })),
     getTcmbPulseItems().catch(() => []),
+    getKonutKarne().catch(() => null),
   ]);
 
   const headlineInsight = publicOverview
@@ -172,6 +176,16 @@ export default async function HomePage() {
           <AmountAiInsightLarge
             insight={headlineInsight}
             cta={{ href: "/istatistikler", label: "Tüm istatistikler" }}
+          />
+        </section>
+      ) : null}
+
+      {konutKarne && konutKarne.regions.length > 0 ? (
+        <section className="container mx-auto px-4 pt-12">
+          <KonutKarneTable
+            rows={konutKarne.regions}
+            tufeYoy={konutKarne.tufeYoy}
+            mode="compact"
           />
         </section>
       ) : null}
