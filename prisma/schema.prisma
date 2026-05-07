@@ -370,3 +370,24 @@ model RateLimitBucket {
 
   @@index([resetsAt])
 }
+
+// TCMB EVDS series snapshot cache. Cron job günde 1 kere yeniler.
+// Reality score ve Official panels bu tablodan okur — direkt EVDS'e
+// public istek atmıyoruz (rate limit + cold start).
+model TcmbSnapshot {
+  id              Int      @id @default(autoincrement())
+  seriesCode      String   @unique
+  // İnsan-okur etiket: "USD/TL satış", "TÜFE genel endeks"
+  label           String
+  // En son veri tarihi (EVDS formatında: "2026-3", "2026-04-15" vb.)
+  lastDate        String
+  lastValue       Float?
+  // Yıllık değişim (%) — TÜFE için kritik (enflasyon → reality score)
+  yoyChangePct    Float?
+  // 12 aylık trend (örnek: [{date, value}, ...]) — chart için
+  history         Json?
+  fetchedAt       DateTime @default(now())
+  // Hata bilgisi (cron başarısızsa, son başarılı çekim değeri durur)
+  lastError       String?
+  lastErrorAt     DateTime?
+}

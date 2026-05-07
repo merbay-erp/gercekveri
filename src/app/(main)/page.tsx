@@ -20,6 +20,8 @@ import { buildSearchIndex } from "@/lib/search-index";
 import { GlobalSearch } from "@/components/search/global-search";
 import { HeroLiveCounters } from "@/components/home/hero-live-counters";
 import { LiveTicker } from "@/components/home/live-ticker";
+import { TcmbPulse } from "@/components/home/tcmb-pulse";
+import { getTcmbPulseItems } from "@/lib/tcmb-snapshot";
 import { LiveTrendsPanel } from "@/components/home/live-trends-panel";
 import { AmountAiInsightLarge } from "@/components/data-display/amount-ai-insight-large";
 import { getPublicStatsOverview } from "@/lib/public-stats";
@@ -84,6 +86,7 @@ export default async function HomePage() {
     recentSubmissions,
     coverage,
     movers,
+    tcmbPulseItems,
   ] = await Promise.all([
     getHomepageStats(),
     getPublicStatsOverview().catch(() => null),
@@ -92,6 +95,7 @@ export default async function HomePage() {
     getRecentSubmissions(8).catch(() => []),
     getCoverageCounts().catch(() => ({ cities: 0, districts: 0 })),
     getTopCityMovers({ limit: 4 }).catch(() => ({ rising: [], falling: [] })),
+    getTcmbPulseItems().catch(() => []),
   ]);
 
   const headlineInsight = publicOverview
@@ -160,6 +164,8 @@ export default async function HomePage() {
       </section>
 
       <LiveTicker items={recentSubmissions} />
+
+      <TcmbPulse items={tcmbPulseItems} />
 
       {headlineInsight ? (
         <section className="container mx-auto px-4 pt-12">
