@@ -141,7 +141,7 @@ export async function GET(req: Request) {
         </div>
 
         <div style={{ marginTop: 16, fontSize: 18, color: "#a3a3a3" }}>
-          {siteConfig.domain}/kira/sisme
+          {`${siteConfig.domain}/kira/sisme`}
         </div>
       </div>
     ),
@@ -177,7 +177,7 @@ function fallbackImage(scopeLabel: string) {
           Veri arttıkça şişkinlik sayıları yayılır.
         </div>
         <div style={{ marginTop: "auto", fontSize: 22, color: "#a3a3a3" }}>
-          {siteConfig.domain}/kira/sisme
+          {`${siteConfig.domain}/kira/sisme`}
         </div>
       </div>
     ),
