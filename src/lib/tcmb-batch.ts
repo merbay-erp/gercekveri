@@ -27,9 +27,10 @@ const SERIES: SeriesSpec[] = [
   { code: "TP.APIFON4", label: "TCMB politika faizi (AOFM)", frequency: "1", computeYoY: false },
   // Enflasyon (aylık) — reality score için kritik
   { code: "TP.FE.OKTG01", label: "TÜFE genel endeks", frequency: "5", computeYoY: true },
-  // NOT: TP.HKFE01-04 + TP.YKFE01 batch test'te empty/400 döndü.
-  // Pattern muhtemelen yanlış — gerçek kod araştırılıyor (TP.HKFE-NSA,
-  // TP.HKFE-SA gibi alternatifler denenecek). Şimdilik çıkarıldı.
+  // Konut endeksleri — public chart portlet API'sinden doğrulandı
+  // (TP.KFE_TR ve TP.YOKFEND_TR JSON içinde geliyor; nokta versiyonu API'ye)
+  { code: "TP.KFE.TR", label: "Konut Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
+  { code: "TP.YOKFEND.TR", label: "Yeni Olmayan Konutlar Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
 ];
 
 function formatTcmbDate(d: Date): string {

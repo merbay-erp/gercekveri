@@ -68,21 +68,20 @@ export interface HousingIndexSnapshot {
   fetchedAt: Date;
 }
 
-const CITY_HKFE_MAP: Record<string, { code: string; cityName: string }> = {
-  istanbul: { code: "TP.HKFE02", cityName: "İstanbul" },
-  ankara: { code: "TP.HKFE03", cityName: "Ankara" },
-  izmir: { code: "TP.HKFE04", cityName: "İzmir" },
-};
+// Şehir bazlı KFE serileri henüz keşfedilmedi (TCMB EVDS UI'dan veya
+// chart portlet'lerden öğrenmek gerek). Şu an tüm şehirler Türkiye geneli
+// (TP.KFE.TR) görüyor. Doğrulandığında bu map güncellenecek.
+const CITY_KFE_MAP: Record<string, { code: string; cityName: string }> = {};
 
 /**
- * Şehir bazlı hedonik konut endeksi. citySlug 3 büyükşehirden biri değilse
- * Türkiye geneli (TP.HKFE01) döner — fallback.
+ * Şehir bazlı konut fiyat endeksi. Şu an Türkiye geneli (TP.KFE.TR) fallback —
+ * şehir kırılımı kodları keşfedilince map güncellenir.
  */
 export async function getHousingIndex(
   citySlug?: string,
 ): Promise<HousingIndexSnapshot | null> {
-  const cityEntry = citySlug ? CITY_HKFE_MAP[citySlug] : undefined;
-  const code = cityEntry?.code ?? "TP.HKFE01";
+  const cityEntry = citySlug ? CITY_KFE_MAP[citySlug] : undefined;
+  const code = cityEntry?.code ?? "TP.KFE.TR";
 
   const row = await db.tcmbSnapshot.findUnique({
     where: { seriesCode: code },
