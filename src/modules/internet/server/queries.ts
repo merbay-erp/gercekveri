@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
+import { PUBLIC_SUBMISSION_FILTER } from "@/lib/submission-filters";
 import type {
   InternetDataPayload,
   InternetMultiStats,
@@ -35,8 +36,8 @@ async function fetchRows(filters: ListFilters, take?: number): Promise<DbRow[]> 
 
   const rows = await db.submission.findMany({
     where: {
+      ...PUBLIC_SUBMISSION_FILTER,
       type: "INTERNET",
-      status: "APPROVED",
       ...(cityId ? { cityId } : {}),
     },
     orderBy: { createdAt: "desc" },
@@ -194,7 +195,7 @@ export async function getIspRollups(citySlug?: string): Promise<IspRollup[]> {
 export async function topInternetCitySlugs(limit = 20): Promise<string[]> {
   const grouped = await db.submission.groupBy({
     by: ["cityId"],
-    where: { type: "INTERNET", status: "APPROVED", cityId: { not: null } },
+    where: { ...PUBLIC_SUBMISSION_FILTER, type: "INTERNET", cityId: { not: null } },
     _count: { _all: true },
     orderBy: { _count: { id: "desc" } },
     take: limit,

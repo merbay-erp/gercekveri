@@ -167,6 +167,11 @@ model Submission {
   trustScore   Int              @default(50) // 0-100
   qualityScore Int              @default(50) // 0-100
 
+  // Veri kaynağı: USER (anonim kullanıcı paylaşımı, default), DEMO (seed),
+  // TCMB / TUIK / EPDK (resmi referans veri). Public sayfalar default
+  // olarak DEMO'yu filtreler; admin tüm source'ları görür.
+  source String @default("USER")
+
   // Counters (denormalized for performance)
   helpfulCount   Int @default(0)
   unhelpfulCount Int @default(0)

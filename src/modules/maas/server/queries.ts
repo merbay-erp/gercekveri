@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
+import { PUBLIC_SUBMISSION_FILTER } from "@/lib/submission-filters";
 import { positionSlugFor } from "../position-resolver";
 import type { SalarySubmissionView, SalaryStats, SalaryDataPayload } from "../types";
 
@@ -34,8 +35,8 @@ async function fetchRows(filters: ListFilters, take?: number): Promise<DbRow[]> 
 
   const rows = await db.submission.findMany({
     where: {
+      ...PUBLIC_SUBMISSION_FILTER,
       type: "SALARY",
-      status: "APPROVED",
       ...(cityId ? { cityId } : {}),
     },
     orderBy: { createdAt: "desc" },
@@ -125,7 +126,7 @@ export async function getSalaryStats(filters: ListFilters = {}): Promise<SalaryS
  */
 export async function topPositionSlugs(limit = 50): Promise<string[]> {
   const rows = await db.submission.findMany({
-    where: { type: "SALARY", status: "APPROVED" },
+    where: { ...PUBLIC_SUBMISSION_FILTER, type: "SALARY" },
     select: { data: true },
     orderBy: { createdAt: "desc" },
     take: 1000,
@@ -147,7 +148,7 @@ export async function topPositionSlugs(limit = 50): Promise<string[]> {
 export async function topCitySlugs(limit = 20): Promise<string[]> {
   const grouped = await db.submission.groupBy({
     by: ["cityId"],
-    where: { type: "SALARY", status: "APPROVED", cityId: { not: null } },
+    where: { ...PUBLIC_SUBMISSION_FILTER, type: "SALARY", cityId: { not: null } },
     _count: { _all: true },
     orderBy: { _count: { id: "desc" } },
     take: limit,
@@ -172,7 +173,7 @@ export async function getRelatedPositions(
   if (!city) return [];
 
   const rows = await db.submission.findMany({
-    where: { type: "SALARY", status: "APPROVED", cityId: city.id },
+    where: { ...PUBLIC_SUBMISSION_FILTER, type: "SALARY", cityId: city.id },
     select: { data: true },
     take: 500,
   });

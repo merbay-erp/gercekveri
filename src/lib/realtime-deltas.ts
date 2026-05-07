@@ -8,15 +8,15 @@
  * alınır. Veri seyrek olduğunda fallback: tüm-zamanlar median (gri).
  */
 import { db } from "@/lib/db";
+import {
+  REAL_ACTIVITY_FILTER,
+  PUBLIC_SUBMISSION_FILTER,
+} from "@/lib/submission-filters";
 
-const REAL_FILTER = {
-  status: "APPROVED" as const,
-  NOT: { ipHash: { startsWith: "demo-" } },
-};
-
-const FALLBACK_FILTER = {
-  status: "APPROVED" as const,
-};
+const REAL_FILTER = REAL_ACTIVITY_FILTER;
+// Fallback: gerçek user thin ise resmi referans veri sayılarını da kullan
+// (DEMO yine hariç).
+const FALLBACK_FILTER = PUBLIC_SUBMISSION_FILTER;
 
 const ALL_TYPES = ["SALARY", "RENT", "AIDAT", "INTERNET", "UTILITY", "TEXTILE"] as const;
 type CategoryType = (typeof ALL_TYPES)[number];

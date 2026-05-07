@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
+import { PUBLIC_SUBMISSION_FILTER } from "@/lib/submission-filters";
 import type { AmountStats } from "@/components/data-display/amount-stats";
 import type { AidatSubmissionView, AidatDataPayload } from "../types";
 import type { AmenityKey } from "../config";
@@ -28,8 +29,8 @@ async function fetchRows(filters: ListFilters, take?: number): Promise<DbRow[]> 
 
   const rows = await db.submission.findMany({
     where: {
+      ...PUBLIC_SUBMISSION_FILTER,
       type: "AIDAT",
-      status: "APPROVED",
       ...(cityId ? { cityId } : {}),
     },
     orderBy: { createdAt: "desc" },
@@ -107,7 +108,7 @@ export async function getAidatStats(filters: ListFilters = {}): Promise<AmountSt
 export async function topAidatCitySlugs(limit = 20): Promise<string[]> {
   const grouped = await db.submission.groupBy({
     by: ["cityId"],
-    where: { type: "AIDAT", status: "APPROVED", cityId: { not: null } },
+    where: { ...PUBLIC_SUBMISSION_FILTER, type: "AIDAT", cityId: { not: null } },
     _count: { _all: true },
     orderBy: { _count: { id: "desc" } },
     take: limit,

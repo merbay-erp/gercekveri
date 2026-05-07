@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
+import { PUBLIC_SUBMISSION_FILTER } from "@/lib/submission-filters";
 import type { AmountStats } from "@/components/data-display/amount-stats";
 import type { RentSubmissionView, RentDataPayload } from "../types";
 
@@ -27,8 +28,8 @@ async function fetchRows(filters: ListFilters, take?: number): Promise<DbRow[]> 
 
   const rows = await db.submission.findMany({
     where: {
+      ...PUBLIC_SUBMISSION_FILTER,
       type: "RENT",
-      status: "APPROVED",
       ...(cityId ? { cityId } : {}),
     },
     orderBy: { createdAt: "desc" },
@@ -116,7 +117,7 @@ function percentile(sortedValues: number[], p: number): number {
 export async function topRentCitySlugs(limit = 20): Promise<string[]> {
   const grouped = await db.submission.groupBy({
     by: ["cityId"],
-    where: { type: "RENT", status: "APPROVED", cityId: { not: null } },
+    where: { ...PUBLIC_SUBMISSION_FILTER, type: "RENT", cityId: { not: null } },
     _count: { _all: true },
     orderBy: { _count: { id: "desc" } },
     take: limit,
@@ -216,8 +217,8 @@ export async function getTopInflationCities(
 ): Promise<CityInflationRow[]> {
   const rows = await db.submission.findMany({
     where: {
+      ...PUBLIC_SUBMISSION_FILTER,
       type: "RENT",
-      status: "APPROVED",
       cityId: { not: null },
     },
     select: {

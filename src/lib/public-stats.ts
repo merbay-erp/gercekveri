@@ -4,16 +4,14 @@
  * excludes demo seed rows so the numbers reflect real usage.
  */
 import { db } from "@/lib/db";
+import { PUBLIC_SUBMISSION_FILTER } from "@/lib/submission-filters";
 
-const REAL_FILTER = {
-  status: "APPROVED" as const,
-  // Demo seed ipHashes start with "demo-" — treat them as not-real for
-  // public-facing counters. Internal admin views still see them.
-  NOT: { ipHash: { startsWith: "demo-" } },
-};
+// Public istatistikler hem kullanıcı hem resmi referans veriyi sayar,
+// sadece DEMO'yu hariç tutar.
+const REAL_FILTER = PUBLIC_SUBMISSION_FILTER;
 
 const ALL_STATUS_REAL = {
-  NOT: { ipHash: { startsWith: "demo-" } },
+  NOT: { source: "DEMO" },
 };
 
 export interface PublicStatsOverview {

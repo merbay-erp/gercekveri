@@ -5,11 +5,11 @@
  * real users only. Not strictly real-time — anasayfa ISR's at 60s.
  */
 import { db } from "@/lib/db";
+import { REAL_ACTIVITY_FILTER } from "@/lib/submission-filters";
 
-const REAL_FILTER = {
-  status: "APPROVED" as const,
-  NOT: { ipHash: { startsWith: "demo-" } },
-};
+// Trends/recent feed sadece gerçek kullanıcı paylaşımlarını gösterir —
+// resmi referans veri (TCMB/TÜİK) "aktivite" sayılmaz.
+const REAL_FILTER = REAL_ACTIVITY_FILTER;
 
 export interface CategoryDelta {
   type: string;

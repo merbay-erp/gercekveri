@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
+import { PUBLIC_SUBMISSION_FILTER } from "@/lib/submission-filters";
 import type { AmountStats } from "@/components/data-display/amount-stats";
 import type { TekstilSubmissionView, TekstilDataPayload } from "../types";
 import type { SubType, Unit, FabricType, CustomerType } from "../config";
@@ -38,8 +39,8 @@ async function fetchRows(filters: ListFilters, take?: number): Promise<DbRow[]> 
 
   const rows = await db.submission.findMany({
     where: {
+      ...PUBLIC_SUBMISSION_FILTER,
       type: "TEXTILE",
-      status: "APPROVED",
       ...(cityId ? { cityId } : {}),
       ...(dataConditions.length > 0
         ? { AND: dataConditions.map((c) => ({ data: c })) }
@@ -123,7 +124,7 @@ export async function getTekstilStats(filters: ListFilters = {}): Promise<Amount
 export async function topTekstilCitySlugs(limit = 20): Promise<string[]> {
   const grouped = await db.submission.groupBy({
     by: ["cityId"],
-    where: { type: "TEXTILE", status: "APPROVED", cityId: { not: null } },
+    where: { ...PUBLIC_SUBMISSION_FILTER, type: "TEXTILE", cityId: { not: null } },
     _count: { _all: true },
     orderBy: { _count: { id: "desc" } },
     take: limit,

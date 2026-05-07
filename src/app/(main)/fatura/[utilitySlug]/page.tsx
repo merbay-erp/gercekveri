@@ -25,6 +25,8 @@ import {
 import { formatTRY } from "@/lib/money";
 import { formatNumber } from "@/lib/money";
 import { buildFaturaScope, getOrGenerateInsight } from "@/services/ai/insights";
+import { OfficialVsRealPanel } from "@/components/data-display/official-vs-real-panel";
+import { findOfficialReferenceFromDb } from "@/lib/official-server";
 
 export const revalidate = 60;
 export const dynamicParams = false;
@@ -65,7 +67,7 @@ export default async function FaturaUtilityPage({ params }: { params: Params }) 
   const label = utilityLabels[utility];
   const unitName = utilityUnits[utility];
 
-  const [submissions, stats, unitStats] = await Promise.all([
+  const [submissions, stats, unitStats, official] = await Promise.all([
     listFaturaSubmissions({ utilityType: utility, limit: 50 }).catch(() => []),
     getFaturaStats({ utilityType: utility }).catch(() => emptyStats),
     getFaturaUnitCostStats({ utilityType: utility }).catch(() => ({
@@ -74,6 +76,9 @@ export default async function FaturaUtilityPage({ params }: { params: Params }) 
       p25: null,
       p75: null,
     })),
+    findOfficialReferenceFromDb({ type: "UTILITY", utilityType: utility }).catch(
+      () => null,
+    ),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -110,6 +115,21 @@ export default async function FaturaUtilityPage({ params }: { params: Params }) 
       </div>
 
       <div className="space-y-8">
+        {official ? (
+          <OfficialVsRealPanel
+            sourceLabel={official.sourceLabel}
+            sourceUrl={official.sourceUrl}
+            referenceDate={official.referenceDate}
+            officialValue={official.amount}
+            userMedian={unitStats.median}
+            userCount={unitStats.count}
+            formatValue={(n) => `${formatTRY(n)} / ${unitName}`}
+            metricLabel={`${label} birim fiyat (TL/${unitName})`}
+            scopeLabel={label}
+            methodology={(official.data.note as string) ?? undefined}
+          />
+        ) : null}
+
         {unitStats.median !== null ? (
           <div className="rounded-xl border bg-muted/20 p-4 text-sm sm:p-5">
             <p className="text-muted-foreground">

@@ -27,17 +27,20 @@ interface RawRow {
   amount: { toString(): string } | number | null;
 }
 
+// Heatmap için: USER + OFFICIAL referans veri haritayı doldurur, DEMO
+// hariçtir. Gerçek user thin ise resmi data sayısı yeterli olur, ek
+// fallback'a gerek kalmaz.
 const REAL_FILTER = {
   status: "APPROVED" as const,
-  NOT: { ipHash: { startsWith: "demo-" } },
+  NOT: { source: "DEMO" },
 };
 
 const FALLBACK_FILTER = {
-  // If real-only data is too sparse to draw a meaningful map, fall back
-  // to ALL approved data (including demo seed) so the heatmap still has
-  // a story. Public preview phase only — switch to REAL_FILTER once we
-  // have user-generated coverage.
+  // Geriye dönük uyumluluk için tutuldu — şu an REAL_FILTER ile aynı
+  // sonuç verir (DEMO hariç). İleride USER-only mode'a geçilirse burası
+  // resmi veriyi göstermeye fallback olur.
   status: "APPROVED" as const,
+  NOT: { source: "DEMO" },
 };
 
 const PER_CITY_MIN = 3;

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
+import { PUBLIC_SUBMISSION_FILTER } from "@/lib/submission-filters";
 import type { AmountStats } from "@/components/data-display/amount-stats";
 import type { FaturaSubmissionView, FaturaDataPayload } from "../types";
 import type { UtilityType, HouseholdSize } from "../config";
@@ -29,8 +30,8 @@ async function fetchRows(filters: ListFilters, take?: number): Promise<DbRow[]> 
 
   const rows = await db.submission.findMany({
     where: {
+      ...PUBLIC_SUBMISSION_FILTER,
       type: "UTILITY",
-      status: "APPROVED",
       ...(cityId ? { cityId } : {}),
       ...(filters.utilityType
         ? { data: { path: ["utilityType"], equals: filters.utilityType } }
@@ -151,7 +152,7 @@ export async function getFaturaUnitCostStats(
 export async function topFaturaCitySlugs(limit = 20): Promise<string[]> {
   const grouped = await db.submission.groupBy({
     by: ["cityId"],
-    where: { type: "UTILITY", status: "APPROVED", cityId: { not: null } },
+    where: { ...PUBLIC_SUBMISSION_FILTER, type: "UTILITY", cityId: { not: null } },
     _count: { _all: true },
     orderBy: { _count: { id: "desc" } },
     take: limit,

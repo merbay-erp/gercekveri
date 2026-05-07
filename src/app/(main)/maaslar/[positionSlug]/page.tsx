@@ -24,7 +24,9 @@ import {
 } from "@/modules/maas/position-resolver";
 import { topCitySlugs } from "@/modules/maas/server/queries";
 import { findCityBySlug } from "@/lib/cities";
-import { formatNumber } from "@/lib/money";
+import { formatNumber, formatTRY } from "@/lib/money";
+import { OfficialVsRealPanel } from "@/components/data-display/official-vs-real-panel";
+import { findOfficialReferenceFromDb } from "@/lib/official-server";
 
 const RESERVED_SLUGS = new Set(["yeni", "sehir"]);
 
@@ -70,9 +72,10 @@ export default async function PositionPage({ params }: { params: Params }) {
 
   const positionName = positionNameFromSlug(positionSlug);
 
-  const [submissions, stats] = await Promise.all([
+  const [submissions, stats, official] = await Promise.all([
     listSalarySubmissions({ positionSlug, limit: 50 }).catch(() => []),
     getSalaryStats({ positionSlug }).catch(() => emptyStats),
+    findOfficialReferenceFromDb({ type: "SALARY", positionSlug }).catch(() => null),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -125,6 +128,21 @@ export default async function PositionPage({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-8">
+        {official ? (
+          <OfficialVsRealPanel
+            sourceLabel={official.sourceLabel}
+            sourceUrl={official.sourceUrl}
+            referenceDate={official.referenceDate}
+            officialValue={official.amount}
+            userMedian={stats.median}
+            userCount={stats.count}
+            formatValue={(n) => formatTRY(n)}
+            metricLabel="Aylık net maaş"
+            scopeLabel={positionName}
+            methodology={(official.data.note as string) ?? undefined}
+          />
+        ) : null}
+
         <AmountStatsPanel stats={stats} scopeLabel={`${positionName} · Türkiye geneli`} />
 
         {insight ? <AmountAiInsight insight={insight} /> : null}

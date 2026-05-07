@@ -18,10 +18,12 @@ import {
   topRentCitySlugs,
 } from "@/modules/kira/server/queries";
 import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
-import { formatNumber } from "@/lib/money";
+import { formatNumber, formatTRY } from "@/lib/money";
 import { buildRentScope, getOrGenerateInsight } from "@/services/ai/insights";
 import { getScopeTrustScore } from "@/lib/trust-score-server";
 import { TrustScoreBadge } from "@/components/data-display/trust-score-badge";
+import { OfficialVsRealPanel } from "@/components/data-display/official-vs-real-panel";
+import { findOfficialReferenceFromDb } from "@/lib/official-server";
 import { db } from "@/lib/db";
 
 export const revalidate = 60;
@@ -67,7 +69,7 @@ export default async function KiraCityPage({ params }: { params: Params }) {
     .findUnique({ where: { slug: cityRecord.slug }, select: { id: true } })
     .catch(() => null);
 
-  const [submissions, stats, inflation, trust] = await Promise.all([
+  const [submissions, stats, inflation, trust, official] = await Promise.all([
     listRentSubmissions({ citySlug, limit: 50 }).catch(() => []),
     getRentStats({ citySlug }).catch(() => emptyStats),
     getRentInflationStats({ citySlug }).catch(() => ({
@@ -79,6 +81,7 @@ export default async function KiraCityPage({ params }: { params: Params }) {
     cityDb
       ? getScopeTrustScore({ type: "RENT", cityId: cityDb.id }).catch(() => null)
       : Promise.resolve(null),
+    findOfficialReferenceFromDb({ type: "RENT", citySlug }).catch(() => null),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -132,6 +135,21 @@ export default async function KiraCityPage({ params }: { params: Params }) {
           <TrustScoreBadge
             score={trust}
             scopeLabel={`${cityRecord.name} · kira verisi`}
+          />
+        ) : null}
+
+        {official ? (
+          <OfficialVsRealPanel
+            sourceLabel={official.sourceLabel}
+            sourceUrl={official.sourceUrl}
+            referenceDate={official.referenceDate}
+            officialValue={official.amount}
+            userMedian={stats.median}
+            userCount={stats.count}
+            formatValue={(n) => formatTRY(n)}
+            metricLabel="Aylık kira (2+1 ortalama)"
+            scopeLabel={cityRecord.name}
+            methodology={(official.data.note as string) ?? undefined}
           />
         ) : null}
 
