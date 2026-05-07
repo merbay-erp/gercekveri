@@ -10,6 +10,8 @@ import { AdSlot } from "@/components/ad-slot";
 import { MaasList } from "@/modules/maas/components/maas-list";
 import { MaasStats } from "@/modules/maas/components/maas-stats";
 import { MaasHistogram } from "@/modules/maas/components/maas-histogram";
+import { MaasAiInsight } from "@/modules/maas/components/maas-ai-insight";
+import { buildSalaryScope, getOrGenerateSalaryInsight } from "@/services/ai/insights";
 import {
   getRelatedPositions,
   getSalaryStats,
@@ -64,6 +66,12 @@ export default async function CityPage({ params }: { params: Params }) {
     ),
   ]);
 
+  const insight = await getOrGenerateSalaryInsight({
+    scope: buildSalaryScope(undefined, citySlug),
+    scopeLabel: `${cityRecord.name} — tüm pozisyonlar`,
+    stats,
+  }).catch(() => null);
+
   const amounts = submissions.map((s) => s.amount);
 
   return (
@@ -95,6 +103,8 @@ export default async function CityPage({ params }: { params: Params }) {
 
       <div className="space-y-8">
         <MaasStats stats={stats} scopeLabel={`${cityRecord.name} · tüm pozisyonlar`} />
+
+        {insight ? <MaasAiInsight insight={insight} /> : null}
 
         {amounts.length >= 3 ? (
           <MaasHistogram

@@ -10,6 +10,8 @@ import { AdSlot } from "@/components/ad-slot";
 import { MaasList } from "@/modules/maas/components/maas-list";
 import { MaasStats } from "@/modules/maas/components/maas-stats";
 import { MaasHistogram } from "@/modules/maas/components/maas-histogram";
+import { MaasAiInsight } from "@/modules/maas/components/maas-ai-insight";
+import { buildSalaryScope, getOrGenerateSalaryInsight } from "@/services/ai/insights";
 import {
   getRelatedPositions,
   getSalaryStats,
@@ -73,6 +75,12 @@ export default async function PositionPage({ params }: { params: Params }) {
     getSalaryStats({ positionSlug }).catch(() => emptyStats),
   ]);
 
+  const insight = await getOrGenerateSalaryInsight({
+    scope: buildSalaryScope(positionSlug),
+    scopeLabel: `${positionName} — Türkiye geneli`,
+    stats,
+  }).catch(() => null);
+
   const amounts = submissions.map((s) => s.amount);
 
   const cityCounts = new Map<string, { name: string; count: number }>();
@@ -116,6 +124,8 @@ export default async function PositionPage({ params }: { params: Params }) {
 
       <div className="space-y-8">
         <MaasStats stats={stats} scopeLabel={`${positionName} · Türkiye geneli`} />
+
+        {insight ? <MaasAiInsight insight={insight} /> : null}
 
         {amounts.length >= 3 ? (
           <MaasHistogram
