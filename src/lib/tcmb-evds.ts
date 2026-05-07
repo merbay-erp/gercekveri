@@ -63,6 +63,8 @@ export interface EvdsResult {
   error?: string;
   /** Raw response (debug için) */
   raw?: EvdsRawResponse;
+  /** Debug: request URL'i + key prefix (admin'e şeffaflık) */
+  debug?: { url: string; keyPrefix: string; keyLength: number };
 }
 
 function getApiKey(): string | null {
@@ -92,9 +94,15 @@ export async function fetchEvds(opts: EvdsFetchOptions): Promise<EvdsResult> {
   const seriesArr = normalizeSeries(opts.series);
   const seriesParam = seriesArr.join("-"); // EVDS dash-separated istiyor
 
-  // EVDS path-style query pattern. Hem header hem URL'de key — bazı edge
-  // case'lerde header gitmeyebiliyor (CDN/redirect), URL fallback güvenli.
-  const url = `${BASE_URL}/series=${seriesParam}&startDate=${opts.startDate}&endDate=${opts.endDate}&type=json&frequency=${opts.frequency ?? "5"}&aggregationTypes=${opts.aggregationTypes ?? "avg"}&formulas=${opts.formulas ?? 0}&key=${encodeURIComponent(key)}`;
+  // EVDS path-style query pattern. 5 Nisan 2024 sonrası key SADECE HTTP
+  // header'da kabul edilir; URL'de key varsa anasayfaya redirect eder.
+  const url = `${BASE_URL}/series=${seriesParam}&startDate=${opts.startDate}&endDate=${opts.endDate}&type=json&frequency=${opts.frequency ?? "5"}&aggregationTypes=${opts.aggregationTypes ?? "avg"}&formulas=${opts.formulas ?? 0}`;
+
+  const debug = {
+    url,
+    keyPrefix: key.slice(0, 4) + "…",
+    keyLength: key.length,
+  };
 
   let response: Response;
   try {
@@ -102,7 +110,9 @@ export async function fetchEvds(opts: EvdsFetchOptions): Promise<EvdsResult> {
       headers: {
         key,
         accept: "application/json",
-        "user-agent": "gercekveri-bot/1.0",
+        // EVDS bot detection için tarayıcı benzeri UA
+        "user-agent":
+          "Mozilla/5.0 (compatible; gercekveri/1.0; +https://gercekveri.com)",
       },
       cache: "no-store",
       redirect: "manual", // redirect yapıyorsa hata olarak gör
@@ -113,6 +123,7 @@ export async function fetchEvds(opts: EvdsFetchOptions): Promise<EvdsResult> {
       status: 0,
       series: {},
       error: err instanceof Error ? err.message : "fetch failed",
+      debug,
     };
   }
 
@@ -128,6 +139,7 @@ export async function fetchEvds(opts: EvdsFetchOptions): Promise<EvdsResult> {
       status: response.status,
       series: {},
       error: `HTTP ${response.status}: ${body || response.statusText}`,
+      debug,
     };
   }
 
