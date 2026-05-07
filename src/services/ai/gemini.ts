@@ -1,13 +1,12 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 /**
- * Gemini 1.5 Flash — picked for its 15 RPM / 1500 RPD free-tier ceiling
- * (vs 2.5 Flash's 10 RPM / 250 RPD) which we hit immediately on first
- * crawl. Quality difference is negligible for short Turkish summaries.
- *
- * 2.0 Flash is free-tier-locked (limit:0) on this Google AI Studio project.
+ * Gemini 2.5 Flash Lite — best free-tier ceiling on this AI Studio project
+ * (15 RPM / 1500 RPD). 1.5-flash is 404 here, 2.5-flash is 250 RPD which
+ * we burn through on first crawl, 2.0-flash is free-tier-locked (limit:0).
+ * Lite handles short Turkish summaries fine.
  */
-export const GEMINI_MODEL = "gemini-1.5-flash";
+export const GEMINI_MODEL = "gemini-2.5-flash-lite";
 
 let cachedClient: GoogleGenAI | null = null;
 

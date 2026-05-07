@@ -8,7 +8,7 @@ import { generateSalaryInsight, GEMINI_MODEL, type SalaryInsightOutput } from ".
  * The `promptHash` field invalidates cache when prompt structure changes.
  */
 
-const PROMPT_VERSION = "v1-2026-05";
+const PROMPT_VERSION = "v1-2026-05-flashlite";
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 // 30-minute negative cache: when generation fails (rate limit, API down)
 // we still write to AiSummary with empty body so the next request can
