@@ -1,16 +1,17 @@
 /**
  * TCMB EVDS (Elektronik Veri Dağıtım Sistemi) client.
  *
- * 5 Nisan 2024 itibarıyla anahtar URL query yerine `key` HTTP header'ında
- * gönderiliyor — bu fonksiyon header pattern'ini kullanır.
+ * EVDS2 (evds2.tcmb.gov.tr/service/evds) Mayıs 2026 itibarıyla 302 redirect
+ * dönüyor — sunset olmuş. EVDS3 base URL'ine migrate edildi:
+ *   https://evds3.tcmb.gov.tr/igmevdsms-dis/
  *
- * Base: https://evds2.tcmb.gov.tr/service/evds
- * Docs: https://evds2.tcmb.gov.tr/help/videos/EVDS_Web_Servis_Kullanim_Kilavuzu.pdf
+ * Pattern aynı: GET, path-style query (`/series=X&startDate=...`),
+ * `key` HTTP header. fatihmete/evds v0.4 source'u doğrulayan referans.
  *
  * Sorgu başına limit: max 100 seri, max 10.000 gözlem.
  */
 
-const BASE_URL = "https://evds2.tcmb.gov.tr/service/evds";
+const BASE_URL = "https://evds3.tcmb.gov.tr/igmevdsms-dis";
 
 export type Frequency =
   | "1" // günlük
@@ -94,9 +95,9 @@ export async function fetchEvds(opts: EvdsFetchOptions): Promise<EvdsResult> {
   const seriesArr = normalizeSeries(opts.series);
   const seriesParam = seriesArr.join("-"); // EVDS dash-separated istiyor
 
-  // EVDS path-style query pattern. Nisan 2024 sonrası key header'da olmalı,
-  // ama bazı endpoint'ler URL'de de kabul ediyor — ikisini de gönder.
-  const url = `${BASE_URL}/series=${seriesParam}&startDate=${opts.startDate}&endDate=${opts.endDate}&type=json&frequency=${opts.frequency ?? "5"}&aggregationTypes=${opts.aggregationTypes ?? "avg"}&formulas=${opts.formulas ?? 0}&key=${encodeURIComponent(key)}`;
+  // EVDS3 path-style query pattern (EVDS2 ile aynı format). Key sadece
+  // header'da (URL'de yer almayacak — EVDS3 bot detection sıkı).
+  const url = `${BASE_URL}/series=${seriesParam}&startDate=${opts.startDate}&endDate=${opts.endDate}&type=json&frequency=${opts.frequency ?? "5"}&aggregationTypes=${opts.aggregationTypes ?? "avg"}&formulas=${opts.formulas ?? 0}`;
 
   const debug: { url: string; keyPrefix: string; keyLength: number; redirectTo?: string } = {
     url,
