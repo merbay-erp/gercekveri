@@ -23,7 +23,9 @@ import { buildRentScope, getOrGenerateInsight } from "@/services/ai/insights";
 import { getScopeTrustScore } from "@/lib/trust-score-server";
 import { TrustScoreBadge } from "@/components/data-display/trust-score-badge";
 import { OfficialVsRealPanel } from "@/components/data-display/official-vs-real-panel";
+import { TcmbHousingPanel } from "@/components/data-display/tcmb-housing-panel";
 import { findOfficialReferenceFromDb } from "@/lib/official-server";
+import { getHousingIndex } from "@/lib/tcmb-snapshot";
 import { db } from "@/lib/db";
 
 export const revalidate = 60;
@@ -69,20 +71,24 @@ export default async function KiraCityPage({ params }: { params: Params }) {
     .findUnique({ where: { slug: cityRecord.slug }, select: { id: true } })
     .catch(() => null);
 
-  const [submissions, stats, inflation, trust, official] = await Promise.all([
-    listRentSubmissions({ citySlug, limit: 50 }).catch(() => []),
-    getRentStats({ citySlug }).catch(() => emptyStats),
-    getRentInflationStats({ citySlug }).catch(() => ({
-      pairCount: 0,
-      realMedian: null,
-      listedMedian: null,
-      inflationPct: null,
-    })),
-    cityDb
-      ? getScopeTrustScore({ type: "RENT", cityId: cityDb.id }).catch(() => null)
-      : Promise.resolve(null),
-    findOfficialReferenceFromDb({ type: "RENT", citySlug }).catch(() => null),
-  ]);
+  const [submissions, stats, inflation, trust, official, housingIndex] =
+    await Promise.all([
+      listRentSubmissions({ citySlug, limit: 50 }).catch(() => []),
+      getRentStats({ citySlug }).catch(() => emptyStats),
+      getRentInflationStats({ citySlug }).catch(() => ({
+        pairCount: 0,
+        realMedian: null,
+        listedMedian: null,
+        inflationPct: null,
+      })),
+      cityDb
+        ? getScopeTrustScore({ type: "RENT", cityId: cityDb.id }).catch(
+            () => null,
+          )
+        : Promise.resolve(null),
+      findOfficialReferenceFromDb({ type: "RENT", citySlug }).catch(() => null),
+      getHousingIndex(citySlug).catch(() => null),
+    ]);
 
   const insight = await getOrGenerateInsight({
     scope: buildRentScope(citySlug),
@@ -152,6 +158,8 @@ export default async function KiraCityPage({ params }: { params: Params }) {
             methodology={(official.data.note as string) ?? undefined}
           />
         ) : null}
+
+        {housingIndex ? <TcmbHousingPanel data={housingIndex} /> : null}
 
         <RentInflationPanel
           stats={inflation}

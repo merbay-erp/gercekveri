@@ -10,6 +10,8 @@ import { AmountAiInsight } from "@/components/data-display/amount-ai-insight";
 import { KiraList } from "@/modules/kira/components/kira-list";
 import { KiraFilterBar } from "@/modules/kira/components/kira-filter-bar";
 import { RentInflationPanel } from "@/modules/kira/components/rent-inflation-panel";
+import { TcmbHousingPanel } from "@/components/data-display/tcmb-housing-panel";
+import { getHousingIndex } from "@/lib/tcmb-snapshot";
 import {
   listRentSubmissions,
   getRentStats,
@@ -38,7 +40,7 @@ const emptyStats = {
 };
 
 export default async function KiraPage() {
-  const [submissions, stats, inflation] = await Promise.all([
+  const [submissions, stats, inflation, housingIndex] = await Promise.all([
     listRentSubmissions({ limit: 50 }).catch(() => []),
     getRentStats().catch(() => emptyStats),
     getRentInflationStats({}).catch(() => ({
@@ -47,6 +49,7 @@ export default async function KiraPage() {
       listedMedian: null,
       inflationPct: null,
     })),
+    getHousingIndex().catch(() => null),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -79,6 +82,8 @@ export default async function KiraPage() {
           scopeLabel="Türkiye geneli"
           shareHref="/kira/sisme"
         />
+
+        {housingIndex ? <TcmbHousingPanel data={housingIndex} /> : null}
 
         <AmountStatsPanel stats={stats} scopeLabel="Türkiye geneli — tüm kira ilanları" />
 

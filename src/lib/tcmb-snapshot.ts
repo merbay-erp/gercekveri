@@ -56,3 +56,47 @@ export async function getInflationYoyPct(): Promise<number | null> {
   });
   return row?.yoyChangePct ?? null;
 }
+
+export interface HousingIndexSnapshot {
+  scope: "national" | "city";
+  cityName?: string;
+  seriesCode: string;
+  label: string;
+  lastDate: string;
+  lastValue: number;
+  yoyChangePct: number | null;
+  fetchedAt: Date;
+}
+
+const CITY_HKFE_MAP: Record<string, { code: string; cityName: string }> = {
+  istanbul: { code: "TP.HKFE02", cityName: "İstanbul" },
+  ankara: { code: "TP.HKFE03", cityName: "Ankara" },
+  izmir: { code: "TP.HKFE04", cityName: "İzmir" },
+};
+
+/**
+ * Şehir bazlı hedonik konut endeksi. citySlug 3 büyükşehirden biri değilse
+ * Türkiye geneli (TP.HKFE01) döner — fallback.
+ */
+export async function getHousingIndex(
+  citySlug?: string,
+): Promise<HousingIndexSnapshot | null> {
+  const cityEntry = citySlug ? CITY_HKFE_MAP[citySlug] : undefined;
+  const code = cityEntry?.code ?? "TP.HKFE01";
+
+  const row = await db.tcmbSnapshot.findUnique({
+    where: { seriesCode: code },
+  });
+  if (!row || row.lastValue === null) return null;
+
+  return {
+    scope: cityEntry ? "city" : "national",
+    cityName: cityEntry?.cityName,
+    seriesCode: code,
+    label: row.label,
+    lastDate: row.lastDate,
+    lastValue: row.lastValue,
+    yoyChangePct: row.yoyChangePct,
+    fetchedAt: row.fetchedAt,
+  };
+}

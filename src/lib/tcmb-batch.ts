@@ -21,12 +21,20 @@ interface SeriesSpec {
 }
 
 const SERIES: SeriesSpec[] = [
+  // Döviz + faiz (günlük)
   { code: "TP.DK.USD.S", label: "USD/TL (satış)", frequency: "1", computeYoY: false },
   { code: "TP.DK.EUR.S", label: "EUR/TL (satış)", frequency: "1", computeYoY: false },
-  { code: "TP.FE.OKTG01", label: "TÜFE genel endeks", frequency: "5", computeYoY: true },
-  { code: "TP.HKFE01", label: "Hedonik Konut Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
   { code: "TP.APIFON4", label: "TCMB politika faizi (AOFM)", frequency: "1", computeYoY: false },
-  { code: "TP.BISTTLREF.KAPANIS", label: "TLREF (kapanış)", frequency: "1", computeYoY: false },
+  // Enflasyon (aylık) — reality score için kritik
+  { code: "TP.FE.OKTG01", label: "TÜFE genel endeks", frequency: "5", computeYoY: true },
+  // Konut fiyat endeksleri (aylık) — kira sayfaları için
+  // PDF: KFE-Tablo.pdf — TP.KFE01 / TP.YKFE01 / TP.HKFE01 doğrulandı,
+  // şehir kırılımları (.02/.03/.04) tahmin — batch test ile teyit edilir.
+  { code: "TP.HKFE01", label: "Hedonik Konut Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
+  { code: "TP.HKFE02", label: "Hedonik Konut Fiyat Endeksi (İstanbul)", frequency: "5", computeYoY: true },
+  { code: "TP.HKFE03", label: "Hedonik Konut Fiyat Endeksi (Ankara)", frequency: "5", computeYoY: true },
+  { code: "TP.HKFE04", label: "Hedonik Konut Fiyat Endeksi (İzmir)", frequency: "5", computeYoY: true },
+  { code: "TP.YKFE01", label: "Yeni Konutlar Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
 ];
 
 function formatTcmbDate(d: Date): string {
