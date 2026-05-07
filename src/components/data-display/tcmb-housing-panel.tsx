@@ -75,7 +75,7 @@ export function TcmbHousingPanel({ data }: Props) {
         </span>
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            TCMB · Hedonik Konut Fiyat Endeksi
+            TCMB · Konut Fiyat Endeksi
           </p>
           <p className="text-[11px] text-muted-foreground">
             {scopeLabel} · {formatDate(data.lastDate)}
