@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { after } from "next/server";
 
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
 import { hashIp, hashFingerprint, safeUserAgent } from "@/lib/fingerprint";
 import { slugify } from "@/lib/slug";
+import { postprocessSubmission } from "@/services/submission-postprocess";
 import { aidatInputSchema, type AidatInput } from "../schema";
 import { amenityOrder, type AmenityKey } from "../config";
 
@@ -134,12 +136,25 @@ export async function createAidatSubmission(input: AidatInput): Promise<ActionRe
       trustScore: 50,
       qualityScore,
     },
-    select: { publicId: true },
+    select: { id: true, publicId: true },
   });
 
   revalidatePath("/aidat");
   if (cityRecord) revalidatePath(`/aidat/sehir/${cityRecord.slug}`);
   revalidatePath("/");
+
+  after(() =>
+    postprocessSubmission({
+      submissionId: submission.id,
+      publicId: submission.publicId,
+      type: "AIDAT",
+      ipHash,
+      qualityScore,
+      amount: data.aidatAmount,
+      currency: "TRY",
+      cityName: cityRecord.name,
+    }),
+  );
 
   return { ok: true, publicId: submission.publicId };
 }

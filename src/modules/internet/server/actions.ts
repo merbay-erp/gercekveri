@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { after } from "next/server";
 
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
 import { hashIp, hashFingerprint, safeUserAgent } from "@/lib/fingerprint";
 import { slugify } from "@/lib/slug";
+import { postprocessSubmission } from "@/services/submission-postprocess";
 import { internetInputSchema, type InternetInput } from "../schema";
 
 type ActionResult =
@@ -132,7 +134,7 @@ export async function createInternetSubmission(
       trustScore: 50,
       qualityScore,
     },
-    select: { publicId: true },
+    select: { id: true, publicId: true },
   });
 
   revalidatePath("/internet");
@@ -141,6 +143,19 @@ export async function createInternetSubmission(
     revalidatePath(`/internet/sehir/${cityRecord.slug}`);
   }
   revalidatePath("/");
+
+  after(() =>
+    postprocessSubmission({
+      submissionId: submission.id,
+      publicId: submission.publicId,
+      type: "INTERNET",
+      ipHash,
+      qualityScore,
+      amount: data.realSpeedMbps,
+      currency: null,
+      cityName: cityRecord.name,
+    }),
+  );
 
   return { ok: true, publicId: submission.publicId };
 }

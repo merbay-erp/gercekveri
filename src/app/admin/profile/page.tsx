@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
+import { Bell, BellOff } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/admin-auth";
+import { getAdminNotifyEmail } from "@/lib/email";
 import { PasswordForm } from "./password-form";
 
 export const dynamic = "force-dynamic";
@@ -54,10 +56,65 @@ export default async function AdminProfilePage() {
         </div>
       </Card>
 
+      <Card className="mb-6 p-5">
+        <h2 className="mb-3 text-base font-medium">Bildirimler</h2>
+        <NotificationStatus />
+      </Card>
+
       <Card className="p-5">
         <h2 className="mb-3 text-base font-medium">Şifre değiştir</h2>
         <PasswordForm />
       </Card>
+    </div>
+  );
+}
+
+function NotificationStatus() {
+  const adminEmail = getAdminNotifyEmail();
+  const resendConfigured = Boolean(process.env.RESEND_API_KEY);
+
+  if (!resendConfigured) {
+    return (
+      <div className="flex items-start gap-3 rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
+        <BellOff className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+        <div>
+          <p className="font-medium">Email bildirimleri kapalı</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            <span className="font-mono">RESEND_API_KEY</span> ortam değişkeni
+            ayarlanmamış. Auto-flag tetiklendiğinde email gönderilmez; sadece
+            ModerationLog'a kayıt düşer.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!adminEmail) {
+    return (
+      <div className="flex items-start gap-3 rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
+        <BellOff className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+        <div>
+          <p className="font-medium">Hedef email tanımlı değil</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            <span className="font-mono">ADMIN_NOTIFY_EMAIL</span> ortam değişkeni
+            ayarlanmamış. Email bildirimleri inaktif.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-start gap-3 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm">
+      <Bell className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+      <div>
+        <p className="font-medium">Email bildirimleri aktif</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Auto-flag tetiklendiğinde <span className="font-mono">{adminEmail}</span>{" "}
+          adresine bildirim gönderilir. Tetikleyiciler: 24 saatte aynı IP'den 5+ paylaşım,
+          quality skoru 25'in altında.
+        </p>
+      </div>
     </div>
   );
 }

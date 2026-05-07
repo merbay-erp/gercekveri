@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { after } from "next/server";
 
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
 import { hashIp, hashFingerprint, safeUserAgent } from "@/lib/fingerprint";
 import { slugify } from "@/lib/slug";
+import { postprocessSubmission } from "@/services/submission-postprocess";
 import { faturaInputSchema, type FaturaInput } from "../schema";
 import { utilitySlugs } from "../config";
 
@@ -138,7 +140,7 @@ export async function createFaturaSubmission(input: FaturaInput): Promise<Action
       trustScore: 50,
       qualityScore,
     },
-    select: { publicId: true },
+    select: { id: true, publicId: true },
   });
 
   const utilSlug = utilitySlugs[data.utilityType];
@@ -146,6 +148,19 @@ export async function createFaturaSubmission(input: FaturaInput): Promise<Action
   revalidatePath(`/fatura/${utilSlug}`);
   if (cityRecord) revalidatePath(`/fatura/sehir/${cityRecord.slug}`);
   revalidatePath("/");
+
+  after(() =>
+    postprocessSubmission({
+      submissionId: submission.id,
+      publicId: submission.publicId,
+      type: "UTILITY",
+      ipHash,
+      qualityScore,
+      amount: data.amountTRY,
+      currency: "TRY",
+      cityName: cityRecord.name,
+    }),
+  );
 
   return { ok: true, publicId: submission.publicId };
 }

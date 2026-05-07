@@ -2,10 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { after } from "next/server";
 
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
 import { hashIp, hashFingerprint, safeUserAgent } from "@/lib/fingerprint";
+import { postprocessSubmission } from "@/services/submission-postprocess";
 import { positionSlugFor } from "../position-resolver";
 import { salaryInputSchema, type SalaryInput } from "../schema";
 
@@ -143,7 +145,7 @@ export async function createSalarySubmission(input: SalaryInput): Promise<Action
       trustScore: 50,
       qualityScore,
     },
-    select: { publicId: true },
+    select: { id: true, publicId: true },
   });
 
   const positionSlug = positionSlugFor(data.position.trim());
@@ -154,6 +156,19 @@ export async function createSalarySubmission(input: SalaryInput): Promise<Action
     revalidatePath(`/maaslar/${positionSlug}/${cityRecord.slug}`);
   }
   revalidatePath("/");
+
+  after(() =>
+    postprocessSubmission({
+      submissionId: submission.id,
+      publicId: submission.publicId,
+      type: "SALARY",
+      ipHash,
+      qualityScore,
+      amount: data.netSalary,
+      currency: "TRY",
+      cityName: cityRecord?.name ?? null,
+    }),
+  );
 
   return { ok: true, publicId: submission.publicId };
 }

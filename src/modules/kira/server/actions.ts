@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { after } from "next/server";
 
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
 import { hashIp, hashFingerprint, safeUserAgent } from "@/lib/fingerprint";
 import { slugify } from "@/lib/slug";
+import { postprocessSubmission } from "@/services/submission-postprocess";
 import { rentInputSchema, type RentInput } from "../schema";
 
 type ActionResult =
@@ -144,12 +146,25 @@ export async function createRentSubmission(input: RentInput): Promise<ActionResu
       trustScore: 50,
       qualityScore,
     },
-    select: { publicId: true },
+    select: { id: true, publicId: true },
   });
 
   revalidatePath("/kira");
   if (cityRecord) revalidatePath(`/kira/sehir/${cityRecord.slug}`);
   revalidatePath("/");
+
+  after(() =>
+    postprocessSubmission({
+      submissionId: submission.id,
+      publicId: submission.publicId,
+      type: "RENT",
+      ipHash,
+      qualityScore,
+      amount: data.rentPrice,
+      currency: "TRY",
+      cityName: cityRecord.name,
+    }),
+  );
 
   return { ok: true, publicId: submission.publicId };
 }
