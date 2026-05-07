@@ -24,6 +24,11 @@ import {
 import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
 import { formatTRY, formatNumber } from "@/lib/money";
 import { buildFaturaScope, getOrGenerateInsight } from "@/services/ai/insights";
+import { getScopeTrustScore } from "@/lib/trust-score-server";
+import { TrustScoreBadge } from "@/components/data-display/trust-score-badge";
+import { db } from "@/lib/db";
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -41,7 +46,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const city = findCityBySlug(citySlug);
   if (!city) return { title: "Bulunamadı" };
   return {
-    title: `${city.name} Faturaları — Anonim, Gerçek Veri`,
+    title: `${city.name} Fatura Endeksi ${CURRENT_YEAR} — Anonim Gerçek Veri`,
     description: `${city.name}'da elektrik, doğalgaz ve su faturası tutarları. Anonim hane verisinden derlenmiş gerçek rakamlar.`,
     alternates: { canonical: `/fatura/sehir/${citySlug}` },
   };
@@ -62,9 +67,16 @@ export default async function FaturaCityPage({ params }: { params: Params }) {
   const city = findCityBySlug(citySlug);
   if (!city) notFound();
 
-  const [submissions, stats] = await Promise.all([
+  const cityDb = await db.city
+    .findUnique({ where: { slug: city.slug }, select: { id: true } })
+    .catch(() => null);
+
+  const [submissions, stats, trust] = await Promise.all([
     listFaturaSubmissions({ citySlug, limit: 50 }).catch(() => []),
     getFaturaStats({ citySlug }).catch(() => emptyStats),
+    cityDb
+      ? getScopeTrustScore({ type: "UTILITY", cityId: cityDb.id }).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const perUtility = await Promise.all(
@@ -101,7 +113,7 @@ export default async function FaturaCityPage({ params }: { params: Params }) {
             {city.region}
           </Badge>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {city.name} Faturaları
+            {city.name} Fatura Endeksi {CURRENT_YEAR}
           </h1>
           <p className="text-muted-foreground">
             {formatNumber(stats.count)} anonim paylaşımdan derlenmiş, {city.name} özelinde.
@@ -113,6 +125,10 @@ export default async function FaturaCityPage({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-8">
+        {trust ? (
+          <TrustScoreBadge score={trust} scopeLabel={`${city.name} · fatura verisi`} />
+        ) : null}
+
         <div className="grid gap-3 sm:grid-cols-3">
           {perUtility.map(({ utility, unit }) => (
             <div key={utility} className="rounded-xl border bg-muted/20 p-4">

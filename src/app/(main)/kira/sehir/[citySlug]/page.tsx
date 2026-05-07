@@ -20,6 +20,9 @@ import {
 import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
 import { formatNumber } from "@/lib/money";
 import { buildRentScope, getOrGenerateInsight } from "@/services/ai/insights";
+import { getScopeTrustScore } from "@/lib/trust-score-server";
+import { TrustScoreBadge } from "@/components/data-display/trust-score-badge";
+import { db } from "@/lib/db";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -32,13 +35,15 @@ export async function generateStaticParams() {
   return merged.map((citySlug) => ({ citySlug }));
 }
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { citySlug } = await params;
   const cityRecord = findCityBySlug(citySlug);
   if (!cityRecord) return { title: "Bulunamadı" };
   return {
-    title: `${cityRecord.name} Kira Fiyatları — Anonim, Gerçek Veri`,
-    description: `${cityRecord.name} şehrinde anonim kullanıcılarla derlenmiş gerçek kira tutarları. m², oda sayısı ve bina yaşı ayrımıyla.`,
+    title: `${cityRecord.name} Kira Endeksi ${CURRENT_YEAR} — Anonim Gerçek Veri`,
+    description: `${cityRecord.name} kira endeksi: emlakçı ilanlarına değil, gerçek kiracılara dayalı medyan, ortalama, ilan-gerçek şişkinliği. m², oda sayısı ve bina yaşı kırılımıyla.`,
     alternates: { canonical: `/kira/sehir/${citySlug}` },
   };
 }
@@ -58,7 +63,11 @@ export default async function KiraCityPage({ params }: { params: Params }) {
   const cityRecord = findCityBySlug(citySlug);
   if (!cityRecord) notFound();
 
-  const [submissions, stats, inflation] = await Promise.all([
+  const cityDb = await db.city
+    .findUnique({ where: { slug: cityRecord.slug }, select: { id: true } })
+    .catch(() => null);
+
+  const [submissions, stats, inflation, trust] = await Promise.all([
     listRentSubmissions({ citySlug, limit: 50 }).catch(() => []),
     getRentStats({ citySlug }).catch(() => emptyStats),
     getRentInflationStats({ citySlug }).catch(() => ({
@@ -67,6 +76,9 @@ export default async function KiraCityPage({ params }: { params: Params }) {
       listedMedian: null,
       inflationPct: null,
     })),
+    cityDb
+      ? getScopeTrustScore({ type: "RENT", cityId: cityDb.id }).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -94,11 +106,21 @@ export default async function KiraCityPage({ params }: { params: Params }) {
             {cityRecord.region}
           </Badge>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {cityRecord.name} Kira Fiyatları
+            {cityRecord.name} Kira Endeksi {CURRENT_YEAR}
           </h1>
           <p className="text-muted-foreground">
-            {formatNumber(stats.count)} anonim ilandan derlenmiş gerçek aralıklar.
+            {formatNumber(stats.count)} anonim kiracı paylaşımından derlenmiş gerçek
+            aralıklar — emlakçı ilanlarından değil, ödeyenlerden.
           </p>
+          {trust ? (
+            <div className="pt-1">
+              <TrustScoreBadge
+                score={trust}
+                scopeLabel={`${cityRecord.name} kira verisi`}
+                variant="pill"
+              />
+            </div>
+          ) : null}
         </div>
         <Link href="/kira/yeni" className={buttonVariants()}>
           <Plus className="mr-1.5 h-4 w-4" /> Kira ilanımı paylaş
@@ -106,6 +128,13 @@ export default async function KiraCityPage({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-8">
+        {trust ? (
+          <TrustScoreBadge
+            score={trust}
+            scopeLabel={`${cityRecord.name} · kira verisi`}
+          />
+        ) : null}
+
         <RentInflationPanel
           stats={inflation}
           scopeLabel={cityRecord.name}

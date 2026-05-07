@@ -20,6 +20,11 @@ import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
 import { formatNumber } from "@/lib/money";
 import { formatMbps } from "@/modules/internet/config";
 import { buildInternetScope, getOrGenerateInsight } from "@/services/ai/insights";
+import { getScopeTrustScore } from "@/lib/trust-score-server";
+import { TrustScoreBadge } from "@/components/data-display/trust-score-badge";
+import { db } from "@/lib/db";
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -37,7 +42,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const city = findCityBySlug(citySlug);
   if (!city) return { title: "Bulunamadı" };
   return {
-    title: `${city.name} İnternet Hızı & Sağlayıcılar`,
+    title: `${city.name} İnternet Hız Endeksi ${CURRENT_YEAR} — Anonim Gerçek Veri`,
     description: `${city.name} şehrinde anonim kullanıcılardan derlenmiş gerçek internet hız, ping ve memnuniyet verisi. ISP karşılaştırması.`,
     alternates: { canonical: `/internet/sehir/${citySlug}` },
   };
@@ -59,10 +64,17 @@ export default async function InternetCityPage({ params }: { params: Params }) {
   const city = findCityBySlug(citySlug);
   if (!city) notFound();
 
-  const [submissions, stats, ispRollups] = await Promise.all([
+  const cityDb = await db.city
+    .findUnique({ where: { slug: city.slug }, select: { id: true } })
+    .catch(() => null);
+
+  const [submissions, stats, ispRollups, trust] = await Promise.all([
     listInternetSubmissions({ citySlug, limit: 50 }).catch(() => []),
     getInternetStats({ citySlug }).catch(() => emptyMultiStats),
     getIspRollups(citySlug).catch(() => []),
+    cityDb
+      ? getScopeTrustScore({ type: "INTERNET", cityId: cityDb.id }).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -97,7 +109,7 @@ export default async function InternetCityPage({ params }: { params: Params }) {
             {city.region}
           </Badge>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {city.name} İnternet Hızı
+            {city.name} İnternet Hız Endeksi {CURRENT_YEAR}
           </h1>
           <p className="text-muted-foreground">
             {formatNumber(stats.count)} anonim ölçümden derlenmiş, {city.name} özelinde.
@@ -109,6 +121,10 @@ export default async function InternetCityPage({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-8">
+        {trust ? (
+          <TrustScoreBadge score={trust} scopeLabel={`${city.name} · internet verisi`} />
+        ) : null}
+
         <InternetStatsPanel stats={stats} scopeLabel={`${city.name} · tüm sağlayıcılar`} />
         <InternetIspTable rollups={ispRollups} citySlug={citySlug} />
 

@@ -20,6 +20,11 @@ import {
 } from "@/modules/maas/server/queries";
 import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
 import { formatNumber } from "@/lib/money";
+import { getScopeTrustScore } from "@/lib/trust-score-server";
+import { TrustScoreBadge } from "@/components/data-display/trust-score-badge";
+import { db } from "@/lib/db";
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -37,8 +42,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const cityRecord = findCityBySlug(citySlug);
   if (!cityRecord) return { title: "Bulunamadı" };
   return {
-    title: `${cityRecord.name} Maaşları — Anonim, Gerçek Veri`,
-    description: `${cityRecord.name} şehrinde pozisyon ve sektör bazında anonim olarak paylaşılan gerçek net maaşlar.`,
+    title: `${cityRecord.name} Maaş Endeksi ${CURRENT_YEAR} — Anonim Gerçek Veri`,
+    description: `${cityRecord.name} maaş endeksi: pozisyon ve sektör bazında anonim çalışanlardan derlenmiş gerçek net maaşlar — şirket beklentisi değil, ödenen.`,
     alternates: { canonical: `/maaslar/sehir/${citySlug}` },
   };
 }
@@ -58,12 +63,19 @@ export default async function CityPage({ params }: { params: Params }) {
   const cityRecord = findCityBySlug(citySlug);
   if (!cityRecord) notFound();
 
-  const [submissions, stats, relatedPositions] = await Promise.all([
+  const cityDb = await db.city
+    .findUnique({ where: { slug: cityRecord.slug }, select: { id: true } })
+    .catch(() => null);
+
+  const [submissions, stats, relatedPositions, trust] = await Promise.all([
     listSalarySubmissions({ citySlug, limit: 50 }).catch(() => []),
     getSalaryStats({ citySlug }).catch(() => emptyStats),
     getRelatedPositions(citySlug, "", 8).catch(
       () => [] as { slug: string; name: string; count: number }[],
     ),
+    cityDb
+      ? getScopeTrustScore({ type: "SALARY", cityId: cityDb.id }).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -91,12 +103,21 @@ export default async function CityPage({ params }: { params: Params }) {
             {cityRecord.region}
           </Badge>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {cityRecord.name} Maaşları
+            {cityRecord.name} Maaş Endeksi {CURRENT_YEAR}
           </h1>
           <p className="text-muted-foreground">
-            {formatNumber(stats.count)} anonim paylaşımdan derlenmiş — pozisyon ve
-            sektör bazında.
+            {formatNumber(stats.count)} anonim çalışan paylaşımı — pozisyon ve sektör
+            bazında, şirket beklentisi değil ödenen tutarlar.
           </p>
+          {trust ? (
+            <div className="pt-1">
+              <TrustScoreBadge
+                score={trust}
+                scopeLabel={`${cityRecord.name} maaş verisi`}
+                variant="pill"
+              />
+            </div>
+          ) : null}
         </div>
         <Link href="/maaslar/yeni" className={buttonVariants()}>
           <Plus className="mr-1.5 h-4 w-4" /> Maaşımı paylaş
@@ -104,6 +125,13 @@ export default async function CityPage({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-8">
+        {trust ? (
+          <TrustScoreBadge
+            score={trust}
+            scopeLabel={`${cityRecord.name} · maaş verisi`}
+          />
+        ) : null}
+
         <AmountStatsPanel stats={stats} scopeLabel={`${cityRecord.name} · tüm pozisyonlar`} />
 
         {insight ? <AmountAiInsight insight={insight} /> : null}

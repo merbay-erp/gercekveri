@@ -18,6 +18,11 @@ import {
 import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
 import { formatNumber } from "@/lib/money";
 import { buildAidatScope, getOrGenerateInsight } from "@/services/ai/insights";
+import { getScopeTrustScore } from "@/lib/trust-score-server";
+import { TrustScoreBadge } from "@/components/data-display/trust-score-badge";
+import { db } from "@/lib/db";
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -35,8 +40,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const city = findCityBySlug(citySlug);
   if (!city) return { title: "Bulunamadı" };
   return {
-    title: `${city.name} Aidatları — Anonim, Gerçek Veri`,
-    description: `${city.name} şehrinde apartman ve site aidatları. Anonim kullanıcı verisinden derlenmiş gerçek tutarlar.`,
+    title: `${city.name} Aidat Endeksi ${CURRENT_YEAR} — Anonim Gerçek Veri`,
+    description: `${city.name} aidat endeksi: apartman ve site aidatlarının yapı tipi + hizmet bazında gerçek dağılımı. Anonim sakin verisi, yönetim açıklaması değil.`,
     alternates: { canonical: `/aidat/sehir/${citySlug}` },
   };
 }
@@ -56,9 +61,16 @@ export default async function AidatCityPage({ params }: { params: Params }) {
   const city = findCityBySlug(citySlug);
   if (!city) notFound();
 
-  const [submissions, stats] = await Promise.all([
+  const cityDb = await db.city
+    .findUnique({ where: { slug: city.slug }, select: { id: true } })
+    .catch(() => null);
+
+  const [submissions, stats, trust] = await Promise.all([
     listAidatSubmissions({ citySlug, limit: 50 }).catch(() => []),
     getAidatStats({ citySlug }).catch(() => emptyStats),
+    cityDb
+      ? getScopeTrustScore({ type: "AIDAT", cityId: cityDb.id }).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -86,7 +98,7 @@ export default async function AidatCityPage({ params }: { params: Params }) {
             {city.region}
           </Badge>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {city.name} Aidatları
+            {city.name} Aidat Endeksi {CURRENT_YEAR}
           </h1>
           <p className="text-muted-foreground">
             {formatNumber(stats.count)} anonim paylaşımdan derlenmiş, {city.name} özelinde.
@@ -98,6 +110,10 @@ export default async function AidatCityPage({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-8">
+        {trust ? (
+          <TrustScoreBadge score={trust} scopeLabel={`${city.name} · aidat verisi`} />
+        ) : null}
+
         <AmountStatsPanel stats={stats} scopeLabel={`${city.name} · tüm tipler`} />
 
         {insight ? <AmountAiInsight insight={insight} /> : null}

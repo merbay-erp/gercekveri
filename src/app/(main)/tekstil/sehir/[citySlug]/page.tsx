@@ -16,6 +16,11 @@ import {
 } from "@/modules/tekstil/server/queries";
 import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
 import { formatNumber } from "@/lib/money";
+import { getScopeTrustScore } from "@/lib/trust-score-server";
+import { TrustScoreBadge } from "@/components/data-display/trust-score-badge";
+import { db } from "@/lib/db";
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -33,7 +38,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const city = findCityBySlug(citySlug);
   if (!city) return { title: "Bulunamadı" };
   return {
-    title: `${city.name} Tekstil Fiyatları — Anonim, Gerçek Veri`,
+    title: `${city.name} Tekstil Fiyat Endeksi ${CURRENT_YEAR} — Anonim Gerçek Veri`,
     description: `${city.name}'da kesim, dikim, boyahane, baskı ve kumaş üretim fiyatları. Anonim üretici verisinden derlenmiş gerçek rakamlar.`,
     alternates: { canonical: `/tekstil/sehir/${citySlug}` },
   };
@@ -54,9 +59,16 @@ export default async function TekstilCityPage({ params }: { params: Params }) {
   const city = findCityBySlug(citySlug);
   if (!city) notFound();
 
-  const [submissions, stats] = await Promise.all([
+  const cityDb = await db.city
+    .findUnique({ where: { slug: city.slug }, select: { id: true } })
+    .catch(() => null);
+
+  const [submissions, stats, trust] = await Promise.all([
     listTekstilSubmissions({ citySlug, limit: 50 }).catch(() => []),
     getTekstilStats({ citySlug }).catch(() => emptyStats),
+    cityDb
+      ? getScopeTrustScore({ type: "TEXTILE", cityId: cityDb.id }).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const amounts = submissions.map((s) => s.amount);
@@ -76,7 +88,7 @@ export default async function TekstilCityPage({ params }: { params: Params }) {
             {city.region}
           </Badge>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {city.name} Tekstil Fiyatları
+            {city.name} Tekstil Fiyat Endeksi {CURRENT_YEAR}
           </h1>
           <p className="text-muted-foreground">
             {formatNumber(stats.count)} anonim üretici paylaşımı, {city.name} özelinde.
@@ -89,6 +101,10 @@ export default async function TekstilCityPage({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-8">
+        {trust ? (
+          <TrustScoreBadge score={trust} scopeLabel={`${city.name} · tekstil verisi`} />
+        ) : null}
+
         <AmountStatsPanel
           stats={stats}
           scopeLabel={`${city.name} · tüm tekstil işleri (karma birim)`}
