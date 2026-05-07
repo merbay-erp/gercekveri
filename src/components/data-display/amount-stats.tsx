@@ -1,13 +1,26 @@
 import { Card } from "@/components/ui/card";
 import { formatTRY, formatNumber } from "@/lib/money";
-import type { SalaryStats } from "../types";
+
+export interface AmountStats {
+  count: number;
+  avg: number | null;
+  median: number | null;
+  p25: number | null;
+  p75: number | null;
+  min: number | null;
+  max: number | null;
+}
 
 interface Props {
-  stats: SalaryStats;
+  stats: AmountStats;
   scopeLabel?: string;
 }
 
-export function MaasStats({ stats, scopeLabel }: Props) {
+/**
+ * Generic five-bucket stats panel — the same layout works for salary, rent,
+ * utility bills, anything monetary. Pass `scopeLabel` to caption the grid.
+ */
+export function AmountStatsPanel({ stats, scopeLabel }: Props) {
   const empty = stats.count === 0;
   const items: { label: string; value: string; emphasize?: boolean }[] = [
     { label: "Veri sayısı", value: formatNumber(stats.count) },

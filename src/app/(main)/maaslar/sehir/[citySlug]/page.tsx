@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { AdSlot } from "@/components/ad-slot";
 import { MaasList } from "@/modules/maas/components/maas-list";
-import { MaasStats } from "@/modules/maas/components/maas-stats";
-import { MaasHistogram } from "@/modules/maas/components/maas-histogram";
-import { MaasAiInsight } from "@/modules/maas/components/maas-ai-insight";
-import { buildSalaryScope, getOrGenerateSalaryInsight } from "@/services/ai/insights";
+import { AmountStatsPanel } from "@/components/data-display/amount-stats";
+import { AmountHistogram } from "@/components/data-display/amount-histogram";
+import { AmountAiInsight } from "@/components/data-display/amount-ai-insight";
+import { buildSalaryScope, getOrGenerateInsight } from "@/services/ai/insights";
 import {
   getRelatedPositions,
   getSalaryStats,
@@ -66,10 +66,12 @@ export default async function CityPage({ params }: { params: Params }) {
     ),
   ]);
 
-  const insight = await getOrGenerateSalaryInsight({
+  const insight = await getOrGenerateInsight({
     scope: buildSalaryScope(undefined, citySlug),
     scopeLabel: `${cityRecord.name} — tüm pozisyonlar`,
     stats,
+    nounSingular: "maaş",
+    nounPlural: "maaşlar",
   }).catch(() => null);
 
   const amounts = submissions.map((s) => s.amount);
@@ -102,14 +104,16 @@ export default async function CityPage({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-8">
-        <MaasStats stats={stats} scopeLabel={`${cityRecord.name} · tüm pozisyonlar`} />
+        <AmountStatsPanel stats={stats} scopeLabel={`${cityRecord.name} · tüm pozisyonlar`} />
 
-        {insight ? <MaasAiInsight insight={insight} /> : null}
+        {insight ? <AmountAiInsight insight={insight} /> : null}
 
         {amounts.length >= 3 ? (
-          <MaasHistogram
+          <AmountHistogram
             amounts={amounts}
             scopeLabel={`${cityRecord.name} maaş aralığı dağılımı`}
+            title="Maaş dağılımı"
+            unitLabel="kişi"
           />
         ) : null}
 

@@ -7,7 +7,12 @@ interface Props {
   insight: CachedInsight;
 }
 
-export function MaasAiInsight({ insight }: Props) {
+/**
+ * Generic AI insight card — same layout works for salary, rent, utility,
+ * etc. The cached body comes from `getOrGenerateInsight()` which already
+ * picked module-appropriate copy in the prompt.
+ */
+export function AmountAiInsight({ insight }: Props) {
   return (
     <Card className="overflow-hidden border-amber-500/20 bg-gradient-to-br from-amber-500/[0.04] via-transparent to-transparent p-5">
       <div className="flex items-start gap-3">

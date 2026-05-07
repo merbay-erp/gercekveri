@@ -5,8 +5,8 @@ import { Plus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { AdSlot } from "@/components/ad-slot";
 import { MaasList } from "@/modules/maas/components/maas-list";
-import { MaasStats } from "@/modules/maas/components/maas-stats";
-import { MaasHistogram } from "@/modules/maas/components/maas-histogram";
+import { AmountStatsPanel } from "@/components/data-display/amount-stats";
+import { AmountHistogram } from "@/components/data-display/amount-histogram";
 import { MaasFilterBar } from "@/modules/maas/components/maas-filter-bar";
 import {
   getSalaryStats,
@@ -74,10 +74,15 @@ export default async function MaaslarPage() {
 
       <div className="space-y-8">
         <MaasFilterBar topPositions={topPositions} />
-        <MaasStats stats={stats} scopeLabel="Türkiye geneli — tüm pozisyonlar" />
+        <AmountStatsPanel stats={stats} scopeLabel="Türkiye geneli — tüm pozisyonlar" />
 
         {amounts.length >= 3 ? (
-          <MaasHistogram amounts={amounts} scopeLabel="Türkiye geneli maaş dağılımı" />
+          <AmountHistogram
+            amounts={amounts}
+            scopeLabel="Türkiye geneli maaş dağılımı"
+            title="Maaş dağılımı"
+            unitLabel="kişi"
+          />
         ) : null}
 
         <AdSlot slotKey="maaslar-list-top" format="leaderboard" />

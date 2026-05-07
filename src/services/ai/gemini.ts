@@ -18,7 +18,7 @@ function getClient(): GoogleGenAI | null {
   return cachedClient;
 }
 
-export interface SalaryInsightOutput {
+export interface InsightOutput {
   title: string;
   body: string;
   bullets: string[];
@@ -41,7 +41,7 @@ const insightSchema = {
   required: ["title", "body", "bullets"],
 };
 
-interface GenerateInput {
+export interface GenerateAmountInsightInput {
   scopeLabel: string;
   count: number;
   median: number;
@@ -50,16 +50,25 @@ interface GenerateInput {
   p75: number;
   min: number;
   max: number;
+  /** Singular form of what's being measured: "maaş" / "kira" / "fatura" */
+  nounSingular: string;
+  /** Plural / context noun: "maaşlar" / "kira ilanları" / "faturalar" */
+  nounPlural: string;
+  /** Cadence — defaults to "/ay" for monthly amounts */
+  unitSuffix?: string;
 }
 
 /**
- * Generate a short Turkish summary for a salary stats scope.
+ * Generate a short Turkish summary for any monetary stats scope. Module-
+ * specific copy is injected via `nounSingular`/`nounPlural` so the same
+ * function powers salary, rent, utility, and future modules without forks.
+ *
  * Returns null if the API key isn't configured or the call fails — the
  * caller is expected to render gracefully without a summary.
  */
-export async function generateSalaryInsight(
-  input: GenerateInput,
-): Promise<SalaryInsightOutput | null> {
+export async function generateAmountInsight(
+  input: GenerateAmountInsightInput,
+): Promise<InsightOutput | null> {
   const client = getClient();
   if (!client) return null;
 
@@ -79,7 +88,7 @@ export async function generateSalaryInsight(
 
     const text = response.text;
     if (!text) return null;
-    const parsed = JSON.parse(text) as SalaryInsightOutput;
+    const parsed = JSON.parse(text) as InsightOutput;
     if (!parsed.title || !parsed.body) return null;
     return {
       title: String(parsed.title).slice(0, 160),
@@ -94,24 +103,31 @@ export async function generateSalaryInsight(
   }
 }
 
-function buildPrompt(input: GenerateInput): string {
+function buildPrompt(input: GenerateAmountInsightInput): string {
   const fmt = (n: number) =>
-    new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY", maximumFractionDigits: 0 }).format(n);
+    new Intl.NumberFormat("tr-TR", {
+      style: "currency",
+      currency: "TRY",
+      maximumFractionDigits: 0,
+    }).format(n);
 
-  return `Sen Türkiye'deki maaş verisini analiz eden, dürüst ve sade konuşan bir veri analistisisin. Aşağıdaki istatistikler için kısa bir Türkçe özet yaz.
+  const unitSuffix = input.unitSuffix ?? "/ay";
+
+  return `Sen Türkiye'deki ${input.nounPlural} verisini analiz eden, dürüst ve sade konuşan bir veri analistisisin. Aşağıdaki istatistikler için kısa bir Türkçe özet yaz.
 
 Kapsam: ${input.scopeLabel}
 Veri sayısı: ${input.count}
-Medyan: ${fmt(input.median)}
-Ortalama: ${fmt(input.avg)}
-Alt çeyrek (P25): ${fmt(input.p25)}
-Üst çeyrek (P75): ${fmt(input.p75)}
-Minimum: ${fmt(input.min)}
-Maksimum: ${fmt(input.max)}
+Medyan: ${fmt(input.median)} ${unitSuffix}
+Ortalama: ${fmt(input.avg)} ${unitSuffix}
+Alt çeyrek (P25): ${fmt(input.p25)} ${unitSuffix}
+Üst çeyrek (P75): ${fmt(input.p75)} ${unitSuffix}
+Minimum: ${fmt(input.min)} ${unitSuffix}
+Maksimum: ${fmt(input.max)} ${unitSuffix}
 
 Kurallar:
 - Sadece veriden çıkanı söyle, varsayım yapma.
 - Sayıları aynen kullan; uydurma rakam ekleme.
+- "${input.nounSingular}" kelimesini doğal yerlerde kullan.
 - Özet kısa, doğal, doğrudan olsun (3-4 cümle).
 - "Yaklaşık", "ortalama olarak" gibi muğlak ifadelerden kaçın; rakamı söyle.
 - Bullet'lar kısa, net olsun (en fazla 12 kelime).
@@ -120,3 +136,9 @@ Kurallar:
 
 JSON çıktı ver: { title, body, bullets[] }`;
 }
+
+// Backward-compat alias — older callers can keep using the salary-specific name.
+export const generateSalaryInsight = (input: Omit<GenerateAmountInsightInput, "nounSingular" | "nounPlural">) =>
+  generateAmountInsight({ ...input, nounSingular: "maaş", nounPlural: "maaşlar" });
+
+export type SalaryInsightOutput = InsightOutput;

@@ -54,7 +54,7 @@ export const categories: CategoryDef[] = [
     longDescription:
       "Emlakçı bekleyen fiyatları değil, kiracıların ödediği gerçek tutarları gör. m², oda, bina yaşı bazında filtre.",
     icon: Home,
-    status: "soon",
+    status: "live",
     accent: "from-sky-500/20 to-sky-500/5",
     sortOrder: 2,
   },
@@ -125,9 +125,9 @@ export const mainNav = [
 export const footerNav = {
   product: [
     { label: "Maaşlar", href: "/maaslar" },
-    { label: "Kira", href: "/kira" },
-    { label: "İnternet", href: "/internet" },
-    { label: "Veri Paylaş", href: "/maaslar/yeni" },
+    { label: "Kiralar", href: "/kira" },
+    { label: "Maaş paylaş", href: "/maaslar/yeni" },
+    { label: "Kira paylaş", href: "/kira/yeni" },
   ],
   legal: [
     { label: "Gizlilik Politikası", href: "/gizlilik" },

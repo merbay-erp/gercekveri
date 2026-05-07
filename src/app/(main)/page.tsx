@@ -13,6 +13,7 @@ import {
   topCitySlugs,
   getSalaryStats,
 } from "@/modules/maas/server/queries";
+import { topRentCitySlugs, getRentStats } from "@/modules/kira/server/queries";
 import { positionNameFromSlug } from "@/modules/maas/position-resolver";
 import { findCityBySlug } from "@/lib/cities";
 
@@ -20,20 +21,41 @@ export const revalidate = 60;
 
 async function getHomepageStats() {
   try {
-    const [salaryCount, generalStats, popularPositionSlugs, popularCitySlugs] =
-      await Promise.all([
-        db.submission.count({ where: { type: "SALARY", status: "APPROVED" } }),
-        getSalaryStats(),
-        topPositionSlugs(6),
-        topCitySlugs(6),
-      ]);
-    return { salaryCount, generalStats, popularPositionSlugs, popularCitySlugs };
+    const [
+      salaryCount,
+      rentCount,
+      generalStats,
+      rentStats,
+      popularPositionSlugs,
+      popularSalaryCitySlugs,
+      popularRentCitySlugs,
+    ] = await Promise.all([
+      db.submission.count({ where: { type: "SALARY", status: "APPROVED" } }),
+      db.submission.count({ where: { type: "RENT", status: "APPROVED" } }),
+      getSalaryStats(),
+      getRentStats(),
+      topPositionSlugs(6),
+      topCitySlugs(6),
+      topRentCitySlugs(6),
+    ]);
+    return {
+      salaryCount,
+      rentCount,
+      generalStats,
+      rentStats,
+      popularPositionSlugs,
+      popularSalaryCitySlugs,
+      popularRentCitySlugs,
+    };
   } catch {
     return {
       salaryCount: 0,
+      rentCount: 0,
       generalStats: { count: 0, median: null, avg: null, p25: null, p75: null, min: null, max: null },
+      rentStats: { count: 0, median: null, avg: null, p25: null, p75: null, min: null, max: null },
       popularPositionSlugs: [] as string[],
-      popularCitySlugs: [] as string[],
+      popularSalaryCitySlugs: [] as string[],
+      popularRentCitySlugs: [] as string[],
     };
   }
 }
@@ -73,7 +95,8 @@ export default async function HomePage() {
                 <ShieldCheck className="h-4 w-4 text-emerald-500" /> %100 anonim
               </span>
               <span className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-sky-500" /> {formatNumber(stats.salaryCount)} maaş paylaşımı
+                <BarChart3 className="h-4 w-4 text-sky-500" />
+                {formatNumber(stats.salaryCount)} maaş · {formatNumber(stats.rentCount)} kira paylaşımı
               </span>
               <span className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-amber-500" /> AI özetler — yakında
@@ -85,9 +108,12 @@ export default async function HomePage() {
 
       {/* POPULAR LINKS — surfaces SEO pages directly on the home for crawl
           discovery + repeat-visit retention */}
-      {stats.popularPositionSlugs.length + stats.popularCitySlugs.length > 0 ? (
+      {stats.popularPositionSlugs.length +
+        stats.popularSalaryCitySlugs.length +
+        stats.popularRentCitySlugs.length >
+      0 ? (
         <section className="container mx-auto px-4 pt-4 pb-12">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <Card className="p-5">
               <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 <Briefcase className="h-3.5 w-3.5" /> Popüler pozisyonlar
@@ -106,10 +132,10 @@ export default async function HomePage() {
             </Card>
             <Card className="p-5">
               <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                <MapPin className="h-3.5 w-3.5" /> Popüler şehirler
+                <MapPin className="h-3.5 w-3.5" /> Maaş şehirleri
               </div>
               <div className="flex flex-wrap gap-2">
-                {stats.popularCitySlugs.map((slug) => {
+                {stats.popularSalaryCitySlugs.map((slug) => {
                   const city = findCityBySlug(slug);
                   if (!city) return null;
                   return (
@@ -124,13 +150,33 @@ export default async function HomePage() {
                 })}
               </div>
             </Card>
+            <Card className="p-5">
+              <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5" /> Kira şehirleri
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {stats.popularRentCitySlugs.map((slug) => {
+                  const city = findCityBySlug(slug);
+                  if (!city) return null;
+                  return (
+                    <Link
+                      key={slug}
+                      href={`/kira/sehir/${slug}`}
+                      className="rounded-full border bg-background px-3 py-1 text-sm transition hover:border-foreground/30 hover:bg-muted"
+                    >
+                      {city.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </Card>
           </div>
 
-          {stats.generalStats.median ? (
-            <Card className="mt-4 flex flex-col items-start gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {stats.generalStats.median ? (
+              <Card className="space-y-2 p-5">
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Türkiye geneli medyan
+                  Türkiye geneli maaş medyanı
                 </p>
                 <p className="text-2xl font-semibold tabular-nums sm:text-3xl">
                   {formatTRY(stats.generalStats.median)}
@@ -138,14 +184,32 @@ export default async function HomePage() {
                     net / ay
                   </span>
                 </p>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {formatNumber(stats.generalStats.count)} paylaşımdan derlendi · alt %25{" "}
-                {formatTRY(stats.generalStats.p25)} · üst %75{" "}
-                {formatTRY(stats.generalStats.p75)}
-              </div>
-            </Card>
-          ) : null}
+                <p className="text-xs text-muted-foreground">
+                  {formatNumber(stats.generalStats.count)} paylaşım · P25{" "}
+                  {formatTRY(stats.generalStats.p25)} · P75{" "}
+                  {formatTRY(stats.generalStats.p75)}
+                </p>
+              </Card>
+            ) : null}
+            {stats.rentStats.median ? (
+              <Card className="space-y-2 p-5">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Türkiye geneli kira medyanı
+                </p>
+                <p className="text-2xl font-semibold tabular-nums sm:text-3xl">
+                  {formatTRY(stats.rentStats.median)}
+                  <span className="ml-2 text-sm font-normal text-muted-foreground">
+                    aylık
+                  </span>
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {formatNumber(stats.rentStats.count)} ilan · P25{" "}
+                  {formatTRY(stats.rentStats.p25)} · P75{" "}
+                  {formatTRY(stats.rentStats.p75)}
+                </p>
+              </Card>
+            ) : null}
+          </div>
         </section>
       ) : null}
 

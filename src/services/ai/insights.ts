@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 import { db } from "@/lib/db";
-import { generateSalaryInsight, GEMINI_MODEL, type SalaryInsightOutput } from "./gemini";
+import { generateAmountInsight, GEMINI_MODEL } from "./gemini";
 
 /**
  * AI summaries are stored in `AiSummary` table keyed by (scope, language).
@@ -30,6 +30,10 @@ interface GetOrGenerateArgs {
   scope: string;
   scopeLabel: string;
   stats: ScopeStats;
+  /** Single-word noun e.g. "maaş", "kira" — used in the AI prompt copy. */
+  nounSingular?: string;
+  /** Plural / context noun e.g. "maaşlar", "kira ilanları". */
+  nounPlural?: string;
 }
 
 export interface CachedInsight {
@@ -61,10 +65,12 @@ function statsHash(stats: ScopeStats): string {
  * Behaviour intentionally degrades silently — pages must render fine even
  * when AI is unavailable.
  */
-export async function getOrGenerateSalaryInsight({
+export async function getOrGenerateInsight({
   scope,
   scopeLabel,
   stats,
+  nounSingular = "maaş",
+  nounPlural = "maaşlar",
 }: GetOrGenerateArgs): Promise<CachedInsight | null> {
   if (
     stats.count < MIN_DATA_FOR_INSIGHT ||
@@ -107,7 +113,7 @@ export async function getOrGenerateSalaryInsight({
     };
   }
 
-  const generated = await generateSalaryInsight({
+  const generated = await generateAmountInsight({
     scopeLabel,
     count: stats.count,
     median: stats.median,
@@ -116,6 +122,8 @@ export async function getOrGenerateSalaryInsight({
     p75: stats.p75,
     min: stats.min,
     max: stats.max,
+    nounSingular,
+    nounPlural,
   });
 
   if (!generated) {
@@ -205,3 +213,11 @@ export function buildSalaryScope(positionSlug?: string, citySlug?: string): stri
   if (positionSlug) parts.push(`p/${positionSlug}`);
   return parts.length === 1 ? "salary:all" : parts.join(":");
 }
+
+export function buildRentScope(citySlug?: string): string {
+  if (!citySlug) return "rent:all";
+  return `rent:c/${citySlug}`;
+}
+
+// Backward-compat alias — older callers using the salary-specific name.
+export const getOrGenerateSalaryInsight = getOrGenerateInsight;

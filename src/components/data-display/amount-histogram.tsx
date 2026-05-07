@@ -17,6 +17,10 @@ import { formatCompact, formatTRY } from "@/lib/money";
 interface Props {
   amounts: number[];
   scopeLabel?: string;
+  /** Default: "Dağılım" */
+  title?: string;
+  /** Default: "kayıt" — singular noun used in tooltip ("12 kayıt") */
+  unitLabel?: string;
 }
 
 interface Bin {
@@ -41,7 +45,6 @@ function buildBins(amounts: number[]): Bin[] {
   const range = Math.max(max - min, 1);
   const targetBins = Math.min(12, Math.max(5, Math.ceil(Math.sqrt(trimmed.length))));
 
-  // Round bin width to a "nice" number for human-friendly axis labels.
   const rawWidth = range / targetBins;
   const magnitude = Math.pow(10, Math.floor(Math.log10(rawWidth)));
   const niceWidth = Math.ceil(rawWidth / magnitude) * magnitude;
@@ -64,7 +67,19 @@ function buildBins(amounts: number[]): Bin[] {
   return bins;
 }
 
-export function MaasHistogram({ amounts, scopeLabel }: Props) {
+/**
+ * Generic histogram for monetary amounts. Bin width is computed from a "nice
+ * number" rounded to the leading magnitude so axis labels read cleanly even
+ * on small samples. Module-specific copy (e.g. "Maaş dağılımı") is passed in
+ * via the `title` and `unitLabel` props so the same chart can render salary,
+ * rent, utility, etc. without forking.
+ */
+export function AmountHistogram({
+  amounts,
+  scopeLabel,
+  title = "Dağılım",
+  unitLabel = "kayıt",
+}: Props) {
   const bins = React.useMemo(() => buildBins(amounts), [amounts]);
 
   if (bins.length < 3) {
@@ -78,7 +93,7 @@ export function MaasHistogram({ amounts, scopeLabel }: Props) {
           {scopeLabel}
         </p>
       ) : null}
-      <h3 className="mb-4 text-sm font-medium">Maaş dağılımı</h3>
+      <h3 className="mb-4 text-sm font-medium">{title}</h3>
       <div className="h-56 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={bins} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
@@ -106,7 +121,9 @@ export function MaasHistogram({ amounts, scopeLabel }: Props) {
                 fontSize: 12,
                 color: "var(--foreground)",
               }}
-              formatter={(value) => [`${String(value)} kişi`, "Veri sayısı"] as [string, string]}
+              formatter={(value) =>
+                [`${String(value)} ${unitLabel}`, "Veri sayısı"] as [string, string]
+              }
               labelFormatter={(_label: unknown, payload: ReadonlyArray<{ payload?: Bin }>) => {
                 const bin = payload?.[0]?.payload;
                 return bin ? `~${formatTRY(bin.midpoint)}` : "";
