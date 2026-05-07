@@ -8,6 +8,15 @@ import { ogFormatTRY as fmtTry } from "@/lib/og-format";
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
+  try {
+    return await render(req);
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    return new Response(msg.slice(0, 500), { status: 500, headers: { "content-type": "text/plain" } });
+  }
+}
+
+async function render(req: Request) {
   const { searchParams } = new URL(req.url);
   const citySlug = searchParams.get("city") ?? undefined;
   const cityRecord = citySlug ? findCityBySlug(citySlug) : undefined;
