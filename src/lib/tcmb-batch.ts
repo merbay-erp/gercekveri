@@ -27,16 +27,29 @@ const SERIES: SeriesSpec[] = [
   { code: "TP.APIFON4", label: "TCMB politika faizi (AOFM)", frequency: "1", computeYoY: false },
   // Enflasyon (aylık) — reality score için kritik
   { code: "TP.FE.OKTG01", label: "TÜFE genel endeks", frequency: "5", computeYoY: true },
-  // Konut endeksleri — public chart portlet API'sinden 20 series kod
-  // doğrulandı: TP.KFE.TR (genel) + 18 NUTS-1/NUTS-2 region kırılımı.
-  // Şu an 5 ana büyükşehir + Türkiye geneli ekledik; geri kalan bölgeler
-  // ihtiyaç oldukça eklenir.
+  // Konut endeksleri — TCMB public chart portlet API'sinden 20 series
+  // kod doğrulandı: TP.KFE.TR (genel) + 19 NUTS-1/NUTS-2 region.
+  // Tam Türkiye kapsamı: her 81 il bir region'a eşleniyor (CITY_KFE_MAP).
   { code: "TP.KFE.TR", label: "Konut Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
   { code: "TP.KFE.TR10", label: "Konut Fiyat Endeksi (İstanbul)", frequency: "5", computeYoY: true },
-  { code: "TP.KFE.TR51", label: "Konut Fiyat Endeksi (Ankara)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR21", label: "Konut Fiyat Endeksi (Tekirdağ-Edirne-Kırklareli)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR22", label: "Konut Fiyat Endeksi (Balıkesir-Çanakkale)", frequency: "5", computeYoY: true },
   { code: "TP.KFE.TR31", label: "Konut Fiyat Endeksi (İzmir)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR32", label: "Konut Fiyat Endeksi (Aydın-Denizli-Muğla)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR33", label: "Konut Fiyat Endeksi (Manisa-Afyon-Kütahya-Uşak)", frequency: "5", computeYoY: true },
   { code: "TP.KFE.TR41", label: "Konut Fiyat Endeksi (Bursa-Eskişehir-Bilecik)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR42", label: "Konut Fiyat Endeksi (Kocaeli-Sakarya-Düzce-Bolu-Yalova)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR51", label: "Konut Fiyat Endeksi (Ankara)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR52", label: "Konut Fiyat Endeksi (Konya-Karaman)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR61", label: "Konut Fiyat Endeksi (Antalya-Isparta-Burdur)", frequency: "5", computeYoY: true },
   { code: "TP.KFE.TR62", label: "Konut Fiyat Endeksi (Adana-Mersin)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR63", label: "Konut Fiyat Endeksi (Hatay-Maraş-Osmaniye)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR7", label: "Konut Fiyat Endeksi (Orta Anadolu)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR8", label: "Konut Fiyat Endeksi (Batı Karadeniz)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR9", label: "Konut Fiyat Endeksi (Doğu Karadeniz)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TRA", label: "Konut Fiyat Endeksi (Kuzeydoğu Anadolu)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TRB", label: "Konut Fiyat Endeksi (Ortadoğu Anadolu)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TRC", label: "Konut Fiyat Endeksi (Güneydoğu Anadolu)", frequency: "5", computeYoY: true },
   { code: "TP.YOKFEND.TR", label: "Yeni Olmayan Konutlar Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
 ];
 

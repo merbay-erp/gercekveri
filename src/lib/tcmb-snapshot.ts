@@ -68,21 +68,46 @@ export interface HousingIndexSnapshot {
   fetchedAt: Date;
 }
 
-// EVDS3 chart portlet API'sinden çıkarıldı — TP.KFE.TR{NUTS-2 code} pattern.
-// 18 region var, 5 ana şehir doğrudan eşleştirildi. Çevreleyen bölgesi
-// olmayan şehirler Türkiye geneli (TP.KFE.TR) görüyor.
-const CITY_KFE_MAP: Record<string, { code: string; cityName: string }> = {
-  istanbul: { code: "TP.KFE.TR10", cityName: "İstanbul" },
-  ankara: { code: "TP.KFE.TR51", cityName: "Ankara" },
-  izmir: { code: "TP.KFE.TR31", cityName: "İzmir" },
-  // TR41 — Bursa, Eskişehir, Bilecik
-  bursa: { code: "TP.KFE.TR41", cityName: "Bursa-Eskişehir-Bilecik (TR41)" },
-  eskisehir: { code: "TP.KFE.TR41", cityName: "Bursa-Eskişehir-Bilecik (TR41)" },
-  bilecik: { code: "TP.KFE.TR41", cityName: "Bursa-Eskişehir-Bilecik (TR41)" },
-  // TR62 — Adana, Mersin
-  adana: { code: "TP.KFE.TR62", cityName: "Adana-Mersin (TR62)" },
-  mersin: { code: "TP.KFE.TR62", cityName: "Adana-Mersin (TR62)" },
-};
+// 81 il × 19 NUTS region tam eşleşme — TCMB EVDS resmi NUTS-2 sınıflandırması.
+// Her şehrin konut fiyat endeksi kendi bölgesinin verisini görür.
+// Tek-il bölgeler (İstanbul, Ankara, İzmir) salt o ili kapsar; diğerleri
+// birden fazla ili gruplar (örn. TR41 = Bursa+Eskişehir+Bilecik).
+const CITY_KFE_MAP: Record<string, { code: string; cityName: string }> = (() => {
+  const groups: Array<{ code: string; cityName: string; slugs: string[] }> = [
+    { code: "TP.KFE.TR10", cityName: "İstanbul", slugs: ["istanbul"] },
+    { code: "TP.KFE.TR21", cityName: "Tekirdağ-Edirne-Kırklareli", slugs: ["tekirdag", "edirne", "kirklareli"] },
+    { code: "TP.KFE.TR22", cityName: "Balıkesir-Çanakkale", slugs: ["balikesir", "canakkale"] },
+    { code: "TP.KFE.TR31", cityName: "İzmir", slugs: ["izmir"] },
+    { code: "TP.KFE.TR32", cityName: "Aydın-Denizli-Muğla", slugs: ["aydin", "denizli", "mugla"] },
+    { code: "TP.KFE.TR33", cityName: "Manisa-Afyon-Kütahya-Uşak", slugs: ["manisa", "afyonkarahisar", "kutahya", "usak"] },
+    { code: "TP.KFE.TR41", cityName: "Bursa-Eskişehir-Bilecik", slugs: ["bursa", "eskisehir", "bilecik"] },
+    { code: "TP.KFE.TR42", cityName: "Kocaeli-Sakarya-Düzce-Bolu-Yalova", slugs: ["kocaeli", "sakarya", "duzce", "bolu", "yalova"] },
+    { code: "TP.KFE.TR51", cityName: "Ankara", slugs: ["ankara"] },
+    { code: "TP.KFE.TR52", cityName: "Konya-Karaman", slugs: ["konya", "karaman"] },
+    { code: "TP.KFE.TR61", cityName: "Antalya-Isparta-Burdur", slugs: ["antalya", "isparta", "burdur"] },
+    { code: "TP.KFE.TR62", cityName: "Adana-Mersin", slugs: ["adana", "mersin"] },
+    { code: "TP.KFE.TR63", cityName: "Hatay-Maraş-Osmaniye", slugs: ["hatay", "kahramanmaras", "osmaniye"] },
+    { code: "TP.KFE.TR7", cityName: "Orta Anadolu (Kayseri-Sivas-Yozgat-Niğde-Nevşehir-Kırşehir-Aksaray-Kırıkkale)",
+      slugs: ["kayseri", "sivas", "yozgat", "nigde", "nevsehir", "kirsehir", "aksaray", "kirikkale"] },
+    { code: "TP.KFE.TR8", cityName: "Batı Karadeniz (Samsun-Tokat-Çorum-Amasya-Zonguldak-Karabük-Bartın-Kastamonu-Çankırı-Sinop)",
+      slugs: ["samsun", "tokat", "corum", "amasya", "zonguldak", "karabuk", "bartin", "kastamonu", "cankiri", "sinop"] },
+    { code: "TP.KFE.TR9", cityName: "Doğu Karadeniz (Trabzon-Ordu-Giresun-Rize-Artvin-Gümüşhane)",
+      slugs: ["trabzon", "ordu", "giresun", "rize", "artvin", "gumushane"] },
+    { code: "TP.KFE.TRA", cityName: "Kuzeydoğu Anadolu (Erzurum-Erzincan-Bayburt-Ağrı-Kars-Iğdır-Ardahan)",
+      slugs: ["erzurum", "erzincan", "bayburt", "agri", "kars", "igdir", "ardahan"] },
+    { code: "TP.KFE.TRB", cityName: "Ortadoğu Anadolu (Malatya-Elazığ-Bingöl-Tunceli-Van-Muş-Bitlis-Hakkari)",
+      slugs: ["malatya", "elazig", "bingol", "tunceli", "van", "mus", "bitlis", "hakkari"] },
+    { code: "TP.KFE.TRC", cityName: "Güneydoğu Anadolu (Gaziantep-Şanlıurfa-Diyarbakır-Mardin-Adıyaman-Kilis-Batman-Şırnak-Siirt)",
+      slugs: ["gaziantep", "sanliurfa", "diyarbakir", "mardin", "adiyaman", "kilis", "batman", "sirnak", "siirt"] },
+  ];
+  const map: Record<string, { code: string; cityName: string }> = {};
+  for (const g of groups) {
+    for (const slug of g.slugs) {
+      map[slug] = { code: g.code, cityName: g.cityName };
+    }
+  }
+  return map;
+})();
 
 /**
  * Şehir bazlı konut fiyat endeksi. Şu an Türkiye geneli (TP.KFE.TR) fallback —
