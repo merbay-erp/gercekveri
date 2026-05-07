@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Database } from "lucide-react";
 
 import { footerNav, siteConfig } from "@/lib/site-config";
 import { Separator } from "@/components/ui/separator";
+import { BrandMark } from "@/components/brand-mark";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -13,9 +13,7 @@ export function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-4">
           <div className="space-y-3">
             <Link href="/" className="flex items-center gap-2 font-semibold">
-              <span className="grid h-7 w-7 place-items-center rounded-md bg-foreground text-background">
-                <Database className="h-3.5 w-3.5" />
-              </span>
+              <BrandMark className="h-7 w-7 shrink-0" />
               <span>{siteConfig.name}</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
