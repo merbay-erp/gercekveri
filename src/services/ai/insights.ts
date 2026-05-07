@@ -8,7 +8,7 @@ import { generateAmountInsight, GEMINI_MODEL } from "./gemini";
  * The `promptHash` field invalidates cache when prompt structure changes.
  */
 
-const PROMPT_VERSION = "v1-2026-05-flashlite";
+const PROMPT_VERSION = "v2-2026-05-formatvalue";
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 // 30-minute negative cache: when generation fails (rate limit, API down)
 // we still write to AiSummary with empty body so the next request can
@@ -34,6 +34,11 @@ interface GetOrGenerateArgs {
   nounSingular?: string;
   /** Plural / context noun e.g. "maaşlar", "kira ilanları". */
   nounPlural?: string;
+  /**
+   * Override how stats values are stringified in the prompt. Defaults to TRY
+   * — pass a Mbps / ms formatter for non-money scopes.
+   */
+  formatValue?: (n: number) => string;
 }
 
 export interface CachedInsight {
@@ -71,6 +76,7 @@ export async function getOrGenerateInsight({
   stats,
   nounSingular = "maaş",
   nounPlural = "maaşlar",
+  formatValue,
 }: GetOrGenerateArgs): Promise<CachedInsight | null> {
   if (
     stats.count < MIN_DATA_FOR_INSIGHT ||
@@ -124,6 +130,7 @@ export async function getOrGenerateInsight({
     max: stats.max,
     nounSingular,
     nounPlural,
+    formatValue,
   });
 
   if (!generated) {
