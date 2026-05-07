@@ -25,6 +25,7 @@ import { positionSlugFor } from "@/modules/maas/position-resolver";
 import { computeComparison } from "@/lib/comparison";
 import { siteConfig } from "@/lib/site-config";
 import { ogFormatTRY as fmtTry } from "@/lib/og-format";
+import { OgBrandMark } from "@/lib/og-brand-mark";
 
 type Kind = "maas" | "kira" | "aidat" | "fatura" | "tekstil";
 const VALID_SITE_TYPES = new Set(["BLOCK", "VILLA", "INDEPENDENT", "RESIDENCE"]);
@@ -237,22 +238,7 @@ export async function GET(req: Request) {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 32 }}>
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 11,
-              background: "#fafafa",
-              color: "#0a0a0a",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-              fontWeight: 700,
-            }}
-          >
-            G
-          </div>
+          <OgBrandMark size={44} />
           <div style={{ fontSize: 26, fontWeight: 600 }}>{siteConfig.name}</div>
           <div
             style={{

@@ -5,6 +5,7 @@ import { getRentInflationStats } from "@/modules/kira/server/queries";
 import { siteConfig } from "@/lib/site-config";
 import { ogFormatTRY as fmtTry } from "@/lib/og-format";
 import { computeRealityScore } from "@/lib/reality-score";
+import { OgBrandMark } from "@/lib/og-brand-mark";
 
 export const runtime = "nodejs";
 
@@ -73,22 +74,7 @@ async function render(req: Request) {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 11,
-              background: "#fafafa",
-              color: "#0a0a0a",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-              fontWeight: 700,
-            }}
-          >
-            G
-          </div>
+          <OgBrandMark size={44} />
           <div style={{ fontSize: 26, fontWeight: 600 }}>{siteConfig.name}</div>
           <div
             style={{

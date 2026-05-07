@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Database, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { GlobalSearch } from "@/components/search/global-search";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { BrandMark } from "@/components/brand-mark";
 import { mainNav, siteConfig } from "@/lib/site-config";
 import { buildSearchIndex } from "@/lib/search-index";
 import { cn } from "@/lib/utils";
@@ -19,9 +20,7 @@ export function SiteHeader() {
             href="/"
             className="flex items-center gap-2 font-semibold tracking-tight"
           >
-            <span className="grid h-7 w-7 place-items-center rounded-md bg-foreground text-background">
-              <Database className="h-3.5 w-3.5" />
-            </span>
+            <BrandMark className="h-7 w-7 shrink-0" />
             <span>{siteConfig.name}</span>
           </Link>
 

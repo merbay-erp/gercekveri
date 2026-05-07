@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/lib/site-config";
+import { OgBrandMark } from "@/lib/og-brand-mark";
 
 export const runtime = "edge";
 export const alt = `${siteConfig.name} — ${siteConfig.tagline}`;
@@ -22,22 +23,7 @@ export default async function og() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 64 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 14,
-              background: "#fafafa",
-              color: "#0a0a0a",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 36,
-              fontWeight: 700,
-            }}
-          >
-            G
-          </div>
+          <OgBrandMark size={56} />
           <div style={{ fontSize: 36, fontWeight: 600, letterSpacing: -0.5 }}>
             {siteConfig.name}
           </div>
