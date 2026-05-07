@@ -50,7 +50,10 @@ export async function GET(req: Request) {
     return Response.json({ error: "TCMB_EVDS_API_KEY env yok" }, { status: 500 });
   }
 
-  const url = `${BASE}/serieList/?type=json&code=${encodeURIComponent(group)}`;
+  // mode=2 → "kategoriden gelen tüm series" (fatihmete'in get_sub_categories
+  // pattern'inden ilham — serieList için de gerekli olduğu deneme yanılma ile
+  // bulundu çünkü mode'suz 400 dönüyordu)
+  const url = `${BASE}/serieList/?type=json&mode=2&code=${encodeURIComponent(group)}`;
 
   let response: Response;
   try {

@@ -27,9 +27,16 @@ const SERIES: SeriesSpec[] = [
   { code: "TP.APIFON4", label: "TCMB politika faizi (AOFM)", frequency: "1", computeYoY: false },
   // Enflasyon (aylık) — reality score için kritik
   { code: "TP.FE.OKTG01", label: "TÜFE genel endeks", frequency: "5", computeYoY: true },
-  // Konut endeksleri — public chart portlet API'sinden doğrulandı
-  // (TP.KFE_TR ve TP.YOKFEND_TR JSON içinde geliyor; nokta versiyonu API'ye)
+  // Konut endeksleri — public chart portlet API'sinden 20 series kod
+  // doğrulandı: TP.KFE.TR (genel) + 18 NUTS-1/NUTS-2 region kırılımı.
+  // Şu an 5 ana büyükşehir + Türkiye geneli ekledik; geri kalan bölgeler
+  // ihtiyaç oldukça eklenir.
   { code: "TP.KFE.TR", label: "Konut Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR10", label: "Konut Fiyat Endeksi (İstanbul)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR51", label: "Konut Fiyat Endeksi (Ankara)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR31", label: "Konut Fiyat Endeksi (İzmir)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR41", label: "Konut Fiyat Endeksi (Bursa-Eskişehir-Bilecik)", frequency: "5", computeYoY: true },
+  { code: "TP.KFE.TR62", label: "Konut Fiyat Endeksi (Adana-Mersin)", frequency: "5", computeYoY: true },
   { code: "TP.YOKFEND.TR", label: "Yeni Olmayan Konutlar Fiyat Endeksi (TR)", frequency: "5", computeYoY: true },
 ];
 

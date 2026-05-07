@@ -68,10 +68,21 @@ export interface HousingIndexSnapshot {
   fetchedAt: Date;
 }
 
-// Şehir bazlı KFE serileri henüz keşfedilmedi (TCMB EVDS UI'dan veya
-// chart portlet'lerden öğrenmek gerek). Şu an tüm şehirler Türkiye geneli
-// (TP.KFE.TR) görüyor. Doğrulandığında bu map güncellenecek.
-const CITY_KFE_MAP: Record<string, { code: string; cityName: string }> = {};
+// EVDS3 chart portlet API'sinden çıkarıldı — TP.KFE.TR{NUTS-2 code} pattern.
+// 18 region var, 5 ana şehir doğrudan eşleştirildi. Çevreleyen bölgesi
+// olmayan şehirler Türkiye geneli (TP.KFE.TR) görüyor.
+const CITY_KFE_MAP: Record<string, { code: string; cityName: string }> = {
+  istanbul: { code: "TP.KFE.TR10", cityName: "İstanbul" },
+  ankara: { code: "TP.KFE.TR51", cityName: "Ankara" },
+  izmir: { code: "TP.KFE.TR31", cityName: "İzmir" },
+  // TR41 — Bursa, Eskişehir, Bilecik
+  bursa: { code: "TP.KFE.TR41", cityName: "Bursa-Eskişehir-Bilecik (TR41)" },
+  eskisehir: { code: "TP.KFE.TR41", cityName: "Bursa-Eskişehir-Bilecik (TR41)" },
+  bilecik: { code: "TP.KFE.TR41", cityName: "Bursa-Eskişehir-Bilecik (TR41)" },
+  // TR62 — Adana, Mersin
+  adana: { code: "TP.KFE.TR62", cityName: "Adana-Mersin (TR62)" },
+  mersin: { code: "TP.KFE.TR62", cityName: "Adana-Mersin (TR62)" },
+};
 
 /**
  * Şehir bazlı konut fiyat endeksi. Şu an Türkiye geneli (TP.KFE.TR) fallback —
