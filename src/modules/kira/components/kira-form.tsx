@@ -208,7 +208,7 @@ export function KiraForm() {
             name="rentPrice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Kira (TL / ay)</FormLabel>
+                <FormLabel>Gerçek kira (TL / ay)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -219,6 +219,33 @@ export function KiraForm() {
                   />
                 </FormControl>
                 <FormDescription>Aylık ödediğin/ödenen kira tutarı.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="listedPrice"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>İlan fiyatı (opsiyonel)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    min={500}
+                    placeholder="Örn. 32000"
+                    value={field.value ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      field.onChange(v === "" ? undefined : Number(v));
+                    }}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Sahibinden / emlakçı ilanındaki sayı. Şişkinlik panelini besler.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

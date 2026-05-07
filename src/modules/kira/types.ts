@@ -7,6 +7,8 @@ export interface RentDataPayload {
   citySlug: string;
   districtName?: string | null;
   cityName?: string;
+  /** İlan kaynaklı fiyat (TL) — emlakçı/sahibinden duyurulan sayı; boş olabilir. */
+  listedPrice?: number | null;
 }
 
 export interface RentSubmissionView {

@@ -137,6 +137,8 @@ export async function createRentSubmission(input: RentInput): Promise<ActionResu
         citySlug: data.citySlug,
         districtName: districtNameTrimmed || null,
         cityName: cityRecord.name,
+        listedPrice:
+          data.listedPrice && data.listedPrice > 0 ? data.listedPrice : null,
       },
       ipHash,
       fingerprint,

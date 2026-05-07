@@ -129,3 +129,143 @@ export async function topRentCitySlugs(limit = 20): Promise<string[]> {
   const slugById = new Map(cities.map((c) => [c.id, c.slug]));
   return cityIds.map((id) => slugById.get(id)!).filter(Boolean);
 }
+
+export interface RentInflationStats {
+  /** How many submissions in scope had BOTH a real and a listed price */
+  pairCount: number;
+  realMedian: number | null;
+  listedMedian: number | null;
+  /** (listedMedian − realMedian) / realMedian, rounded percent */
+  inflationPct: number | null;
+}
+
+/**
+ * "Gerçek vs ilan" şişme — within a city/district scope, looks at
+ * submissions where users provided BOTH the listed (ilan) price and the
+ * real paid price, then computes the gap.
+ *
+ * Demands at least 3 paired submissions to publish a number; below that
+ * the panel renders "yetersiz veri" placeholder rather than misleading
+ * a single anomaly.
+ */
+export async function getRentInflationStats(filters: {
+  citySlug?: string;
+  districtName?: string;
+}): Promise<RentInflationStats> {
+  const rows = await fetchRows({ citySlug: filters.citySlug }, undefined);
+
+  interface Pair {
+    real: number;
+    listed: number;
+  }
+  const pairs: Pair[] = [];
+  const wantDistrict = filters.districtName?.toLowerCase().trim();
+  for (const row of rows) {
+    const data = (row.data ?? {}) as Partial<RentDataPayload>;
+    if (
+      wantDistrict &&
+      !(data.districtName ?? "").toLowerCase().includes(wantDistrict)
+    ) {
+      continue;
+    }
+    const real = row.amount ? Number(row.amount.toString()) : 0;
+    const listed = typeof data.listedPrice === "number" ? data.listedPrice : 0;
+    if (real <= 0 || listed <= 0) continue;
+    pairs.push({ real, listed });
+  }
+
+  if (pairs.length < 3) {
+    return {
+      pairCount: pairs.length,
+      realMedian: null,
+      listedMedian: null,
+      inflationPct: null,
+    };
+  }
+
+  const realSorted = pairs.map((p) => p.real).sort((a, b) => a - b);
+  const listedSorted = pairs.map((p) => p.listed).sort((a, b) => a - b);
+  const realMedian = Math.round(percentile(realSorted, 0.5));
+  const listedMedian = Math.round(percentile(listedSorted, 0.5));
+  const inflationPct =
+    realMedian > 0
+      ? Math.round(((listedMedian - realMedian) / realMedian) * 100)
+      : null;
+
+  return {
+    pairCount: pairs.length,
+    realMedian,
+    listedMedian,
+    inflationPct,
+  };
+}
+
+export interface CityInflationRow {
+  citySlug: string;
+  cityName: string;
+  pairCount: number;
+  realMedian: number;
+  listedMedian: number;
+  inflationPct: number;
+}
+
+/** Top N cities by absolute inflation %, with at least N paired entries. */
+export async function getTopInflationCities(
+  minPairs = 3,
+  limit = 20,
+): Promise<CityInflationRow[]> {
+  const rows = await db.submission.findMany({
+    where: {
+      type: "RENT",
+      status: "APPROVED",
+      cityId: { not: null },
+    },
+    select: {
+      amount: true,
+      data: true,
+      city: { select: { slug: true, name: true } },
+    },
+  });
+
+  // Group by city slug, collect listed/real pairs.
+  const byCity = new Map<
+    string,
+    { cityName: string; pairs: Array<{ real: number; listed: number }> }
+  >();
+  for (const row of rows) {
+    const slug = row.city?.slug;
+    if (!slug) continue;
+    const data = (row.data ?? {}) as Partial<RentDataPayload>;
+    const real = row.amount ? Number(row.amount.toString()) : 0;
+    const listed = typeof data.listedPrice === "number" ? data.listedPrice : 0;
+    if (real <= 0 || listed <= 0) continue;
+    const bucket = byCity.get(slug) ?? {
+      cityName: row.city?.name ?? slug,
+      pairs: [],
+    };
+    bucket.pairs.push({ real, listed });
+    byCity.set(slug, bucket);
+  }
+
+  const result: CityInflationRow[] = [];
+  for (const [slug, bucket] of byCity) {
+    if (bucket.pairs.length < minPairs) continue;
+    const realSorted = bucket.pairs.map((p) => p.real).sort((a, b) => a - b);
+    const listedSorted = bucket.pairs.map((p) => p.listed).sort((a, b) => a - b);
+    const realMedian = Math.round(percentile(realSorted, 0.5));
+    const listedMedian = Math.round(percentile(listedSorted, 0.5));
+    if (realMedian <= 0) continue;
+    const inflationPct = Math.round(((listedMedian - realMedian) / realMedian) * 100);
+    result.push({
+      citySlug: slug,
+      cityName: bucket.cityName,
+      pairCount: bucket.pairs.length,
+      realMedian,
+      listedMedian,
+      inflationPct,
+    });
+  }
+
+  result.sort((a, b) => b.inflationPct - a.inflationPct);
+  return result.slice(0, limit);
+}

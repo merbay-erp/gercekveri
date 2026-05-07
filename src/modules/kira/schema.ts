@@ -38,6 +38,15 @@ export const rentInputSchema = z.object({
     .int("Kuruşsuz tam tutar gir")
     .min(500, "En az 500 TL")
     .max(1_000_000_000, "Çok yüksek bir değer"),
+  // İlan kaynaklı fiyat (opsiyonel) — emlakçı / sahibinden duyurulan
+  // sayı. "Gerçek vs ilan şişkinlik" panelini besler. Boş bırakılırsa
+  // sadece gerçek tutar kullanılır.
+  listedPrice: z.coerce
+    .number()
+    .int()
+    .min(500)
+    .max(1_000_000_000)
+    .optional(),
   furnished: furnishedEnum,
   heating: heatingEnum.optional().or(z.literal("")),
   // Honeypot — hidden field bots fill, humans skip.
@@ -53,6 +62,7 @@ export const rentDefaults: RentInput = {
   m2: 0,
   buildingAge: "0-5",
   rentPrice: 0,
+  listedPrice: undefined,
   furnished: "UNFURNISHED",
   heating: "",
   website: "",

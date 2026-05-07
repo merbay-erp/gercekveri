@@ -10,9 +10,11 @@ import { AmountStatsPanel } from "@/components/data-display/amount-stats";
 import { AmountHistogram } from "@/components/data-display/amount-histogram";
 import { AmountAiInsight } from "@/components/data-display/amount-ai-insight";
 import { KiraList } from "@/modules/kira/components/kira-list";
+import { RentInflationPanel } from "@/modules/kira/components/rent-inflation-panel";
 import {
   listRentSubmissions,
   getRentStats,
+  getRentInflationStats,
   topRentCitySlugs,
 } from "@/modules/kira/server/queries";
 import { findCityBySlug, featuredCitySlugs } from "@/lib/cities";
@@ -56,9 +58,15 @@ export default async function KiraCityPage({ params }: { params: Params }) {
   const cityRecord = findCityBySlug(citySlug);
   if (!cityRecord) notFound();
 
-  const [submissions, stats] = await Promise.all([
+  const [submissions, stats, inflation] = await Promise.all([
     listRentSubmissions({ citySlug, limit: 50 }).catch(() => []),
     getRentStats({ citySlug }).catch(() => emptyStats),
+    getRentInflationStats({ citySlug }).catch(() => ({
+      pairCount: 0,
+      realMedian: null,
+      listedMedian: null,
+      inflationPct: null,
+    })),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -98,6 +106,12 @@ export default async function KiraCityPage({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-8">
+        <RentInflationPanel
+          stats={inflation}
+          scopeLabel={cityRecord.name}
+          shareHref="/kira/sisme"
+        />
+
         <AmountStatsPanel stats={stats} scopeLabel={`${cityRecord.name} · tüm tipler`} />
 
         {insight ? <AmountAiInsight insight={insight} /> : null}

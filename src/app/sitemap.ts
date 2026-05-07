@@ -57,6 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/maaslar/yeni", 0.6, "monthly"),
     u("/kira", 0.9, "daily"),
     u("/kira/yeni", 0.6, "monthly"),
+    u("/kira/sisme", 0.8, "daily"),
     u("/aidat", 0.9, "daily"),
     u("/aidat/yeni", 0.6, "monthly"),
     u("/fatura", 0.9, "daily"),

@@ -9,7 +9,12 @@ import { AmountHistogram } from "@/components/data-display/amount-histogram";
 import { AmountAiInsight } from "@/components/data-display/amount-ai-insight";
 import { KiraList } from "@/modules/kira/components/kira-list";
 import { KiraFilterBar } from "@/modules/kira/components/kira-filter-bar";
-import { listRentSubmissions, getRentStats } from "@/modules/kira/server/queries";
+import { RentInflationPanel } from "@/modules/kira/components/rent-inflation-panel";
+import {
+  listRentSubmissions,
+  getRentStats,
+  getRentInflationStats,
+} from "@/modules/kira/server/queries";
 import { kiraModule } from "@/modules/kira/config";
 import { buildRentScope, getOrGenerateInsight } from "@/services/ai/insights";
 
@@ -33,9 +38,15 @@ const emptyStats = {
 };
 
 export default async function KiraPage() {
-  const [submissions, stats] = await Promise.all([
+  const [submissions, stats, inflation] = await Promise.all([
     listRentSubmissions({ limit: 50 }).catch(() => []),
     getRentStats().catch(() => emptyStats),
+    getRentInflationStats({}).catch(() => ({
+      pairCount: 0,
+      realMedian: null,
+      listedMedian: null,
+      inflationPct: null,
+    })),
   ]);
 
   const insight = await getOrGenerateInsight({
@@ -62,6 +73,13 @@ export default async function KiraPage() {
 
       <div className="space-y-8">
         <KiraFilterBar />
+
+        <RentInflationPanel
+          stats={inflation}
+          scopeLabel="Türkiye geneli"
+          shareHref="/kira/sisme"
+        />
+
         <AmountStatsPanel stats={stats} scopeLabel="Türkiye geneli — tüm kira ilanları" />
 
         {insight ? <AmountAiInsight insight={insight} /> : null}

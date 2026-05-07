@@ -55,6 +55,7 @@ function fold(s: string): string {
 const STATIC_PAGES: Array<{ label: string; href: string; hint?: string }> = [
   { label: "Maaşlar", href: "/maaslar", hint: "Pozisyon ve şehir bazında" },
   { label: "Kira", href: "/kira", hint: "Bölgesel kira fiyatları" },
+  { label: "Kira şişkinliği — Gerçek vs İlan", href: "/kira/sisme", hint: "Şehir bazlı şişkinlik" },
   { label: "Aidat", href: "/aidat", hint: "Site ve apartman aidatları" },
   { label: "Fatura", href: "/fatura", hint: "Elektrik, doğalgaz, su" },
   { label: "Tekstil", href: "/tekstil", hint: "Üretim fiyatları" },
