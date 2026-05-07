@@ -5,13 +5,22 @@ import { listSalarySubmissions } from "@/modules/maas/server/queries";
 import { listRentSubmissions } from "@/modules/kira/server/queries";
 import { listAidatSubmissions } from "@/modules/aidat/server/queries";
 import { siteTypeLabels } from "@/modules/aidat/config";
+import { listFaturaSubmissions } from "@/modules/fatura/server/queries";
+import {
+  utilityLabels,
+  householdSizeLabels,
+  type UtilityType,
+  type HouseholdSize,
+} from "@/modules/fatura/config";
 import { positionSlugFor } from "@/modules/maas/position-resolver";
 import { computeComparison } from "@/lib/comparison";
 import { siteConfig } from "@/lib/site-config";
 import { ogFormatTRY as fmtTry } from "@/lib/og-format";
 
-type Kind = "maas" | "kira" | "aidat";
+type Kind = "maas" | "kira" | "aidat" | "fatura";
 const VALID_SITE_TYPES = new Set(["BLOCK", "VILLA", "INDEPENDENT", "RESIDENCE"]);
+const VALID_UTILITY = new Set(["ELEKTRIK", "DOGALGAZ", "SU"]);
+const VALID_HH = new Set(["1", "2", "3", "4", "5+"]);
 
 export const runtime = "nodejs";
 
@@ -19,7 +28,13 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const rawKind = searchParams.get("kind");
   const kind: Kind =
-    rawKind === "kira" ? "kira" : rawKind === "aidat" ? "aidat" : "maas";
+    rawKind === "kira"
+      ? "kira"
+      : rawKind === "aidat"
+        ? "aidat"
+        : rawKind === "fatura"
+          ? "fatura"
+          : "maas";
   const amountNum = Number(searchParams.get("amount") ?? "");
   if (!Number.isFinite(amountNum) || amountNum <= 0) {
     return fallbackImage(kind);
@@ -75,7 +90,7 @@ export async function GET(req: Request) {
         higherIsBetter: false,
         formatValue: (n) => fmtTry(n),
       });
-    } else {
+    } else if (kind === "aidat") {
       const districtName = searchParams.get("district")?.trim() ?? "";
       const siteTypeRaw = searchParams.get("siteType") ?? "";
       const siteType = VALID_SITE_TYPES.has(siteTypeRaw)
@@ -109,6 +124,39 @@ export async function GET(req: Request) {
         value: amountNum,
         sortedPeers: sorted,
         subjectLabel: "Aidatın",
+        scopeLabel,
+        higherIsBetter: false,
+        formatValue: (n) => fmtTry(n),
+      });
+    } else {
+      const utilityRaw = searchParams.get("utilityType") ?? "ELEKTRIK";
+      const utilityType: UtilityType = VALID_UTILITY.has(utilityRaw)
+        ? (utilityRaw as UtilityType)
+        : "ELEKTRIK";
+      const hhRaw = searchParams.get("householdSize") ?? "";
+      const householdSize: HouseholdSize | undefined = VALID_HH.has(hhRaw)
+        ? (hhRaw as HouseholdSize)
+        : undefined;
+
+      const submissions = await listFaturaSubmissions({
+        citySlug,
+        utilityType,
+        limit: 1000,
+      });
+      const filtered = householdSize
+        ? submissions.filter((s) => s.data.householdSize === householdSize)
+        : submissions;
+      const sorted = filtered.map((s) => s.amount).filter((n) => n > 0).sort((a, b) => a - b);
+
+      const labelParts: string[] = [utilityLabels[utilityType]];
+      if (cityRecord) labelParts.push(cityRecord.name);
+      if (householdSize) labelParts.push(householdSizeLabels[householdSize]);
+      scopeLabel = labelParts.join(" · ");
+
+      result = computeComparison({
+        value: amountNum,
+        sortedPeers: sorted,
+        subjectLabel: "Faturan",
         scopeLabel,
         higherIsBetter: false,
         formatValue: (n) => fmtTry(n),
@@ -233,7 +281,9 @@ function fallbackImage(kind: Kind) {
       ? "Maaşını karşılaştır"
       : kind === "kira"
         ? "Kiranı karşılaştır"
-        : "Aidatını karşılaştır";
+        : kind === "aidat"
+          ? "Aidatını karşılaştır"
+          : "Faturanı karşılaştır";
   return new ImageResponse(
     (
       <div

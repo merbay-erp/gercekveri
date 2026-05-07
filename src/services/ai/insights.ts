@@ -231,6 +231,13 @@ export function buildAidatScope(citySlug?: string): string {
   return `aidat:c/${citySlug}`;
 }
 
+export function buildFaturaScope(utilitySlug?: string, citySlug?: string): string {
+  const parts = ["fatura"];
+  if (utilitySlug) parts.push(`u/${utilitySlug}`);
+  if (citySlug) parts.push(`c/${citySlug}`);
+  return parts.length === 1 ? "fatura:all" : parts.join(":");
+}
+
 export function buildInternetScope(ispSlug?: string, citySlug?: string): string {
   const parts = ["internet"];
   if (citySlug) parts.push(`c/${citySlug}`);

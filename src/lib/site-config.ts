@@ -93,7 +93,7 @@ export const categories: CategoryDef[] = [
     longDescription:
       "Tüketim ve hane büyüklüğüne göre gerçek faturalar. Bölgesel ortalamadan ne kadar uzaktasın?",
     icon: Plug,
-    status: "soon",
+    status: "live",
     accent: "from-rose-500/20 to-rose-500/5",
     sortOrder: 5,
   },
@@ -119,6 +119,7 @@ export const mainNav = [
   { label: "Maaşlar", href: "/maaslar" },
   { label: "Kira", href: "/kira" },
   { label: "Aidat", href: "/aidat" },
+  { label: "Fatura", href: "/fatura" },
   { label: "İnternet", href: "/internet" },
   { label: "Karşılaştır", href: "/karsilastir" },
 ];
@@ -127,10 +128,12 @@ export const footerNav = {
   product: [
     { label: "Maaşlar", href: "/maaslar" },
     { label: "Kiralar", href: "/kira" },
+    { label: "Aidatlar", href: "/aidat" },
+    { label: "Faturalar", href: "/fatura" },
     { label: "İnternet sağlayıcıları", href: "/internet" },
     { label: "Maaş paylaş", href: "/maaslar/yeni" },
     { label: "Kira paylaş", href: "/kira/yeni" },
-    { label: "İnternet paylaş", href: "/internet/yeni" },
+    { label: "Fatura paylaş", href: "/fatura/yeni" },
   ],
   legal: [
     { label: "Gizlilik Politikası", href: "/gizlilik" },

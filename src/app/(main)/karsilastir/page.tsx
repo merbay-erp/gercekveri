@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Banknote, Home, Building2, ArrowRight } from "lucide-react";
+import { Banknote, Home, Building2, Plug, ArrowRight } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Karşılaştır — kendin nerede duruyorsun?",
   description:
-    "Maaşını, kiranı ve aidatını Türkiye ortalamasıyla anlık olarak kıyasla. Kişisel bilgi alınmaz, sadece bu sayfa için hesaplanır.",
+    "Maaşını, kiranı, aidatını ve faturanı Türkiye ortalamasıyla anlık olarak kıyasla. Kişisel bilgi alınmaz, sadece bu sayfa için hesaplanır.",
   alternates: { canonical: "/karsilastir" },
 };
 
@@ -33,6 +33,13 @@ const options = [
     body: "Yapı tipi + bölge medyanı ile kıyas. Komşundan ne kadar farklı?",
     accent: "from-amber-500/10",
   },
+  {
+    href: "/karsilastir/fatura",
+    icon: Plug,
+    title: "Faturamı karşılaştır",
+    body: "Elektrik, gaz, su faturanı bölge medyanıyla kıyasla. Hane filtresi var.",
+    accent: "from-rose-500/10",
+  },
 ];
 
 export default function CompareLandingPage() {
@@ -43,12 +50,13 @@ export default function CompareLandingPage() {
           Sen nerede duruyorsun?
         </h1>
         <p className="text-lg text-muted-foreground">
-          Maaşını, kiranı veya aidatını yaz; Türkiye'deki anonim verilerden hesaplanmış
-          medyanla ne kadar uzakta olduğunu gör. Kişisel bilgi istemez, hesabın saklanmaz.
+          Maaşını, kiranı, aidatını veya faturanı yaz; Türkiye'deki anonim verilerden
+          hesaplanmış medyanla ne kadar uzakta olduğunu gör. Kişisel bilgi istemez,
+          hesabın saklanmaz.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
         {options.map(({ href, icon: Icon, title, body, accent }) => (
           <Link key={href} href={href} className="group">
             <Card
