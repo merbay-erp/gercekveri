@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, ShieldCheck, BarChart3 } from "lucide-react";
+import { ArrowRight, Sparkles, ShieldCheck, BarChart3, MapPin, Briefcase } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -7,18 +7,34 @@ import { Card } from "@/components/ui/card";
 import { AdSlot } from "@/components/ad-slot";
 import { categories, siteConfig } from "@/lib/site-config";
 import { db } from "@/lib/db";
-import { formatNumber } from "@/lib/money";
+import { formatNumber, formatTRY } from "@/lib/money";
+import {
+  topPositionSlugs,
+  topCitySlugs,
+  getSalaryStats,
+} from "@/modules/maas/server/queries";
+import { positionNameFromSlug } from "@/modules/maas/position-resolver";
+import { findCityBySlug } from "@/lib/cities";
 
 export const revalidate = 60;
 
 async function getHomepageStats() {
   try {
-    const [salaryCount] = await Promise.all([
-      db.submission.count({ where: { type: "SALARY", status: "APPROVED" } }),
-    ]);
-    return { salaryCount };
+    const [salaryCount, generalStats, popularPositionSlugs, popularCitySlugs] =
+      await Promise.all([
+        db.submission.count({ where: { type: "SALARY", status: "APPROVED" } }),
+        getSalaryStats(),
+        topPositionSlugs(6),
+        topCitySlugs(6),
+      ]);
+    return { salaryCount, generalStats, popularPositionSlugs, popularCitySlugs };
   } catch {
-    return { salaryCount: 0 };
+    return {
+      salaryCount: 0,
+      generalStats: { count: 0, median: null, avg: null, p25: null, p75: null, min: null, max: null },
+      popularPositionSlugs: [] as string[],
+      popularCitySlugs: [] as string[],
+    };
   }
 }
 
@@ -66,6 +82,72 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* POPULAR LINKS — surfaces SEO pages directly on the home for crawl
+          discovery + repeat-visit retention */}
+      {stats.popularPositionSlugs.length + stats.popularCitySlugs.length > 0 ? (
+        <section className="container mx-auto px-4 pt-4 pb-12">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card className="p-5">
+              <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <Briefcase className="h-3.5 w-3.5" /> Popüler pozisyonlar
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {stats.popularPositionSlugs.map((slug) => (
+                  <Link
+                    key={slug}
+                    href={`/maaslar/${slug}`}
+                    className="rounded-full border bg-background px-3 py-1 text-sm transition hover:border-foreground/30 hover:bg-muted"
+                  >
+                    {positionNameFromSlug(slug)}
+                  </Link>
+                ))}
+              </div>
+            </Card>
+            <Card className="p-5">
+              <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5" /> Popüler şehirler
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {stats.popularCitySlugs.map((slug) => {
+                  const city = findCityBySlug(slug);
+                  if (!city) return null;
+                  return (
+                    <Link
+                      key={slug}
+                      href={`/maaslar/sehir/${slug}`}
+                      className="rounded-full border bg-background px-3 py-1 text-sm transition hover:border-foreground/30 hover:bg-muted"
+                    >
+                      {city.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </Card>
+          </div>
+
+          {stats.generalStats.median ? (
+            <Card className="mt-4 flex flex-col items-start gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Türkiye geneli medyan
+                </p>
+                <p className="text-2xl font-semibold tabular-nums sm:text-3xl">
+                  {formatTRY(stats.generalStats.median)}
+                  <span className="ml-2 text-sm font-normal text-muted-foreground">
+                    net / ay
+                  </span>
+                </p>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {formatNumber(stats.generalStats.count)} paylaşımdan derlendi · alt %25{" "}
+                {formatTRY(stats.generalStats.p25)} · üst %75{" "}
+                {formatTRY(stats.generalStats.p75)}
+              </div>
+            </Card>
+          ) : null}
+        </section>
+      ) : null}
 
       {/* CATEGORIES */}
       <section className="container mx-auto px-4 py-16">
