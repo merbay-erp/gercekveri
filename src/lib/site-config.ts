@@ -119,6 +119,7 @@ export const mainNav = [
   { label: "Maaşlar", href: "/maaslar" },
   { label: "Kira", href: "/kira" },
   { label: "İnternet", href: "/internet" },
+  { label: "Karşılaştır", href: "/karsilastir" },
   { label: "Hakkında", href: "/hakkinda" },
 ];
 

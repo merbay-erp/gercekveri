@@ -82,11 +82,11 @@ export default async function HomePage() {
               {siteConfig.description}
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <Link href="/maaslar/yeni" className={buttonVariants({ size: "lg" })}>
-                Verini paylaş <ArrowRight className="ml-2 h-4 w-4" />
+              <Link href="/karsilastir" className={buttonVariants({ size: "lg" })}>
+                Sen nerede duruyorsun? <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
-              <Link href="/maaslar" className={buttonVariants({ size: "lg", variant: "outline" })}>
-                Maaşları gör
+              <Link href="/maaslar/yeni" className={buttonVariants({ size: "lg", variant: "outline" })}>
+                Verini paylaş
               </Link>
             </div>
 
