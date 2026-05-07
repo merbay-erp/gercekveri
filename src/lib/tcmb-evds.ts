@@ -92,27 +92,20 @@ export async function fetchEvds(opts: EvdsFetchOptions): Promise<EvdsResult> {
   const seriesArr = normalizeSeries(opts.series);
   const seriesParam = seriesArr.join("-"); // EVDS dash-separated istiyor
 
-  const params = new URLSearchParams({
-    series: seriesParam,
-    startDate: opts.startDate,
-    endDate: opts.endDate,
-    type: "json",
-    frequency: opts.frequency ?? "5",
-    aggregationTypes: opts.aggregationTypes ?? "avg",
-    formulas: String(opts.formulas ?? 0),
-  });
-
-  const url = `${BASE_URL}/series=${encodeURIComponent(seriesParam)}&startDate=${opts.startDate}&endDate=${opts.endDate}&type=json&frequency=${opts.frequency ?? "5"}&aggregationTypes=${opts.aggregationTypes ?? "avg"}&formulas=${opts.formulas ?? 0}`;
-  // EVDS endpoint URL pattern: /service/evds/series=...&startDate=...
-  // (path-style query, dokümantasyondaki örneklerle aynı)
-  void params;
+  // EVDS path-style query pattern. Hem header hem URL'de key — bazı edge
+  // case'lerde header gitmeyebiliyor (CDN/redirect), URL fallback güvenli.
+  const url = `${BASE_URL}/series=${seriesParam}&startDate=${opts.startDate}&endDate=${opts.endDate}&type=json&frequency=${opts.frequency ?? "5"}&aggregationTypes=${opts.aggregationTypes ?? "avg"}&formulas=${opts.formulas ?? 0}&key=${encodeURIComponent(key)}`;
 
   let response: Response;
   try {
     response = await fetch(url, {
-      headers: { key },
-      // Cron / build sırasında cache'e takılmasın
+      headers: {
+        key,
+        accept: "application/json",
+        "user-agent": "gercekveri-bot/1.0",
+      },
       cache: "no-store",
+      redirect: "manual", // redirect yapıyorsa hata olarak gör
     });
   } catch (err) {
     return {
