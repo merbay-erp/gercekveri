@@ -110,10 +110,14 @@ export function MaasForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Şehir</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select onValueChange={field.onChange} value={field.value || undefined}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Şehir seç" />
+                      <SelectValue placeholder="Şehir seç">
+                        {(value: unknown) =>
+                          value ? cities.find((c) => c.slug === value)?.name ?? null : null
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -187,7 +191,11 @@ export function MaasForm() {
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seç" />
+                      <SelectValue placeholder="Seç">
+                        {(value: unknown) =>
+                          value ? workModeLabels[value as keyof typeof workModeLabels] ?? null : null
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -212,7 +220,13 @@ export function MaasForm() {
                 <Select onValueChange={field.onChange} value={field.value || undefined}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seç" />
+                      <SelectValue placeholder="Seç">
+                        {(value: unknown) =>
+                          value
+                            ? companySizeLabels[value as keyof typeof companySizeLabels] ?? null
+                            : null
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>

@@ -5,14 +5,15 @@
 
 export interface SalaryDataPayload {
   position: string;
+  positionSlug?: string;
   experienceYears: number;
   workMode: "ONSITE" | "HYBRID" | "REMOTE";
-  companySize?: string;
-  sector?: string;
+  companySize?: string | null;
+  sector?: string | null;
   citySlug: string;
-  districtSlug?: string;
+  districtSlug?: string | null;
   cityName?: string;
-  districtName?: string;
+  districtName?: string | null;
 }
 
 export interface SalarySubmissionView {

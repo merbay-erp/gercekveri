@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { findCityBySlug } from "@/lib/cities";
 import { hashIp, hashFingerprint, safeUserAgent } from "@/lib/fingerprint";
+import { positionSlugFor } from "../position-resolver";
 import { salaryInputSchema, type SalaryInput } from "../schema";
 
 type ActionResult =
@@ -77,6 +78,7 @@ export async function createSalarySubmission(input: SalaryInput): Promise<Action
       currency: "TRY",
       data: {
         position: data.position.trim(),
+        positionSlug: positionSlugFor(data.position.trim()),
         experienceYears: data.experienceYears,
         workMode: data.workMode,
         companySize: data.companySize || null,
@@ -98,7 +100,13 @@ export async function createSalarySubmission(input: SalaryInput): Promise<Action
     select: { publicId: true },
   });
 
+  const positionSlug = positionSlugFor(data.position.trim());
   revalidatePath("/maaslar");
+  revalidatePath(`/maaslar/${positionSlug}`);
+  if (cityRecord) {
+    revalidatePath(`/maaslar/sehir/${cityRecord.slug}`);
+    revalidatePath(`/maaslar/${positionSlug}/${cityRecord.slug}`);
+  }
   revalidatePath("/");
 
   return { ok: true, publicId: submission.publicId };
