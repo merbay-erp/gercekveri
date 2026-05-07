@@ -106,7 +106,7 @@ export const categories: CategoryDef[] = [
     longDescription:
       "Bursa'da boyahane, İstanbul'da kesim — sektörel B2B tekstil fiyatları. Üreticiler için gerçek piyasa şeffaflığı.",
     icon: Shirt,
-    status: "soon",
+    status: "live",
     accent: "from-fuchsia-500/20 to-fuchsia-500/5",
     sortOrder: 6,
   },
@@ -121,6 +121,7 @@ export const mainNav = [
   { label: "Aidat", href: "/aidat" },
   { label: "Fatura", href: "/fatura" },
   { label: "İnternet", href: "/internet" },
+  { label: "Tekstil", href: "/tekstil" },
   { label: "Karşılaştır", href: "/karsilastir" },
 ];
 
@@ -131,9 +132,11 @@ export const footerNav = {
     { label: "Aidatlar", href: "/aidat" },
     { label: "Faturalar", href: "/fatura" },
     { label: "İnternet sağlayıcıları", href: "/internet" },
+    { label: "Tekstil fiyatları", href: "/tekstil" },
     { label: "Maaş paylaş", href: "/maaslar/yeni" },
     { label: "Kira paylaş", href: "/kira/yeni" },
     { label: "Fatura paylaş", href: "/fatura/yeni" },
+    { label: "Tekstil fiyat paylaş", href: "/tekstil/yeni" },
   ],
   legal: [
     { label: "Gizlilik Politikası", href: "/gizlilik" },

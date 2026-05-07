@@ -9,6 +9,11 @@ import { commonPositions } from "@/modules/maas/positions";
 import { positionSlugFor } from "@/modules/maas/position-resolver";
 import { isps } from "@/modules/internet/config";
 import { utilityTypes, utilityLabels, utilitySlugs } from "@/modules/fatura/config";
+import {
+  subTypes as tekstilSubTypes,
+  subTypeLabels as tekstilSubTypeLabels,
+  subTypeSlugs as tekstilSubTypeSlugs,
+} from "@/modules/tekstil/config";
 
 export type SearchEntryGroup =
   | "Pozisyon"
@@ -16,10 +21,12 @@ export type SearchEntryGroup =
   | "Şehir — Kira"
   | "Şehir — Aidat"
   | "Şehir — Fatura"
+  | "Şehir — Tekstil"
   | "Şehir — İnternet"
   | "Sayfa"
   | "Karşılaştır"
   | "Fatura türü"
+  | "Tekstil iş tipi"
   | "İnternet sağlayıcı";
 
 export interface SearchEntry {
@@ -50,6 +57,7 @@ const STATIC_PAGES: Array<{ label: string; href: string; hint?: string }> = [
   { label: "Kira", href: "/kira", hint: "Bölgesel kira fiyatları" },
   { label: "Aidat", href: "/aidat", hint: "Site ve apartman aidatları" },
   { label: "Fatura", href: "/fatura", hint: "Elektrik, doğalgaz, su" },
+  { label: "Tekstil", href: "/tekstil", hint: "Üretim fiyatları" },
   { label: "İnternet", href: "/internet", hint: "Sağlayıcı bazında gerçek hız" },
   { label: "İstatistikler", href: "/istatistikler", hint: "Canlı sayaçlar" },
   { label: "Hakkında", href: "/hakkinda" },
@@ -60,6 +68,7 @@ const COMPARE_PAGES: Array<{ label: string; href: string; hint: string }> = [
   { label: "Kiramı karşılaştır", href: "/karsilastir/kira", hint: "Bölge medyanı" },
   { label: "Aidatımı karşılaştır", href: "/karsilastir/aidat", hint: "Yapı tipi + bölge" },
   { label: "Faturamı karşılaştır", href: "/karsilastir/fatura", hint: "Tüketim + hane" },
+  { label: "Tekstil fiyatımı karşılaştır", href: "/karsilastir/tekstil", hint: "İş tipi + birim" },
 ];
 
 let cached: SearchEntry[] | null = null;
@@ -138,6 +147,14 @@ export function buildSearchIndex(): SearchEntry[] {
       hint: c.region,
     });
     entries.push({
+      id: `city-tekstil:${c.slug}`,
+      group: "Şehir — Tekstil",
+      label: `${c.name} tekstil`,
+      haystack: fold(`${c.name} ${c.region} tekstil`),
+      href: `/tekstil/sehir/${c.slug}`,
+      hint: c.region,
+    });
+    entries.push({
       id: `city-internet:${c.slug}`,
       group: "Şehir — İnternet",
       label: `${c.name} internet`,
@@ -154,6 +171,16 @@ export function buildSearchIndex(): SearchEntry[] {
       label: utilityLabels[u],
       haystack: fold(utilityLabels[u]),
       href: `/fatura/${utilitySlugs[u]}`,
+    });
+  }
+
+  for (const s of tekstilSubTypes) {
+    entries.push({
+      id: `tekstil-sub:${s}`,
+      group: "Tekstil iş tipi",
+      label: tekstilSubTypeLabels[s],
+      haystack: fold(tekstilSubTypeLabels[s]),
+      href: `/tekstil/${tekstilSubTypeSlugs[s]}`,
     });
   }
 

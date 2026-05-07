@@ -12,15 +12,26 @@ import {
   type UtilityType,
   type HouseholdSize,
 } from "@/modules/fatura/config";
+import { listTekstilSubmissions } from "@/modules/tekstil/server/queries";
+import {
+  subTypeLabels,
+  unitLabels,
+  subTypes as tekstilSubTypes,
+  units as tekstilUnits,
+  type SubType as TekstilSubType,
+  type Unit as TekstilUnit,
+} from "@/modules/tekstil/config";
 import { positionSlugFor } from "@/modules/maas/position-resolver";
 import { computeComparison } from "@/lib/comparison";
 import { siteConfig } from "@/lib/site-config";
 import { ogFormatTRY as fmtTry } from "@/lib/og-format";
 
-type Kind = "maas" | "kira" | "aidat" | "fatura";
+type Kind = "maas" | "kira" | "aidat" | "fatura" | "tekstil";
 const VALID_SITE_TYPES = new Set(["BLOCK", "VILLA", "INDEPENDENT", "RESIDENCE"]);
 const VALID_UTILITY = new Set(["ELEKTRIK", "DOGALGAZ", "SU"]);
 const VALID_HH = new Set(["1", "2", "3", "4", "5+"]);
+const VALID_TEKSTIL_SUB = new Set<string>(tekstilSubTypes);
+const VALID_TEKSTIL_UNIT = new Set<string>(tekstilUnits);
 
 export const runtime = "nodejs";
 
@@ -34,7 +45,9 @@ export async function GET(req: Request) {
         ? "aidat"
         : rawKind === "fatura"
           ? "fatura"
-          : "maas";
+          : rawKind === "tekstil"
+            ? "tekstil"
+            : "maas";
   const amountNum = Number(searchParams.get("amount") ?? "");
   if (!Number.isFinite(amountNum) || amountNum <= 0) {
     return fallbackImage(kind);
@@ -128,7 +141,7 @@ export async function GET(req: Request) {
         higherIsBetter: false,
         formatValue: (n) => fmtTry(n),
       });
-    } else {
+    } else if (kind === "fatura") {
       const utilityRaw = searchParams.get("utilityType") ?? "ELEKTRIK";
       const utilityType: UtilityType = VALID_UTILITY.has(utilityRaw)
         ? (utilityRaw as UtilityType)
@@ -159,6 +172,40 @@ export async function GET(req: Request) {
         subjectLabel: "Faturan",
         scopeLabel,
         higherIsBetter: false,
+        formatValue: (n) => fmtTry(n),
+      });
+    } else {
+      const subRaw = searchParams.get("subType") ?? "DIKIM";
+      const unitRaw = searchParams.get("unit") ?? "PIECE";
+      const subType: TekstilSubType = VALID_TEKSTIL_SUB.has(subRaw)
+        ? (subRaw as TekstilSubType)
+        : "DIKIM";
+      const unit: TekstilUnit = VALID_TEKSTIL_UNIT.has(unitRaw)
+        ? (unitRaw as TekstilUnit)
+        : "PIECE";
+
+      const submissions = await listTekstilSubmissions({
+        citySlug,
+        subType,
+        unit,
+        limit: 1000,
+      });
+      const sorted = submissions
+        .map((s) => s.amount)
+        .filter((n) => n > 0)
+        .sort((a, b) => a - b);
+
+      const labelParts: string[] = [subTypeLabels[subType]];
+      if (cityRecord) labelParts.push(cityRecord.name);
+      labelParts.push(`TL/${unitLabels[unit]}`);
+      scopeLabel = labelParts.join(" · ");
+
+      result = computeComparison({
+        value: amountNum,
+        sortedPeers: sorted,
+        subjectLabel: "Fiyatın",
+        scopeLabel,
+        higherIsBetter: true,
         formatValue: (n) => fmtTry(n),
       });
     }
@@ -283,7 +330,9 @@ function fallbackImage(kind: Kind) {
         ? "Kiranı karşılaştır"
         : kind === "aidat"
           ? "Aidatını karşılaştır"
-          : "Faturanı karşılaştır";
+          : kind === "fatura"
+            ? "Faturanı karşılaştır"
+            : "Tekstil fiyatını karşılaştır";
   return new ImageResponse(
     (
       <div

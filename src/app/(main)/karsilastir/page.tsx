@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Banknote, Home, Building2, Plug, ArrowRight } from "lucide-react";
+import { Banknote, Home, Building2, Plug, Scissors, ArrowRight } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 
@@ -39,6 +39,13 @@ const options = [
     title: "Faturamı karşılaştır",
     body: "Elektrik, gaz, su faturanı bölge medyanıyla kıyasla. Hane filtresi var.",
     accent: "from-rose-500/10",
+  },
+  {
+    href: "/karsilastir/tekstil",
+    icon: Scissors,
+    title: "Tekstil fiyatımı karşılaştır",
+    body: "Kesim, dikim, boyahane vs. birim fiyatın piyasa medyanına göre nerede?",
+    accent: "from-fuchsia-500/10",
   },
 ];
 
