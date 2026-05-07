@@ -1,10 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 /**
- * Gemini 2.0 Flash — picked for its 1500 RPD free-tier ceiling (10x higher
- * than 2.5 Flash). Quality is more than enough for short Turkish summaries.
+ * Gemini 2.5 Flash — Gemini 2.0 Flash is free-tier locked (limit:0) on this
+ * project, while 2.5 Flash works with 10 RPM / 250 RPD. The DB cache (7-day
+ * TTL) absorbs traffic so 250 RPD is plenty for our scope volume.
  */
-export const GEMINI_MODEL = "gemini-2.0-flash";
+export const GEMINI_MODEL = "gemini-2.5-flash";
 
 let cachedClient: GoogleGenAI | null = null;
 
