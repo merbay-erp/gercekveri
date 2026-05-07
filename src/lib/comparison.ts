@@ -119,7 +119,7 @@ function percentile(sortedValues: number[], p: number): number {
  */
 export function buildComparisonUrl(
   origin: string,
-  kind: "maas" | "kira",
+  kind: "maas" | "kira" | "aidat",
   params: Record<string, string | number | undefined>,
 ): string {
   const url = new URL(`/karsilastir/${kind}`, origin);

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Banknote, Home, ArrowRight } from "lucide-react";
+import { Banknote, Home, Building2, ArrowRight } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Karşılaştır — kendin nerede duruyorsun?",
   description:
-    "Maaşını ve kiranı Türkiye ortalamasıyla anlık olarak kıyasla. Kişisel bilgi alınmaz, sadece bu sayfa için hesaplanır.",
+    "Maaşını, kiranı ve aidatını Türkiye ortalamasıyla anlık olarak kıyasla. Kişisel bilgi alınmaz, sadece bu sayfa için hesaplanır.",
   alternates: { canonical: "/karsilastir" },
 };
 
@@ -26,6 +26,13 @@ const options = [
     body: "Şehir ve ilçe medyanı ile kıyas. Pahalı mı uygun mu?",
     accent: "from-sky-500/10",
   },
+  {
+    href: "/karsilastir/aidat",
+    icon: Building2,
+    title: "Aidatımı karşılaştır",
+    body: "Yapı tipi + bölge medyanı ile kıyas. Komşundan ne kadar farklı?",
+    accent: "from-amber-500/10",
+  },
 ];
 
 export default function CompareLandingPage() {
@@ -36,12 +43,12 @@ export default function CompareLandingPage() {
           Sen nerede duruyorsun?
         </h1>
         <p className="text-lg text-muted-foreground">
-          Maaşını veya kiranı yaz; Türkiye'deki anonim verilerden hesaplanmış medyanla
-          ne kadar uzakta olduğunu gör. Kişisel bilgi istemez, hesabın saklanmaz.
+          Maaşını, kiranı veya aidatını yaz; Türkiye'deki anonim verilerden hesaplanmış
+          medyanla ne kadar uzakta olduğunu gör. Kişisel bilgi istemez, hesabın saklanmaz.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {options.map(({ href, icon: Icon, title, body, accent }) => (
           <Link key={href} href={href} className="group">
             <Card

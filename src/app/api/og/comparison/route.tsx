@@ -3,16 +3,23 @@ import { ImageResponse } from "next/og";
 import { findCityBySlug } from "@/lib/cities";
 import { listSalarySubmissions } from "@/modules/maas/server/queries";
 import { listRentSubmissions } from "@/modules/kira/server/queries";
+import { listAidatSubmissions } from "@/modules/aidat/server/queries";
+import { siteTypeLabels } from "@/modules/aidat/config";
 import { positionSlugFor } from "@/modules/maas/position-resolver";
 import { computeComparison } from "@/lib/comparison";
 import { siteConfig } from "@/lib/site-config";
 import { ogFormatTRY as fmtTry } from "@/lib/og-format";
 
+type Kind = "maas" | "kira" | "aidat";
+const VALID_SITE_TYPES = new Set(["BLOCK", "VILLA", "INDEPENDENT", "RESIDENCE"]);
+
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const kind = searchParams.get("kind") === "kira" ? "kira" : "maas";
+  const rawKind = searchParams.get("kind");
+  const kind: Kind =
+    rawKind === "kira" ? "kira" : rawKind === "aidat" ? "aidat" : "maas";
   const amountNum = Number(searchParams.get("amount") ?? "");
   if (!Number.isFinite(amountNum) || amountNum <= 0) {
     return fallbackImage(kind);
@@ -48,7 +55,7 @@ export async function GET(req: Request) {
         higherIsBetter: true,
         formatValue: (n) => fmtTry(n),
       });
-    } else {
+    } else if (kind === "kira") {
       const districtName = searchParams.get("district")?.trim() ?? "";
       const submissions = await listRentSubmissions({ citySlug, limit: 1000 });
       const filtered = districtName
@@ -64,6 +71,44 @@ export async function GET(req: Request) {
         value: amountNum,
         sortedPeers: sorted,
         subjectLabel: "Kiran",
+        scopeLabel,
+        higherIsBetter: false,
+        formatValue: (n) => fmtTry(n),
+      });
+    } else {
+      const districtName = searchParams.get("district")?.trim() ?? "";
+      const siteTypeRaw = searchParams.get("siteType") ?? "";
+      const siteType = VALID_SITE_TYPES.has(siteTypeRaw)
+        ? (siteTypeRaw as keyof typeof siteTypeLabels)
+        : undefined;
+
+      const submissions = await listAidatSubmissions({ citySlug, limit: 1000 });
+      const filtered = submissions.filter((s) => {
+        if (siteType && s.data.siteType !== siteType) return false;
+        if (
+          districtName &&
+          !(s.data.districtName ?? "").toLowerCase().includes(districtName.toLowerCase())
+        ) {
+          return false;
+        }
+        return true;
+      });
+      const sorted = filtered.map((s) => s.amount).filter((n) => n > 0).sort((a, b) => a - b);
+
+      const labelParts: string[] = [];
+      if (cityRecord) labelParts.push(cityRecord.name);
+      if (districtName) labelParts.push(districtName);
+      if (siteType) labelParts.push(siteTypeLabels[siteType]);
+      if (labelParts.length) {
+        scopeLabel = labelParts.join(" · ");
+      } else {
+        scopeLabel = "Türkiye geneli — site aidatları";
+      }
+
+      result = computeComparison({
+        value: amountNum,
+        sortedPeers: sorted,
+        subjectLabel: "Aidatın",
         scopeLabel,
         higherIsBetter: false,
         formatValue: (n) => fmtTry(n),
@@ -182,7 +227,13 @@ export async function GET(req: Request) {
   );
 }
 
-function fallbackImage(kind: "maas" | "kira") {
+function fallbackImage(kind: Kind) {
+  const heading =
+    kind === "maas"
+      ? "Maaşını karşılaştır"
+      : kind === "kira"
+        ? "Kiranı karşılaştır"
+        : "Aidatını karşılaştır";
   return new ImageResponse(
     (
       <div
@@ -198,9 +249,7 @@ function fallbackImage(kind: "maas" | "kira") {
         }}
       >
         <div style={{ fontSize: 42, fontWeight: 600, marginBottom: 24 }}>{siteConfig.name}</div>
-        <div style={{ fontSize: 64, fontWeight: 700, letterSpacing: -1 }}>
-          {kind === "maas" ? "Maaşını karşılaştır" : "Kiranı karşılaştır"}
-        </div>
+        <div style={{ fontSize: 64, fontWeight: 700, letterSpacing: -1 }}>{heading}</div>
         <div style={{ marginTop: "auto", fontSize: 22, color: "#a3a3a3" }}>
           {siteConfig.domain}
         </div>
