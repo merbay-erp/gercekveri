@@ -6,6 +6,10 @@
  * propagate but historical submissions stay linked.
  */
 
+import { config as loadEnv } from "dotenv";
+loadEnv({ path: ".env.local" });
+loadEnv({ path: ".env" });
+
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { cities } from "../src/lib/cities";
