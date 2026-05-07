@@ -1,0 +1,3 @@
+# Google AdSense — replace pub-XXXXXXXXXXXXXXXX with your real Publisher ID
+# from https://www.google.com/adsense/new/u/0/pub-.../home → Sites → ads.txt
+# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

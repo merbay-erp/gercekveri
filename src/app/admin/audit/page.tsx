@@ -131,7 +131,8 @@ export default async function AdminAuditPage({
         </Card>
       ) : (
         <Card className="overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] text-sm">
             <thead className="border-b bg-muted/30">
               <tr>
                 <Th>Tarih</Th>
@@ -185,6 +186,7 @@ export default async function AdminAuditPage({
               ))}
             </tbody>
           </table>
+          </div>
         </Card>
       )}
 

@@ -4,6 +4,7 @@ import { Database, Plus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { GlobalSearch } from "@/components/search/global-search";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import { mainNav, siteConfig } from "@/lib/site-config";
 import { buildSearchIndex } from "@/lib/search-index";
 import { cn } from "@/lib/utils";
@@ -55,6 +56,7 @@ export function SiteHeader() {
             <Plus className="h-4 w-4" />
           </Link>
           <ThemeToggle />
+          <MobileNav items={[...mainNav]} />
         </div>
       </div>
     </header>

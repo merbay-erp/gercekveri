@@ -81,7 +81,8 @@ export default async function KiraSismePage() {
           </Card>
         ) : (
           <Card className="overflow-hidden">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[560px] text-sm">
               <thead className="border-b bg-muted/30">
                 <tr>
                   <Th>Şehir</Th>
@@ -137,6 +138,7 @@ export default async function KiraSismePage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </Card>
         )}
       </div>
