@@ -10,9 +10,10 @@ import { generateSalaryInsight, GEMINI_MODEL, type SalaryInsightOutput } from ".
 
 const PROMPT_VERSION = "v1-2026-05";
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-// Threshold tuned for early-stage volume — 3 keeps insights honest while
-// letting the feature surface as soon as a scope has any signal. Phase 3
-// raises this to 10+ once daily volume justifies stricter floors.
+// 30-minute negative cache: when generation fails (rate limit, API down)
+// we still write to AiSummary with empty body so the next request can
+// short-circuit instead of hammering the API.
+const FAILURE_CACHE_MS = 30 * 60 * 1000;
 const MIN_DATA_FOR_INSIGHT = 3;
 
 interface ScopeStats {
@@ -93,6 +94,9 @@ export async function getOrGenerateSalaryInsight({
     cached.promptHash === promptHash &&
     (!cached.validUntil || cached.validUntil.getTime() > Date.now())
   ) {
+    // Empty body = negative cache (previous generation failed). Hold off
+    // re-attempting until validUntil expires.
+    if (!cached.body) return null;
     return {
       title: cached.title,
       body: cached.body,
@@ -113,7 +117,39 @@ export async function getOrGenerateSalaryInsight({
     min: stats.min,
     max: stats.max,
   });
-  if (!generated) return null;
+
+  if (!generated) {
+    // Negative-cache the failure so we don't keep retrying within the
+    // rate-limit window.
+    try {
+      await db.aiSummary.upsert({
+        where: { scope_language: { scope, language: "tr" } },
+        update: {
+          title: null,
+          body: "",
+          bullets: [],
+          inputCount: stats.count,
+          modelName: GEMINI_MODEL,
+          promptHash,
+          validUntil: new Date(Date.now() + FAILURE_CACHE_MS),
+        },
+        create: {
+          scope,
+          language: "tr",
+          title: null,
+          body: "",
+          bullets: [],
+          inputCount: stats.count,
+          modelName: GEMINI_MODEL,
+          promptHash,
+          validUntil: new Date(Date.now() + FAILURE_CACHE_MS),
+        },
+      });
+    } catch (err) {
+      console.warn("[insights] negative cache write failed:", err);
+    }
+    return null;
+  }
 
   const validUntil = new Date(Date.now() + CACHE_TTL_MS);
 
