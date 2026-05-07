@@ -19,6 +19,7 @@ import { findCityBySlug } from "@/lib/cities";
 import { buildSearchIndex } from "@/lib/search-index";
 import { GlobalSearch } from "@/components/search/global-search";
 import { HeroLiveCounters } from "@/components/home/hero-live-counters";
+import { LiveTicker } from "@/components/home/live-ticker";
 import { LiveTrendsPanel } from "@/components/home/live-trends-panel";
 import { AmountAiInsightLarge } from "@/components/data-display/amount-ai-insight-large";
 import { getPublicStatsOverview } from "@/lib/public-stats";
@@ -157,6 +158,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <LiveTicker items={recentSubmissions} />
 
       {headlineInsight ? (
         <section className="container mx-auto px-4 pt-12">
