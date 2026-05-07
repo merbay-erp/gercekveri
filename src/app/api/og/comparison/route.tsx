@@ -6,15 +6,9 @@ import { listRentSubmissions } from "@/modules/kira/server/queries";
 import { positionSlugFor } from "@/modules/maas/position-resolver";
 import { computeComparison } from "@/lib/comparison";
 import { siteConfig } from "@/lib/site-config";
+import { ogFormatTRY as fmtTry } from "@/lib/og-format";
 
 export const runtime = "nodejs";
-
-const fmtTry = (n: number) =>
-  new Intl.NumberFormat("tr-TR", {
-    style: "currency",
-    currency: "TRY",
-    maximumFractionDigits: 0,
-  }).format(n);
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);

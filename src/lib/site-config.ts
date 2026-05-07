@@ -80,7 +80,7 @@ export const categories: CategoryDef[] = [
     longDescription:
       "Komşunla aynı parayı mı veriyorsun yoksa kazıklanıyor musun? Bina yaşı, daire sayısı ve hizmetlere göre kıyas.",
     icon: Building2,
-    status: "soon",
+    status: "live",
     accent: "from-amber-500/20 to-amber-500/5",
     sortOrder: 4,
   },
@@ -118,9 +118,9 @@ export const upcomingCategories = categories.filter((c) => c.status === "soon");
 export const mainNav = [
   { label: "Maaşlar", href: "/maaslar" },
   { label: "Kira", href: "/kira" },
+  { label: "Aidat", href: "/aidat" },
   { label: "İnternet", href: "/internet" },
   { label: "Karşılaştır", href: "/karsilastir" },
-  { label: "Hakkında", href: "/hakkinda" },
 ];
 
 export const footerNav = {

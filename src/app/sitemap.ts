@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { topCitySlugs, topPositionSlugs } from "@/modules/maas/server/queries";
 import { topRentCitySlugs } from "@/modules/kira/server/queries";
+import { topAidatCitySlugs } from "@/modules/aidat/server/queries";
 import { topInternetCitySlugs } from "@/modules/internet/server/queries";
 import { curatedPositionSlugs } from "@/modules/maas/position-resolver";
 import { isps } from "@/modules/internet/config";
@@ -16,17 +17,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     activePositions,
     activeSalaryCities,
     activeRentCities,
+    activeAidatCities,
     activeInternetCities,
   ] = await Promise.all([
     topPositionSlugs(50).catch(() => [] as string[]),
     topCitySlugs(20).catch(() => [] as string[]),
     topRentCitySlugs(20).catch(() => [] as string[]),
+    topAidatCitySlugs(20).catch(() => [] as string[]),
     topInternetCitySlugs(20).catch(() => [] as string[]),
   ]);
 
   const positions = Array.from(new Set([...activePositions, ...curatedPositionSlugs.slice(0, 30)]));
   const salaryCitySet = Array.from(new Set([...activeSalaryCities, ...featuredCitySlugs]));
   const rentCitySet = Array.from(new Set([...activeRentCities, ...featuredCitySlugs]));
+  const aidatCitySet = Array.from(new Set([...activeAidatCities, ...featuredCitySlugs]));
   const internetCitySet = Array.from(new Set([...activeInternetCities, ...featuredCitySlugs]));
 
   const now = new Date();
@@ -43,6 +47,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/maaslar/yeni", 0.6, "monthly"),
     u("/kira", 0.9, "daily"),
     u("/kira/yeni", 0.6, "monthly"),
+    u("/aidat", 0.9, "daily"),
+    u("/aidat/yeni", 0.6, "monthly"),
     u("/internet", 0.9, "daily"),
     u("/internet/yeni", 0.6, "monthly"),
     u("/karsilastir", 0.8, "weekly"),
@@ -54,6 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const positionEntries = positions.map((slug) => u(`/maaslar/${slug}`, 0.7, "weekly"));
   const salaryCityEntries = salaryCitySet.map((slug) => u(`/maaslar/sehir/${slug}`, 0.7, "weekly"));
   const rentCityEntries = rentCitySet.map((slug) => u(`/kira/sehir/${slug}`, 0.7, "weekly"));
+  const aidatCityEntries = aidatCitySet.map((slug) => u(`/aidat/sehir/${slug}`, 0.7, "weekly"));
   const ispEntries = isps.map((isp) => u(`/internet/${isp.slug}`, 0.8, "weekly"));
   const internetCityEntries = internetCitySet.map((slug) =>
     u(`/internet/sehir/${slug}`, 0.7, "weekly"),
@@ -72,6 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...positionEntries,
     ...salaryCityEntries,
     ...rentCityEntries,
+    ...aidatCityEntries,
     ...ispEntries,
     ...internetCityEntries,
     ...crossEntries,

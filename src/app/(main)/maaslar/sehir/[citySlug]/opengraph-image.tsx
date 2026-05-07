@@ -2,7 +2,8 @@ import { ImageResponse } from "next/og";
 import { findCityBySlug } from "@/lib/cities";
 import { siteConfig } from "@/lib/site-config";
 import { getSalaryStats } from "@/modules/maas/server/queries";
-import { formatTRY, formatNumber } from "@/lib/money";
+import { formatNumber } from "@/lib/money";
+import { ogFormatTRY as formatTRY } from "@/lib/og-format";
 
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };

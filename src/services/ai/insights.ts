@@ -226,6 +226,11 @@ export function buildRentScope(citySlug?: string): string {
   return `rent:c/${citySlug}`;
 }
 
+export function buildAidatScope(citySlug?: string): string {
+  if (!citySlug) return "aidat:all";
+  return `aidat:c/${citySlug}`;
+}
+
 export function buildInternetScope(ispSlug?: string, citySlug?: string): string {
   const parts = ["internet"];
   if (citySlug) parts.push(`c/${citySlug}`);
