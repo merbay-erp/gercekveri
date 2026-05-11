@@ -1,11 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { TrendingUp, TrendingDown, AlertCircle, BarChart3 } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  AlertCircle,
+  Info,
+  BookOpen,
+  BarChart3,
+  Calendar,
+  Briefcase,
+  Home,
+  Percent,
+  DollarSign,
+  LineChart,
+  Package,
+} from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { SchemaOrg } from "@/components/schema-org";
 import { AdSlot } from "@/components/ad-slot";
 import { SeriesHistoryChart } from "@/components/data-display/series-history-chart";
+import {
+  ContentSection,
+  Callout,
+  DefinitionList,
+  RelatedDataGrid,
+} from "@/components/content/article-blocks";
 import { tufeSchemas } from "@/lib/schema-presets";
 import {
   getTcmbSeries,
@@ -61,8 +81,8 @@ export default async function TufePage() {
         </Card>
       ) : (
         <>
+          {/* Hero data cards */}
           <div className="mb-6 grid gap-4 sm:grid-cols-2">
-            {/* Endeks değeri */}
             <Card className="p-5">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Endeks değeri
@@ -75,7 +95,6 @@ export default async function TufePage() {
               </p>
             </Card>
 
-            {/* Yıllık değişim — kritik */}
             <Card className="p-5 border-rose-500/30 bg-gradient-to-br from-rose-500/[0.06] to-transparent">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Yıllık değişim (TÜFE Yoy)
@@ -119,96 +138,220 @@ export default async function TufePage() {
             </Card>
           ) : null}
 
-          <AdSlot slotKey="tufe-mid" format="leaderboard" />
+          <AdSlot slotKey="tufe-mid" format="leaderboard" className="mb-12" />
 
-          <article className="prose prose-neutral dark:prose-invert mt-8 max-w-none">
-            <h2>TÜFE nedir?</h2>
-            <p>
-              <strong>Tüketici Fiyat Endeksi</strong> — bir tüketicinin satın
-              aldığı tipik mal ve hizmet sepetinin zaman içindeki fiyat
-              değişimi. TÜİK her ayın 3. iş günü açıklar, TCMB EVDS üzerinden
-              dağıtır.
-            </p>
+          {/* CONTENT BLOCKS — eski düz prose yerine tasarlanmış componentler */}
+          <div className="space-y-10">
+            <ContentSection icon={BookOpen} title="TÜFE nedir?" accent="blue">
+              <p>
+                <strong className="text-foreground">Tüketici Fiyat Endeksi</strong>{" "}
+                — bir tüketicinin satın aldığı tipik mal ve hizmet sepetinin
+                zaman içindeki fiyat değişimi. TÜİK her ayın <strong>3. iş günü</strong>
+                {" "}açıklar, TCMB EVDS üzerinden dağıtır.
+              </p>
 
-            <h2>TÜFE neden önemli?</h2>
-            <ul>
-              <li>
-                <strong>Enflasyon ölçütü</strong> — yıllık TÜFE artışı = yıllık
-                enflasyon oranı.
-              </li>
-              <li>
-                <strong>Maaş ayarlaması</strong> — toplu sözleşmeler ve memur
-                zamlarında referans alınır.
-              </li>
-              <li>
-                <strong>Kira artışı</strong> — yıllık kira artışı en fazla TÜFE
-                kadar yapılabilir (TÜFE Yoy üst sınır).
-              </li>
-              <li>
-                <strong>Para politikası</strong> — TCMB faiz kararını TÜFE
-                hedefine göre verir.
-              </li>
-            </ul>
+              <Callout type="info" title="Resmi metodoloji">
+                TÜFE, 12 ana harcama grubuna (gıda, alkol-tütün, giyim, konut,
+                ev eşyası, sağlık, ulaştırma, haberleşme, eğlence, eğitim,
+                lokanta-otel, çeşitli mal-hizmet) ayrılır. Her grubun ağırlığı
+                tüketici harcama oranına göre <strong>yıllık güncellenir</strong>.
+              </Callout>
+            </ContentSection>
 
-            <h2>TÜFE alt kalemleri</h2>
-            <p>
-              TÜFE 12 ana harcama grubuna ayrılır: gıda, alkol-tütün, giyim,
-              konut, ev eşyası, sağlık, ulaştırma, haberleşme, eğlence, eğitim,
-              lokanta-otel, çeşitli mal-hizmet. Her grubun ağırlığı tüketici
-              harcama oranına göre yıllık güncellenir.
-            </p>
+            <ContentSection
+              icon={TrendingUp}
+              title="TÜFE neden önemli?"
+              accent="rose"
+            >
+              <p>
+                Yıllık TÜFE artışı doğrudan{" "}
+                <strong className="text-foreground">enflasyon oranı</strong>
+                'dır. Türkiye ekonomisinin onlarca kritik kararını şekillendirir:
+              </p>
 
-            <h2>TÜFE vs gerçek hayat</h2>
-            <p>
-              Resmi TÜFE genel ortalamadır. Bireysel tüketici sepetiniz bundan
-              sapabilir — kiranızı yeni başlattıysanız konut etkisi çok daha
-              güçlü olabilir.
-              {series.yoyChangePct !== null
-                ? ` Şu an resmi yıllık enflasyon %${series.yoyChangePct.toFixed(1)} — sizin sepetiniz farklı olabilir.`
-                : ""}
-            </p>
-            <p>
-              <Link href="/konut-enflasyon">
-                Konut enflasyon karnesi
-              </Link>{" "}
-              ile bölgenizdeki konut fiyatlarının TÜFE'ye karşı performansını
-              ölç. {/* */}
-              <Link href="/kira">Gerçek kira verisi</Link> ile resmi
-              istatistikleri karşılaştır.
-            </p>
+              <DefinitionList
+                items={[
+                  {
+                    icon: Briefcase,
+                    term: "Maaş ayarlaması",
+                    description:
+                      "Toplu sözleşmeler, memur zamları ve asgari ücret artışı TÜFE'ye göre belirlenir. Yıllık TÜFE %X ise, maaş artışı genelde bunun ±%5 bandında olur.",
+                  },
+                  {
+                    icon: Home,
+                    term: "Kira artışı üst sınırı",
+                    description:
+                      "Yasal düzenlemeye göre yıllık kira artışı en fazla TÜFE oranında yapılabilir (12 aylık ortalama TÜFE). 2023 sonrası bu kuralla kira piyasası daha öngörülebilir.",
+                  },
+                  {
+                    icon: Percent,
+                    term: "Para politikası",
+                    description:
+                      "TCMB politika faizini, enflasyon hedefine göre yönlendirir. Yüksek enflasyon → sıkı para politikası (yüksek faiz) → talep düşüşü → enflasyon iniş.",
+                  },
+                  {
+                    icon: DollarSign,
+                    term: "Yatırım kararı",
+                    description:
+                      "Mevduat, hisse senedi, gayrimenkul — hepsinin getirisi 'reel' olarak TÜFE'den çıkartılır. Nominal getiri %50 ise TÜFE %30, reel getirin sadece %15.",
+                  },
+                ]}
+              />
+            </ContentSection>
 
-            <h2>Çekirdek TÜFE (C)</h2>
-            <p>
-              Enerji, gıda, alkol-tütün ve altın hariç tutulan bir endeks. Daha
-              az dalgalı olduğu için para politikasında daha güvenilir referans
-              olarak kullanılır.
-            </p>
+            <ContentSection
+              icon={BarChart3}
+              title="TÜFE alt kalemleri"
+              accent="purple"
+            >
+              <p>
+                TÜFE, tek bir rakam gibi görünür ama 12 farklı harcama
+                grubunun ağırlıklı ortalamasıdır. Sepetin içinde ne var?
+              </p>
 
-            <h2>İlgili veriler</h2>
-            <ul>
-              <li>
-                <Link href="/faiz">TCMB Politika Faizi</Link> — enflasyona
-                müdahale aracı
-              </li>
-              <li>
-                <Link href="/doviz">Döviz kurları</Link> — kur enflasyonu
-                tetikler
-              </li>
-              <li>
-                <Link href="/konut-enflasyon">Konut enflasyon karnesi</Link>
-              </li>
-              <li>
-                <Link href="/kira">Gerçek kira fiyatları</Link>
-              </li>
-              <li>
-                <Link href="/maaslar">Gerçek maaşlar</Link>
-              </li>
-            </ul>
-          </article>
+              <div className="my-4 grid gap-2 sm:grid-cols-2">
+                {[
+                  { name: "Gıda ve alkolsüz içecek", weight: "~25%" },
+                  { name: "Konut, su, elektrik, gaz", weight: "~14%" },
+                  { name: "Ulaştırma", weight: "~13%" },
+                  { name: "Lokanta ve otel", weight: "~10%" },
+                  { name: "Ev eşyası", weight: "~7%" },
+                  { name: "Giyim ve ayakkabı", weight: "~6%" },
+                  { name: "Sağlık", weight: "~4%" },
+                  { name: "Eğitim", weight: "~3%" },
+                  { name: "Eğlence ve kültür", weight: "~3%" },
+                  { name: "Haberleşme", weight: "~3%" },
+                  { name: "Alkollü içecek + tütün", weight: "~5%" },
+                  { name: "Çeşitli mal ve hizmet", weight: "~7%" },
+                ].map((item) => (
+                  <div
+                    key={item.name}
+                    className="flex items-center justify-between rounded-md border border-border/60 bg-card px-3 py-2 text-sm"
+                  >
+                    <span className="text-foreground">{item.name}</span>
+                    <span className="tabular-nums font-medium text-muted-foreground">
+                      {item.weight}
+                    </span>
+                  </div>
+                ))}
+              </div>
 
-          <AdSlot slotKey="tufe-bottom" format="responsive" className="mt-8" />
+              <Callout type="tip" title="Çekirdek TÜFE (C)">
+                Enerji, gıda, alkol-tütün ve altın hariç tutulan bir endeks.
+                Daha az dalgalı olduğu için para politikasında daha güvenilir
+                referans olarak kullanılır.
+              </Callout>
+            </ContentSection>
 
-          <p className="mt-12 text-center text-xs text-muted-foreground">
+            <ContentSection
+              icon={Info}
+              title="TÜFE vs gerçek hayat"
+              accent="amber"
+            >
+              <p>
+                Resmi TÜFE <strong>Türkiye geneli ortalamasıdır</strong>.
+                Bireysel tüketici sepetin bundan sapabilir. Örneğin:
+              </p>
+
+              <Callout type="warning" title="Sizin enflasyonunuz farklı olabilir">
+                {series.yoyChangePct !== null ? (
+                  <>
+                    Şu an resmi yıllık enflasyon{" "}
+                    <strong>%{series.yoyChangePct.toFixed(1)}</strong>. Ama kiranızı
+                    yeni başlattıysanız konut etkisi sepetinizde 2-3x daha
+                    güçlü olabilir. Çocuğunuz okula gidiyorsa eğitim
+                    kalemi öne çıkar. Bireysel enflasyonunuz resmi rakamdan
+                    farklı seyredebilir.
+                  </>
+                ) : (
+                  "Bireysel tüketici sepetiniz Türkiye ortalamasından farklı seyredebilir. Konut, eğitim, sağlık gibi kalemlerin ağırlığı kişiden kişiye değişir."
+                )}
+              </Callout>
+
+              <p>
+                Konut tarafının resmi TÜFE'ye göre nasıl seyrettiğini görmek
+                için{" "}
+                <Link
+                  href="/konut-enflasyon"
+                  className="font-medium text-foreground underline-offset-2 hover:underline"
+                >
+                  konut enflasyon karnesi
+                </Link>
+                'ne, gerçek kira ödemelerini görmek için{" "}
+                <Link
+                  href="/kira"
+                  className="font-medium text-foreground underline-offset-2 hover:underline"
+                >
+                  anonim kira verisi
+                </Link>
+                'ne göz at.
+              </p>
+            </ContentSection>
+
+            <ContentSection
+              icon={LineChart}
+              title="TÜFE ile birlikte bakman gereken veriler"
+              accent="emerald"
+            >
+              <RelatedDataGrid
+                links={[
+                  {
+                    title: "TCMB Politika Faizi",
+                    description:
+                      "Enflasyona müdahale aracı — yüksek faiz, talep frenler.",
+                    href: "/faiz",
+                    icon: Percent,
+                    accent: "purple",
+                  },
+                  {
+                    title: "Döviz Kurları",
+                    description:
+                      "Kur enflasyonu tetikler — ithalat-yoğun sepette etki büyük.",
+                    href: "/doviz",
+                    icon: DollarSign,
+                    accent: "emerald",
+                  },
+                  {
+                    title: "Konut Enflasyon Karnesi",
+                    description:
+                      "19 NUTS-2 bölge için TÜFE vs KFE — konut yatırımı reel mi?",
+                    href: "/konut-enflasyon",
+                    icon: Home,
+                    accent: "rose",
+                  },
+                  {
+                    title: "Gerçek Maaşlar",
+                    description:
+                      "Pozisyon × şehir bazında anonim net maaşlar — reel kazanç ölç.",
+                    href: "/maaslar",
+                    icon: Briefcase,
+                    accent: "blue",
+                  },
+                  {
+                    title: "Gerçek Kira Fiyatları",
+                    description:
+                      "İlan değil, gerçek ödenen kiralar — yıllık artış üst sınırı kontrolü.",
+                    href: "/kira",
+                    icon: Home,
+                    accent: "amber",
+                  },
+                  {
+                    title: "Faturalar",
+                    description:
+                      "Elektrik, doğalgaz, su — mevsimsel normalizasyon dahil.",
+                    href: "/fatura",
+                    icon: Package,
+                    accent: "muted",
+                  },
+                ]}
+              />
+            </ContentSection>
+          </div>
+
+          <AdSlot slotKey="tufe-bottom" format="responsive" className="mt-12" />
+
+          <div className="mt-12 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3" />
             Veri kaynağı:{" "}
             <a
               href="https://www.tuik.gov.tr/"
@@ -231,7 +374,7 @@ export default async function TufePage() {
             <code className="rounded bg-muted px-1.5 py-0.5 text-[10px]">
               TP.FE.OKTG01
             </code>
-          </p>
+          </div>
         </>
       )}
     </div>

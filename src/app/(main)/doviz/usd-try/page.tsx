@@ -1,11 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronLeft, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  TrendingUp,
+  TrendingDown,
+  AlertCircle,
+  BookOpen,
+  Building2,
+  Calculator,
+  Percent,
+  DollarSign,
+  LineChart,
+  Calendar,
+  TrendingUp as TrendIcon,
+  Wallet,
+} from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { SchemaOrg } from "@/components/schema-org";
 import { AdSlot } from "@/components/ad-slot";
 import { SeriesHistoryChart } from "@/components/data-display/series-history-chart";
+import {
+  ContentSection,
+  Callout,
+  DefinitionList,
+  RelatedDataGrid,
+} from "@/components/content/article-blocks";
 import { usdTrySchemas } from "@/lib/schema-presets";
 import {
   getTcmbSeries,
@@ -14,7 +34,7 @@ import {
   formatTcmbDate,
 } from "@/lib/tcmb-series";
 
-export const revalidate = 1800; // 30 dk
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Dolar TL Kuru — TCMB Resmi Veri, Anlık",
@@ -68,7 +88,8 @@ export default async function UsdTryPage() {
             <div>
               <p className="text-sm font-medium">Veri henüz hazır değil</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                TCMB EVDS senkronizasyonu bekleniyor. Birkaç dakika sonra tekrar dene.
+                TCMB EVDS senkronizasyonu bekleniyor. Birkaç dakika sonra
+                tekrar dene.
               </p>
             </div>
           </div>
@@ -121,12 +142,9 @@ export default async function UsdTryPage() {
             </div>
           </Card>
 
-          {/* Chart */}
           {series.history && series.history.length > 0 ? (
             <Card className="mb-6 p-6">
-              <h2 className="mb-1 text-sm font-semibold">
-                12 Aylık Tarihçe
-              </h2>
+              <h2 className="mb-1 text-sm font-semibold">12 Aylık Tarihçe</h2>
               <p className="mb-4 text-xs text-muted-foreground">
                 TCMB EVDS API · saatte bir senkronize
               </p>
@@ -139,78 +157,163 @@ export default async function UsdTryPage() {
             </Card>
           ) : null}
 
-          <AdSlot slotKey="doviz-usd-mid" format="leaderboard" />
+          <AdSlot slotKey="doviz-usd-mid" format="leaderboard" className="mb-12" />
 
-          {/* İçerik bloğu — SEO için */}
-          <article className="prose prose-neutral dark:prose-invert mt-8 max-w-none">
-            <h2>USD/TL kuru ne anlama geliyor?</h2>
-            <p>
-              TCMB'nin günlük yayınladığı USD/TL satış kuru, Türkiye'de
-              ithalat-ihracat, döviz mevduatı, kredi geri ödemesi ve enflasyon
-              beklentisi için temel referans göstergesidir.{" "}
-              <strong>1 dolar = {series.lastValue.toFixed(2)} TL</strong> demek,
-              bankaların TCMB referansıyla yaklaşık bu fiyattan dolar satacağı
-              anlamına gelir. Her bankanın kendi 'alış-satış' makası (spread)
-              0.05-0.20 TL bandındadır.
-            </p>
+          {/* CONTENT */}
+          <div className="space-y-10">
+            <ContentSection
+              icon={BookOpen}
+              title="USD/TL kuru ne anlama geliyor?"
+              accent="emerald"
+            >
+              <p>
+                TCMB'nin günlük yayınladığı USD/TL satış kuru, Türkiye'de{" "}
+                <strong className="text-foreground">
+                  ithalat-ihracat, döviz mevduatı, kredi geri ödemesi ve
+                  enflasyon beklentisi
+                </strong>{" "}
+                için temel referans göstergesidir.
+              </p>
 
-            <h2>Neden yıllık değişim önemli?</h2>
-            <p>
-              Yıllık değişim oranı, TL'nin dolar karşısında 12 ayda ne kadar
-              değer kaybettiğini gösterir. Enflasyon hesaplamaları, ücret
-              ayarlamaları ve yatırım kararları için bu rakam kritiktir.{" "}
-              {series.yoyChangePct !== null
-                ? series.yoyChangePct > 0
-                  ? `Son 12 ayda USD/TL %${series.yoyChangePct.toFixed(1)} arttı — bu TL'nin dolar karşısında zayıfladığı anlamına gelir.`
-                  : `Son 12 ayda USD/TL %${Math.abs(series.yoyChangePct).toFixed(1)} azaldı — TL dolar karşısında güçlendi.`
-                : ""}
-            </p>
+              <Callout type="info" title="Kanonik referans">
+                <strong>1 dolar ≈ {series.lastValue.toFixed(2)} TL</strong> demek,
+                bankaların TCMB referansıyla yaklaşık bu fiyattan dolar satacağı
+                anlamına gelir. TCMB serbest kur sistemi uygular — günlük
+                gösterge kuru saat 15:30'da yayınlanır.
+              </Callout>
+            </ContentSection>
 
-            <h2>Bankalardaki dolar kuru neden farklı?</h2>
-            <p>
-              TCMB referans kuru tek bir değerdir, ama her bankanın kendi
-              alış-satış kuru vardır. Genel ortalama olarak:
-            </p>
-            <ul>
-              <li>
-                <strong>Banka satış kuru</strong> = TCMB referans + 0.05-0.20 TL
-              </li>
-              <li>
-                <strong>Banka alış kuru</strong> = TCMB referans − 0.05-0.20 TL
-              </li>
-              <li>
-                <strong>Kambiyo bürosu</strong>: makas genelde 0.20-0.50 TL
-              </li>
-            </ul>
-            <p>
-              Büyük tutarlarda bankaya pazarlık edilebilir (kurumsal müşteriler
-              için referans+0.02 TL bandında özel kurlar mümkündür).
-            </p>
+            <ContentSection
+              icon={TrendIcon}
+              title="Yıllık değişim niye önemli?"
+              accent="rose"
+            >
+              <p>
+                Yıllık değişim oranı, TL'nin dolar karşısında 12 ayda ne kadar
+                değer kaybettiğini gösterir. Enflasyon hesaplamaları, ücret
+                ayarlamaları ve yatırım kararları için bu rakam{" "}
+                <strong className="text-foreground">kritiktir</strong>.
+              </p>
 
-            <h2>İlgili veriler</h2>
-            <ul>
-              <li>
-                <Link href="/doviz/eur-try">EUR/TL kuru</Link> — TCMB resmi EUR
-                satış kuru
-              </li>
-              <li>
-                <Link href="/tufe">TÜFE enflasyon</Link> — yıllık enflasyon
-                oranı (kur etkisi)
-              </li>
-              <li>
-                <Link href="/faiz">Politika faizi</Link> — TCMB APİ fonlama
-                (kur müdahale aracı)
-              </li>
-              <li>
-                <Link href="/konut-enflasyon">Konut enflasyon karnesi</Link> —
-                kur + enflasyon konuta nasıl yansıyor
-              </li>
-            </ul>
-          </article>
+              {series.yoyChangePct !== null ? (
+                <Callout
+                  type={series.yoyChangePct > 0 ? "warning" : "success"}
+                  title={
+                    series.yoyChangePct > 0
+                      ? "TL değer kaybediyor"
+                      : "TL değer kazanıyor"
+                  }
+                >
+                  {series.yoyChangePct > 0
+                    ? `Son 12 ayda USD/TL %${series.yoyChangePct.toFixed(1)} arttı. Bu TL'nin dolar karşısında zayıfladığı anlamına gelir — döviz borçlusu için maliyet artar, ihracatçı için avantaj artar.`
+                    : `Son 12 ayda USD/TL %${Math.abs(series.yoyChangePct).toFixed(1)} azaldı. TL dolar karşısında güçlendi — ithalatçı için avantaj, ihracatçı için baskı.`}
+                </Callout>
+              ) : null}
+            </ContentSection>
 
-          <AdSlot slotKey="doviz-usd-bottom" format="responsive" className="mt-8" />
+            <ContentSection
+              icon={Calculator}
+              title="Bankalardaki dolar kuru neden farklı?"
+              accent="blue"
+            >
+              <p>
+                TCMB tek bir referans satış kuru yayınlar. Bankalar buna kendi{" "}
+                <strong className="text-foreground">alış-satış marjını</strong>{" "}
+                ekler:
+              </p>
 
-          <p className="mt-12 text-center text-xs text-muted-foreground">
+              <DefinitionList
+                items={[
+                  {
+                    icon: TrendingUp,
+                    term: "Banka satış kuru",
+                    description: "TCMB referans + 0.05-0.20 TL marj",
+                  },
+                  {
+                    icon: TrendingDown,
+                    term: "Banka alış kuru",
+                    description: "TCMB referans − 0.05-0.20 TL marj",
+                  },
+                  {
+                    icon: Wallet,
+                    term: "Kambiyo bürosu",
+                    description: "Makas genelde 0.20-0.50 TL — daha geniş",
+                  },
+                ]}
+              />
+
+              <Callout type="tip" title="Pazarlık yapılabilir mi?">
+                Büyük tutarlarda evet — kurumsal müşteriler için bankayla
+                referans+0.02 TL bandında özel kurlar mümkündür. Bireysel
+                100.000 TL+ işlemde de pazarlık denenebilir.
+              </Callout>
+            </ContentSection>
+
+            <ContentSection
+              icon={Percent}
+              title="Faiz - kur ilişkisi"
+              accent="purple"
+            >
+              <p>
+                TCMB politika faizi yükselince TL faizi cazip hale gelir →
+                döviz mevduatından TL'ye geçiş → USD/TL düşer. Faiz düşünce
+                tersi olur. Bu yüzden kur takibi ile faiz takibi birlikte
+                anlam kazanır.
+              </p>
+            </ContentSection>
+
+            <ContentSection
+              icon={LineChart}
+              title="USD/TL ile birlikte bakılması gerekenler"
+              accent="emerald"
+            >
+              <RelatedDataGrid
+                links={[
+                  {
+                    title: "EUR/TL Kuru",
+                    description:
+                      "Avrupa ile ticaret + Euro yatırımı için referans. USD ile asenkronizlik takibi.",
+                    href: "/doviz/eur-try",
+                    icon: DollarSign,
+                    accent: "blue",
+                  },
+                  {
+                    title: "TCMB Politika Faizi",
+                    description:
+                      "Kur müdahale aracı — faiz yön kararı kur'u doğrudan etkiler.",
+                    href: "/faiz",
+                    icon: Percent,
+                    accent: "purple",
+                  },
+                  {
+                    title: "TÜFE Enflasyon",
+                    description:
+                      "Kur enflasyonu tetikler — özellikle ithalat-yoğun sepette etki büyük.",
+                    href: "/tufe",
+                    icon: TrendingUp,
+                    accent: "rose",
+                  },
+                  {
+                    title: "Konut Enflasyon Karnesi",
+                    description:
+                      "Kur + enflasyon konuta nasıl yansıyor — 19 bölge karşılaştırma.",
+                    href: "/konut-enflasyon",
+                    icon: Building2,
+                    accent: "amber",
+                  },
+                ]}
+              />
+            </ContentSection>
+          </div>
+
+          <AdSlot
+            slotKey="doviz-usd-bottom"
+            format="responsive"
+            className="mt-12"
+          />
+
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3" />
             Veri kaynağı:{" "}
             <a
               href="https://evds2.tcmb.gov.tr/"
@@ -220,7 +323,7 @@ export default async function UsdTryPage() {
             >
               TCMB EVDS
             </a>{" "}
-            · Seri kodu:{" "}
+            · Seri:{" "}
             <code className="rounded bg-muted px-1.5 py-0.5 text-[10px]">
               TP.DK.USD.S
             </code>{" "}
@@ -229,7 +332,7 @@ export default async function UsdTryPage() {
               dateStyle: "short",
               timeStyle: "short",
             }).format(series.fetchedAt)}
-          </p>
+          </div>
         </>
       )}
     </div>

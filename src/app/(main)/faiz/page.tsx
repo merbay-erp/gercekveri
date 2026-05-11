@@ -1,15 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { TrendingUp, TrendingDown, AlertCircle, Percent } from "lucide-react";
+import {
+  AlertCircle,
+  Percent,
+  BookOpen,
+  TrendingUp,
+  TrendingDown,
+  Calculator,
+  Calendar,
+  Wallet,
+  Home,
+  DollarSign,
+  LineChart,
+} from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { SchemaOrg } from "@/components/schema-org";
 import { AdSlot } from "@/components/ad-slot";
 import { SeriesHistoryChart } from "@/components/data-display/series-history-chart";
+import {
+  ContentSection,
+  Callout,
+  KeyPointGrid,
+  KeyPointBox,
+  RelatedDataGrid,
+} from "@/components/content/article-blocks";
 import { faizSchemas } from "@/lib/schema-presets";
 import {
   getTcmbSeries,
-  formatPct,
   formatTcmbDate,
 } from "@/lib/tcmb-series";
 
@@ -77,7 +95,8 @@ export default async function FaizPage() {
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Son güncelleme: <strong>{formatTcmbDate(series.lastDate)}</strong>
+                  Son güncelleme:{" "}
+                  <strong>{formatTcmbDate(series.lastDate)}</strong>
                 </p>
               </div>
               <Percent className="h-12 w-12 text-purple-500/30" />
@@ -86,9 +105,7 @@ export default async function FaizPage() {
 
           {series.history && series.history.length > 0 ? (
             <Card className="mb-6 p-6">
-              <h2 className="mb-1 text-sm font-semibold">
-                12 Aylık Tarihçe
-              </h2>
+              <h2 className="mb-1 text-sm font-semibold">12 Aylık Tarihçe</h2>
               <p className="mb-4 text-xs text-muted-foreground">
                 TCMB EVDS · saatlik senkron
               </p>
@@ -101,65 +118,188 @@ export default async function FaizPage() {
             </Card>
           ) : null}
 
-          <AdSlot slotKey="faiz-mid" format="leaderboard" />
+          <AdSlot slotKey="faiz-mid" format="leaderboard" className="mb-12" />
 
-          <article className="prose prose-neutral dark:prose-invert mt-8 max-w-none">
-            <h2>Politika faizi nedir?</h2>
-            <p>
-              TCMB'nin bankalara verdiği <strong>1 hafta vadeli repo</strong>{" "}
-              (APİ Fonlama Oranı) — bankaların TCMB'den borçlandığı temel
-              maliyettir. Şu an <strong>%{series.lastValue.toFixed(2)}</strong>{" "}
-              seviyesinde. Bu oran tüm finansal piyasaların referansıdır.
-            </p>
+          <div className="space-y-10">
+            <ContentSection
+              icon={BookOpen}
+              title="Politika faizi nedir?"
+              accent="purple"
+            >
+              <p>
+                TCMB'nin bankalara verdiği{" "}
+                <strong className="text-foreground">1 hafta vadeli repo</strong>{" "}
+                (APİ Fonlama Oranı) — bankaların TCMB'den borçlandığı temel
+                maliyettir. Şu an{" "}
+                <strong className="text-foreground">
+                  %{series.lastValue.toFixed(2)}
+                </strong>{" "}
+                seviyesinde. Bu oran tüm finansal piyasaların referansıdır.
+              </p>
+            </ContentSection>
 
-            <h2>Faiz neden artar/azalır?</h2>
-            <p>
-              Enflasyon yüksekse TCMB faizi artırır (sıkılaşma) → kredi pahalanır
-              → harcama azalır → talep enflasyonu düşer. Enflasyon düşükse
-              tersi yapılır (gevşeme).
-            </p>
+            <ContentSection
+              icon={TrendingUp}
+              title="Faiz neden artar/azalır?"
+              accent="rose"
+            >
+              <p>
+                Para politikasının temel aracı. Enflasyon hedefiyle ilişkilidir:
+              </p>
 
-            <h2>Mevduat faizi politika faizine nasıl bağlı?</h2>
-            <p>
-              Bankalar mevduat faizini politika faizinin{" "}
-              <strong>%80-110</strong> bandında belirler. Politika %50 ise
-              mevduat genelde %40-55 bandında olur. Vergi (%5-15) sonrası net
-              getirir.
-            </p>
-            <p>
-              Tahmini mevduat aralığı: <strong>%{(series.lastValue * 0.8).toFixed(1)} - %{(series.lastValue * 1.05).toFixed(1)}</strong>
-            </p>
+              <KeyPointGrid>
+                <KeyPointBox
+                  label="Enflasyon yüksek"
+                  value="↑ Faiz"
+                  description="Sıkı para politikası, talep azalır"
+                  tone="negative"
+                />
+                <KeyPointBox
+                  label="Enflasyon düşük"
+                  value="↓ Faiz"
+                  description="Gevşek para, ekonomik canlanma"
+                  tone="positive"
+                />
+              </KeyPointGrid>
 
-            <h2>Kredi faizine etki</h2>
-            <p>
-              Tüketici kredisi faizi genelde politika faizinin{" "}
-              <strong>%150-200</strong>'ü bandındadır. Politika %50 ise tüketici
-              kredisi <strong>%75-100</strong> faiz arar. Konut kredisi daha
-              düşük (politika × 1.2-1.6).
-            </p>
-            <p>
-              Tahmini konut kredisi aralığı:{" "}
-              <strong>%{(series.lastValue * 1.2).toFixed(1)} - %{(series.lastValue * 1.6).toFixed(1)}</strong>
-            </p>
+              <Callout type="info" title="Aktarım mekanizması">
+                Faiz artırınca: bankalar kredi pahalanır → tüketici harcaması
+                azalır → talep enflasyonu düşer. Faiz indirince tersi olur. Bu
+                aktarım <strong>3-6 ay</strong> gecikmeli çalışır.
+              </Callout>
+            </ContentSection>
 
-            <h2>İlgili veriler</h2>
-            <ul>
-              <li>
-                <Link href="/tufe">TÜFE enflasyon</Link> — faiz kararının ana
-                gerekçesi
-              </li>
-              <li>
-                <Link href="/doviz">Döviz kurları</Link> — faiz müdahale aracı
-              </li>
-              <li>
-                <Link href="/konut-enflasyon">Konut enflasyon karnesi</Link>
-              </li>
-            </ul>
-          </article>
+            <ContentSection
+              icon={Wallet}
+              title="Mevduat faizi politika faizine nasıl bağlı?"
+              accent="emerald"
+            >
+              <p>
+                Bankalar mevduat faizini politika faizinin{" "}
+                <strong className="text-foreground">%80-110</strong> bandında
+                belirler.
+              </p>
 
-          <AdSlot slotKey="faiz-bottom" format="responsive" className="mt-8" />
+              <KeyPointGrid>
+                <KeyPointBox
+                  label="Mevduat min."
+                  value={`%${(series.lastValue * 0.8).toFixed(1)}`}
+                  description="Politika × 0.8"
+                  tone="neutral"
+                />
+                <KeyPointBox
+                  label="Mevduat ort."
+                  value={`%${(series.lastValue * 0.95).toFixed(1)}`}
+                  description="Politika × 0.95"
+                  tone="positive"
+                />
+                <KeyPointBox
+                  label="Mevduat max."
+                  value={`%${(series.lastValue * 1.05).toFixed(1)}`}
+                  description="Politika × 1.05"
+                  tone="positive"
+                />
+                <KeyPointBox
+                  label="Vergi sonrası net"
+                  value={`~%${(series.lastValue * 0.95 * 0.85).toFixed(1)}`}
+                  description="−%15 vergi"
+                  tone="warning"
+                />
+              </KeyPointGrid>
 
-          <p className="mt-12 text-center text-xs text-muted-foreground">
+              <Callout type="tip" title="Yüksek mevduat faizi pazarlığı">
+                500.000 TL üzeri mevduatta bankayla pazarlık edilebilir.
+                Promosyon dönemlerinde politika × 1.10 mümkün.
+              </Callout>
+            </ContentSection>
+
+            <ContentSection
+              icon={Calculator}
+              title="Kredi faizine etki"
+              accent="amber"
+            >
+              <p>
+                Tüketici kredisi faizi genelde politika faizinin{" "}
+                <strong className="text-foreground">%150-200</strong>'ü
+                bandındadır. Konut kredisi daha düşük (politika × 1.2-1.6).
+              </p>
+
+              <KeyPointGrid>
+                <KeyPointBox
+                  label="Konut kredisi min."
+                  value={`%${(series.lastValue * 1.2).toFixed(1)}`}
+                  description="Politika × 1.2"
+                  tone="positive"
+                />
+                <KeyPointBox
+                  label="Konut kredisi ort."
+                  value={`%${(series.lastValue * 1.4).toFixed(1)}`}
+                  description="Politika × 1.4"
+                  tone="warning"
+                />
+                <KeyPointBox
+                  label="Tüketici kredisi"
+                  value={`%${(series.lastValue * 1.75).toFixed(1)}`}
+                  description="Politika × 1.75"
+                  tone="negative"
+                />
+                <KeyPointBox
+                  label="İhtiyaç kredisi"
+                  value={`%${(series.lastValue * 2.0).toFixed(1)}`}
+                  description="Politika × 2.0"
+                  tone="negative"
+                />
+              </KeyPointGrid>
+            </ContentSection>
+
+            <ContentSection
+              icon={LineChart}
+              title="Politika faizi ile birlikte bakılması gerekenler"
+              accent="emerald"
+            >
+              <RelatedDataGrid
+                links={[
+                  {
+                    title: "TÜFE Enflasyon",
+                    description:
+                      "Faiz kararının ana gerekçesi — TÜFE > faiz olduğunda reel faiz negatif.",
+                    href: "/tufe",
+                    icon: TrendingUp,
+                    accent: "rose",
+                  },
+                  {
+                    title: "USD/TL Kuru",
+                    description:
+                      "Yüksek faiz → TL'ye geçiş → kur düşer. Faiz indirimi → tersi.",
+                    href: "/doviz/usd-try",
+                    icon: DollarSign,
+                    accent: "emerald",
+                  },
+                  {
+                    title: "Konut Enflasyon Karnesi",
+                    description:
+                      "Konut kredisi faizi konut piyasasını doğrudan etkiler.",
+                    href: "/konut-enflasyon",
+                    icon: Home,
+                    accent: "amber",
+                  },
+                  {
+                    title: "EUR/TL Kuru",
+                    description:
+                      "ECB-TCMB faiz farkı EUR/TL paritesini yönlendirir.",
+                    href: "/doviz/eur-try",
+                    icon: DollarSign,
+                    accent: "blue",
+                  },
+                ]}
+              />
+            </ContentSection>
+          </div>
+
+          <AdSlot slotKey="faiz-bottom" format="responsive" className="mt-12" />
+
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3" />
             Veri kaynağı:{" "}
             <a
               href="https://evds2.tcmb.gov.tr/"
@@ -169,11 +309,11 @@ export default async function FaizPage() {
             >
               TCMB EVDS
             </a>{" "}
-            · Seri kodu:{" "}
+            · Seri:{" "}
             <code className="rounded bg-muted px-1.5 py-0.5 text-[10px]">
               TP.APIFON4
             </code>
-          </p>
+          </div>
         </>
       )}
     </div>

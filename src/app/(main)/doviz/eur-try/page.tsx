@@ -1,11 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronLeft, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  TrendingUp,
+  TrendingDown,
+  AlertCircle,
+  BookOpen,
+  DollarSign,
+  Percent,
+  LineChart,
+  Calendar,
+  Building2,
+} from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { SchemaOrg } from "@/components/schema-org";
 import { AdSlot } from "@/components/ad-slot";
 import { SeriesHistoryChart } from "@/components/data-display/series-history-chart";
+import {
+  ContentSection,
+  Callout,
+  RelatedDataGrid,
+} from "@/components/content/article-blocks";
 import { eurTrySchemas } from "@/lib/schema-presets";
 import {
   getTcmbSeries,
@@ -68,7 +84,8 @@ export default async function EurTryPage() {
             <div>
               <p className="text-sm font-medium">Veri henüz hazır değil</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                TCMB EVDS senkronizasyonu bekleniyor. Birkaç dakika sonra tekrar dene.
+                TCMB EVDS senkronizasyonu bekleniyor. Birkaç dakika sonra
+                tekrar dene.
               </p>
             </div>
           </div>
@@ -135,47 +152,100 @@ export default async function EurTryPage() {
             </Card>
           ) : null}
 
-          <AdSlot slotKey="doviz-eur-mid" format="leaderboard" />
+          <AdSlot
+            slotKey="doviz-eur-mid"
+            format="leaderboard"
+            className="mb-12"
+          />
 
-          <article className="prose prose-neutral dark:prose-invert mt-8 max-w-none">
-            <h2>EUR/TL ne demek?</h2>
-            <p>
-              Avrupa Birliği'nin ortak para birimi Euro'nun Türk Lirası karşılığı.
-              TCMB her iş günü saat 15:30'da günlük gösterge niteliğindeki kuru
-              yayınlar. <strong>1 EUR = {series.lastValue.toFixed(2)} TL</strong>{" "}
-              demek, bankaların TCMB referansıyla yaklaşık bu fiyattan Euro
-              satacağı anlamına gelir.
-            </p>
+          <div className="space-y-10">
+            <ContentSection
+              icon={BookOpen}
+              title="EUR/TL ne demek?"
+              accent="blue"
+            >
+              <p>
+                Avrupa Birliği'nin ortak para birimi{" "}
+                <strong className="text-foreground">Euro</strong>'nun Türk
+                Lirası karşılığı. TCMB her iş günü saat 15:30'da günlük gösterge
+                niteliğindeki kuru yayınlar.
+              </p>
 
-            <h2>Euro neden USD'den farklı hareket eder?</h2>
-            <p>
-              Eurozone ekonomisinin ABD'den farklı seyri, ECB ve Fed'in farklı
-              para politikaları EUR/USD paritesini etkiler. Bu parite TL'ye
-              dolaylı yansır. Euro'da yatırımı/borcu olan kişi için EUR/TL ayrı
-              takip edilmelidir.
-            </p>
+              <Callout type="info" title="Resmi kanonik referans">
+                <strong>1 EUR ≈ {series.lastValue.toFixed(2)} TL</strong> demek,
+                bankaların TCMB referansıyla yaklaşık bu fiyattan Euro satacağı
+                anlamına gelir. Banka makası genelde 0.05-0.20 TL.
+              </Callout>
+            </ContentSection>
 
-            <h2>İlgili veriler</h2>
-            <ul>
-              <li>
-                <Link href="/doviz/usd-try">USD/TL kuru</Link> — TCMB resmi dolar
-                satış kuru
-              </li>
-              <li>
-                <Link href="/doviz">Tüm dövizler</Link> — USD + EUR overview
-              </li>
-              <li>
-                <Link href="/tufe">TÜFE enflasyon</Link>
-              </li>
-              <li>
-                <Link href="/faiz">Politika faizi</Link>
-              </li>
-            </ul>
-          </article>
+            <ContentSection
+              icon={TrendingUp}
+              title="Euro neden USD'den farklı hareket eder?"
+              accent="purple"
+            >
+              <p>
+                Eurozone ekonomisinin ABD'den farklı seyri,{" "}
+                <strong className="text-foreground">ECB ve Fed</strong>'in
+                farklı para politikaları, EUR/USD paritesini etkiler. Bu parite
+                TL'ye dolaylı yansır.
+              </p>
 
-          <AdSlot slotKey="doviz-eur-bottom" format="responsive" className="mt-8" />
+              <Callout type="tip" title="Euro borçlu/yatırımcı için">
+                Euro'da kredi/yatırım varsa EUR/TL ayrı takip edilmelidir.
+                Sadece USD/TL bakmak yanıltıcı olabilir — Euro'nun dolardan
+                ayrıştığı dönemlerde EUR/TL kendi yönünü tutar.
+              </Callout>
+            </ContentSection>
 
-          <p className="mt-12 text-center text-xs text-muted-foreground">
+            <ContentSection
+              icon={LineChart}
+              title="EUR/TL ile birlikte bakılması gerekenler"
+              accent="emerald"
+            >
+              <RelatedDataGrid
+                links={[
+                  {
+                    title: "USD/TL Kuru",
+                    description:
+                      "TCMB resmi dolar satış kuru — USD ile EUR asenkronizliğini takip et.",
+                    href: "/doviz/usd-try",
+                    icon: DollarSign,
+                    accent: "emerald",
+                  },
+                  {
+                    title: "Tüm Dövizler",
+                    description: "USD + EUR overview, anlık karşılaştırma.",
+                    href: "/doviz",
+                    icon: DollarSign,
+                    accent: "blue",
+                  },
+                  {
+                    title: "TCMB Politika Faizi",
+                    description: "Kur müdahale aracı — faiz yönü EUR'yu etkiler.",
+                    href: "/faiz",
+                    icon: Percent,
+                    accent: "purple",
+                  },
+                  {
+                    title: "TÜFE Enflasyon",
+                    description: "Kur enflasyonu — özellikle Euro mal ithalatında.",
+                    href: "/tufe",
+                    icon: TrendingUp,
+                    accent: "rose",
+                  },
+                ]}
+              />
+            </ContentSection>
+          </div>
+
+          <AdSlot
+            slotKey="doviz-eur-bottom"
+            format="responsive"
+            className="mt-12"
+          />
+
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3" />
             Veri kaynağı:{" "}
             <a
               href="https://evds2.tcmb.gov.tr/"
@@ -185,7 +255,7 @@ export default async function EurTryPage() {
             >
               TCMB EVDS
             </a>{" "}
-            · Seri kodu:{" "}
+            · Seri:{" "}
             <code className="rounded bg-muted px-1.5 py-0.5 text-[10px]">
               TP.DK.EUR.S
             </code>{" "}
@@ -194,7 +264,7 @@ export default async function EurTryPage() {
               dateStyle: "short",
               timeStyle: "short",
             }).format(series.fetchedAt)}
-          </p>
+          </div>
         </>
       )}
     </div>
