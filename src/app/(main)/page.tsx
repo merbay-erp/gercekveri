@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, ShieldCheck, MapPin, Briefcase } from "lucide-react";
+import { ArrowRight, Sparkles, ShieldCheck, MapPin, Briefcase, Building2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -20,7 +20,9 @@ import { buildSearchIndex } from "@/lib/search-index";
 import { GlobalSearch } from "@/components/search/global-search";
 import { HeroLiveCounters } from "@/components/home/hero-live-counters";
 import { LiveTicker } from "@/components/home/live-ticker";
-import { TcmbPulse } from "@/components/home/tcmb-pulse";
+import { MarketDashboard } from "@/components/home/market-dashboard";
+import { HighlightStripe } from "@/components/home/highlight-stripe";
+import { FeaturedStories } from "@/components/home/featured-stories";
 import { KonutKarneTable } from "@/components/data-display/konut-karne-table";
 import { getTcmbPulseItems } from "@/lib/tcmb-snapshot";
 import { getKonutKarne } from "@/lib/konut-karne";
@@ -116,21 +118,32 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* HERO */}
+      {/* HERO — dramatic, big numbers, social proof */}
       <section className="relative overflow-hidden border-b border-border/40">
-        <div className="container mx-auto px-4 py-20 sm:py-28">
-          <div className="max-w-3xl space-y-6">
+        {/* Background gradient mesh */}
+        <div
+          className="absolute inset-0 -z-10 opacity-50"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 20% 20%, rgba(56, 189, 174, 0.15), transparent), radial-gradient(ellipse 70% 50% at 80% 40%, rgba(112, 165, 253, 0.12), transparent)",
+          }}
+          aria-hidden
+        />
+
+        <div className="container mx-auto px-4 py-16 sm:py-24">
+          <div className="max-w-4xl space-y-6">
             <Badge variant="secondary" className="font-normal">
-              <Sparkles className="mr-1.5 h-3 w-3" /> Beta — yeni veri kaynağı
+              <Sparkles className="mr-1.5 h-3 w-3" /> Beta · TCMB + anonim halk verisi
             </Badge>
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl lg:text-7xl">
               Türkiye'nin{" "}
-              <span className="bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent">
+              <span className="bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
                 gerçek verisi.
               </span>
             </h1>
-            <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl">
-              {siteConfig.description}
+            <p className="max-w-3xl text-lg text-muted-foreground sm:text-xl">
+              Maaş, kira, fatura, internet — TCMB resmi veri + anonim halk
+              katkısı. Tek bir platformda, ücretsiz, K-anonymity korumalı.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Link href="/karsilastir" className={buttonVariants({ size: "lg" })}>
@@ -157,10 +170,13 @@ export default async function HomePage() {
 
             <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> %100 anonim
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> %100 anonim · KVKK uyumlu
               </span>
               <span className="flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-amber-500" /> AI özetler aktif
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" /> AI özetler · saatlik güncel
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Building2 className="h-3.5 w-3.5 text-blue-500" /> TCMB EVDS · resmi veri
               </span>
             </div>
           </div>
@@ -169,7 +185,19 @@ export default async function HomePage() {
 
       <LiveTicker items={recentSubmissions} />
 
-      <TcmbPulse items={tcmbPulseItems} />
+      {/* Yeni: viral hook'lar (TÜFE/Faiz/USD/Trending) */}
+      <HighlightStripe
+        tcmbItems={tcmbPulseItems}
+        movers={movers}
+        totalSubmissions={publicOverview?.totalApproved ?? 0}
+        totalLast24h={publicOverview?.totalLast24h ?? 0}
+      />
+
+      {/* Yeni: büyük tıklanabilir TCMB kartlar (her biri dedicated sayfaya link) */}
+      <MarketDashboard items={tcmbPulseItems} />
+
+      {/* Yeni: editorial picks 3×2 grid — 6 öne çıkan veri analizi */}
+      <FeaturedStories />
 
       {headlineInsight ? (
         <section className="container mx-auto px-4 pt-12">
