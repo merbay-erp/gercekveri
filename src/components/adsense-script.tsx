@@ -15,13 +15,13 @@
 
 import Script from "next/script";
 
-const CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+// AdSense publisher ID — public bilgi (ads.txt'te de yazili).
+// Env override mumkun, fallback hardcoded → Vercel env ihtimali atlayinca
+// dahi script yuklenir, AdSense crawler bot her zaman bulur.
+const CLIENT_ID =
+  process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ?? "ca-pub-1903288869126718";
 
 export function AdSenseScript() {
-  // ID yoksa hicbir sey render etme. AdSense onayı + env değişkeni
-  // eklenmeden script yüklenirse boşa request olur.
-  if (!CLIENT_ID) return null;
-
   return (
     <Script
       id="adsense-script"
