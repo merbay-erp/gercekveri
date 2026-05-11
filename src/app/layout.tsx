@@ -44,13 +44,16 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
-    images: [{ url: "/og.png", width: 1200, height: 630 }],
+    // OG image: src/app/opengraph-image.tsx auto-generates /opengraph-image
+    // (dynamic, edge runtime, branded gradient + tagline).
+    // Next.js metadata file convention takes precedence — explicit reference
+    // here would shadow the file-based generator.
   },
   twitter: {
     card: "summary_large_image",
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
-    images: ["/og.png"],
+    // Twitter card image: auto from opengraph-image.tsx (Next.js convention)
   },
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },

@@ -75,7 +75,7 @@ export function organizationSchema() {
     name: siteConfig.name,
     alternateName: ["GerçekVeri", "gercekveri.com", "Gerçek Veri"],
     url: SITE_URL,
-    logo: `${SITE_URL}/og.png`,
+    logo: `${SITE_URL}/opengraph-image`,
     description: siteConfig.description,
     slogan: siteConfig.tagline,
     foundingDate: "2026",
