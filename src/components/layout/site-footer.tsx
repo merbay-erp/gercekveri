@@ -10,8 +10,8 @@ export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border/60 bg-muted/20">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid gap-10 md:grid-cols-4">
-          <div className="space-y-3">
+        <div className="grid gap-10 md:grid-cols-5">
+          <div className="space-y-3 md:col-span-2">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <BrandMark className="h-7 w-7 shrink-0" />
               <span>{siteConfig.name}</span>
@@ -52,6 +52,7 @@ export function SiteFooter() {
           </div>
 
           <FooterCol title="Ürün" items={footerNav.product} />
+          <FooterCol title="Ekonomi (TCMB)" items={footerNav.economy} />
           <FooterCol title="Hakkında" items={footerNav.about} />
           <FooterCol title="Yasal" items={footerNav.legal} />
         </div>

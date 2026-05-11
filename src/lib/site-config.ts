@@ -121,7 +121,9 @@ export const mainNav = [
   { label: "Aidat", href: "/aidat" },
   { label: "Fatura", href: "/fatura" },
   { label: "İnternet", href: "/internet" },
-  { label: "Tekstil", href: "/tekstil" },
+  { label: "Döviz", href: "/doviz" },
+  { label: "TÜFE", href: "/tufe" },
+  { label: "Faiz", href: "/faiz" },
   { label: "Karşılaştır", href: "/karsilastir" },
 ];
 
@@ -137,6 +139,14 @@ export const footerNav = {
     { label: "Kira paylaş", href: "/kira/yeni" },
     { label: "Fatura paylaş", href: "/fatura/yeni" },
     { label: "Tekstil fiyat paylaş", href: "/tekstil/yeni" },
+  ],
+  economy: [
+    { label: "Döviz Hub", href: "/doviz" },
+    { label: "USD/TRY", href: "/doviz/usd-try" },
+    { label: "EUR/TRY", href: "/doviz/eur-try" },
+    { label: "TÜFE Enflasyon", href: "/tufe" },
+    { label: "Politika Faizi", href: "/faiz" },
+    { label: "Konut Enflasyon Karnesi", href: "/konut-enflasyon" },
   ],
   legal: [
     { label: "Gizlilik Politikası", href: "/gizlilik" },
