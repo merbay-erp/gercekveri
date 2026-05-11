@@ -1,11 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Building2, TrendingDown, AlertCircle } from "lucide-react";
+import {
+  Building2,
+  TrendingDown,
+  AlertCircle,
+  BookOpen,
+  TrendingUp,
+  Percent,
+  DollarSign,
+  LineChart,
+  Calculator,
+  Home,
+  Calendar,
+} from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { KonutKarneTable } from "@/components/data-display/konut-karne-table";
 import { TcmbHousingPanel } from "@/components/data-display/tcmb-housing-panel";
 import { SchemaOrg } from "@/components/schema-org";
+import {
+  ContentSection,
+  Callout,
+  RelatedDataGrid,
+} from "@/components/content/article-blocks";
 import { konutEnflasyonSchemas } from "@/lib/schema-presets";
 import { getKonutKarne } from "@/lib/konut-karne";
 import { getHousingIndex } from "@/lib/tcmb-snapshot";
@@ -148,8 +165,160 @@ export default async function KonutEnflasyonPage() {
         </div>
       </section>
 
+      {/* Detaylı içerik blokları */}
+      <div className="mt-16 space-y-10">
+        <ContentSection
+          icon={BookOpen}
+          title="Konut Fiyat Endeksi (KFE) nedir?"
+          accent="blue"
+        >
+          <p>
+            <strong className="text-foreground">Konut Fiyat Endeksi</strong> —
+            TCMB tarafından Türkiye'deki konut fiyatlarının zamansal değişimini
+            ölçen resmi endeks. Bankaların kullandığı ekspertiz değerlerini
+            esas alır, satış kayıtlarına dayanır.
+          </p>
+
+          <Callout type="info" title="19 NUTS-2 bölgesi">
+            KFE Türkiye geneli (TR) ve 19 ekonomik bölgesi için ayrı ayrı
+            hesaplanır. 81 il bu 19 bölgeye eşleştirilir — büyük şehirler
+            (İstanbul, Ankara, İzmir) tek başına, küçük iller komşu illerle
+            gruplanır.
+          </Callout>
+        </ContentSection>
+
+        <ContentSection
+          icon={TrendingUp}
+          title="Konut yatırımı reel mi?"
+          accent="rose"
+        >
+          <p>
+            "Konut güvenli liman" — sık duyulan ama her zaman doğru olmayan bir
+            mit. Reel getiri = KFE artışı − TÜFE artışı.
+          </p>
+
+          <Callout type="warning" title="Reel getiri formülü">
+            <strong>KFE Yoy − TÜFE Yoy = Reel performans</strong>
+            <br />• Pozitif → konut enflasyonu yendi, reel değer kazandı
+            <br />• Negatif → konut enflasyonun gerisinde, reel değer kaybetti
+            <br />• Sıfıra yakın → yatırım nötral, sadece enflasyona ayak uydurdu
+          </Callout>
+
+          <p>
+            Şu an Türkiye genelinde{" "}
+            <strong className="text-foreground">
+              {summary.totalRegions} bölgenin {summary.underInflation}'i
+            </strong>{" "}
+            enflasyonun altında kaldı. En iyi performans{" "}
+            <strong>{summary.bestPerformerLabel}</strong>, en kötü{" "}
+            <strong>{summary.worstPerformerLabel}</strong>.
+          </p>
+        </ContentSection>
+
+        <ContentSection
+          icon={Calculator}
+          title="Konut alımı vs kira — ne yapmalı?"
+          accent="amber"
+        >
+          <p>
+            Konut alımı kararı sadece "KFE yüksek mi düşük mü"yle değil,
+            birçok faktörle birlikte değerlendirilir:
+          </p>
+
+          <ul className="my-3 ml-4 list-disc space-y-1 text-sm">
+            <li>
+              <strong className="text-foreground">Kira ödüyorsan</strong>: KFE
+              TÜFE'nin altındaysa konut alımı reel olarak kira ödemeye karşı
+              dezavantajlı.
+            </li>
+            <li>
+              <strong className="text-foreground">Mevduat faizinde isen</strong>:
+              Faiz %50, KFE %30, TÜFE %40 ise mevduatta kalmak avantajlı.
+            </li>
+            <li>
+              <strong className="text-foreground">İlçe seçimi kritik</strong>:
+              Bölgesel ortalama yanıltıcı — semt bazında trend çok farklı
+              olabilir.
+            </li>
+            <li>
+              <strong className="text-foreground">Kredi kullanılıyorsa</strong>:
+              Konut kredisi faizi (politika faizi × 1.2-1.6) ek maliyet
+              getirir.
+            </li>
+          </ul>
+
+          <Callout type="tip" title="Karar checklist'i">
+            Şehrinizin <Link href="/konut-enflasyon" className="font-medium text-foreground underline-offset-2 hover:underline">KFE deltası</Link>{" "}
+            + güncel <Link href="/faiz" className="font-medium text-foreground underline-offset-2 hover:underline">konut kredisi faizi</Link>{" "}
+            + <Link href="/kira" className="font-medium text-foreground underline-offset-2 hover:underline">gerçek kira fiyatları</Link>{" "}
+            + <Link href="/maaslar" className="font-medium text-foreground underline-offset-2 hover:underline">net gelir aralığı</Link>{" "}
+            verilerini birlikte değerlendir.
+          </Callout>
+        </ContentSection>
+
+        <ContentSection
+          icon={LineChart}
+          title="Konut enflasyonu ile birlikte bakılması gerekenler"
+          accent="emerald"
+        >
+          <RelatedDataGrid
+            links={[
+              {
+                title: "TÜFE Enflasyon",
+                description:
+                  "Konut'un reel performansını ölçmek için referans — KFE−TÜFE = reel.",
+                href: "/tufe",
+                icon: TrendingUp,
+                accent: "rose",
+              },
+              {
+                title: "TCMB Politika Faizi",
+                description:
+                  "Konut kredisi faizi politika faizinden türev — ev alım gücünü etkiler.",
+                href: "/faiz",
+                icon: Percent,
+                accent: "purple",
+              },
+              {
+                title: "Gerçek Kira Fiyatları",
+                description:
+                  "Anonim halk verisi — ilan değil, gerçek ödenen kira. Alım vs kira hesabı için.",
+                href: "/kira",
+                icon: Home,
+                accent: "amber",
+              },
+              {
+                title: "Kira Şişmesi",
+                description:
+                  "İlan kirası gerçek kiradan ne kadar yüksek — şehir bazlı.",
+                href: "/kira/sisme",
+                icon: TrendingUp,
+                accent: "blue",
+              },
+              {
+                title: "USD/TL Kuru",
+                description:
+                  "Dolar bazında konut fiyatı — yabancı yatırımcı perspektifi.",
+                href: "/doviz/usd-try",
+                icon: DollarSign,
+                accent: "emerald",
+              },
+              {
+                title: "Aidat (anonim)",
+                description:
+                  "Site/apartman aidatları — toplam barınma maliyeti hesabı.",
+                href: "/aidat",
+                icon: Building2,
+                accent: "muted",
+              },
+            ]}
+          />
+        </ContentSection>
+      </div>
+
       <footer className="mt-12 flex flex-wrap items-center justify-between gap-2 border-t pt-6 text-xs text-muted-foreground">
         <p>
+          <Calendar className="-mt-0.5 mr-1 inline h-3 w-3" />
           Kaynak: TCMB EVDS · Konut Fiyat Endeksi (TP.KFE.TR*) · son güncelleme: {regions[0].lastDate}
         </p>
         <Link href="/" className="hover:text-foreground hover:underline">

@@ -1,10 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { TrendingUp, TrendingDown, ChevronRight } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  ChevronRight,
+  BookOpen,
+  Calculator,
+  AlertTriangle,
+  Building2,
+  Calendar,
+  DollarSign,
+  Percent,
+  Home,
+  LineChart,
+} from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { SchemaOrg } from "@/components/schema-org";
 import { AdSlot } from "@/components/ad-slot";
+import {
+  ContentSection,
+  Callout,
+  DefinitionList,
+  RelatedDataGrid,
+} from "@/components/content/article-blocks";
 import { dovizHubSchemas } from "@/lib/schema-presets";
 import {
   getTcmbSeriesBatch,
@@ -72,12 +91,19 @@ export default async function DovizHubPage() {
         </h1>
         <p className="mt-3 text-muted-foreground">
           Türkiye Cumhuriyet Merkez Bankası (TCMB) tarafından yayınlanan resmi
-          döviz kurları. EVDS API üzerinden saatte bir otomatik fetch — bankalar
-          arası referans değer.
+          döviz kurları. EVDS API üzerinden saatte bir otomatik fetch —
+          bankalar arası referans değer.
         </p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <Callout type="info" title="TCMB referans kuru — Banka kuru değil">
+        Burada gösterilen değerler TCMB'nin yayınladığı{" "}
+        <strong>resmi satış kurudur</strong>. Bankaların kendi alış-satış
+        kurları bu referansa 0.05-0.20 TL marj eklenerek belirlenir.
+      </Callout>
+
+      {/* Currency cards */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
         {CURRENCIES.map((cur) => {
           const series = seriesMap[cur.code];
           if (!series) {
@@ -157,51 +183,204 @@ export default async function DovizHubPage() {
         })}
       </div>
 
-      <AdSlot slotKey="doviz-hub-mid" format="leaderboard" className="mt-8" />
+      <AdSlot slotKey="doviz-hub-mid" format="leaderboard" className="mt-8 mb-12" />
 
-      <article className="prose prose-neutral dark:prose-invert mt-12 max-w-none">
-        <h2>Döviz kurları nereden geliyor?</h2>
-        <p>
-          Tüm değerler <strong>Türkiye Cumhuriyet Merkez Bankası (TCMB)</strong>{" "}
-          Elektronik Veri Dağıtım Sistemi (EVDS) resmi API'sinden çekilir.
-          gercekveri.com bu veriyi saatte bir cache'ler — TCMB'nin günlük
-          gösterge kuru, bankaların referans aldığı resmi değerdir.
-        </p>
+      {/* CONTENT BLOCKS */}
+      <div className="space-y-10">
+        <ContentSection
+          icon={BookOpen}
+          title="Döviz kurları nereden geliyor?"
+          accent="emerald"
+        >
+          <p>
+            Tüm değerler{" "}
+            <strong className="text-foreground">
+              Türkiye Cumhuriyet Merkez Bankası (TCMB)
+            </strong>{" "}
+            Elektronik Veri Dağıtım Sistemi (EVDS) resmi API'sinden çekilir.
+            gercekveri.com bu veriyi <strong>saatte bir</strong> cache'ler.
+          </p>
 
-        <h2>Bankalardaki kur neden farklı?</h2>
-        <p>
-          TCMB tek bir referans satış kuru yayınlar (örneğin USD için saat
-          15:30'da). Bankalar buna kendi 'alış-satış' marjını ekler:
-        </p>
-        <ul>
-          <li>
-            <strong>Banka satış kuru</strong> = TCMB referans + 0.05-0.20 TL
-          </li>
-          <li>
-            <strong>Banka alış kuru</strong> = TCMB referans − 0.05-0.20 TL
-          </li>
-        </ul>
-        <p>
-          Yatırım amaçlı dövize giriş/çıkış yapıyorsan büyük tutarlarda spread'i
-          dikkate al — küçük ölçekli işlemlerde bile bu fark binde 2-5 maliyet
-          demektir.
-        </p>
+          <Callout type="info" title="TCMB Gösterge Kuru ne demek?">
+            Her iş günü saat <strong>15:30'da</strong> TCMB günün döviz alış-satış
+            kurunu açıklar. Bu bankaların gün boyu kullandığı referans değerdir —
+            "gösterge" terimi, gerçek piyasa fiyatına yön veren ana sinyal anlamında.
+          </Callout>
+        </ContentSection>
 
-        <h2>İlgili sayfalar</h2>
-        <ul>
-          <li>
-            <Link href="/tufe">TÜFE enflasyon</Link> — kur ile birlikte
-            satın alma gücünü etkiler
-          </li>
-          <li>
-            <Link href="/faiz">Politika faizi</Link> — kur müdahale aracı
-          </li>
-          <li>
-            <Link href="/konut-enflasyon">Konut enflasyon karnesi</Link> — kur +
-            enflasyon konuta nasıl yansıyor
-          </li>
-        </ul>
-      </article>
+        <ContentSection
+          icon={Calculator}
+          title="Bankalardaki kur neden farklı?"
+          accent="blue"
+        >
+          <p>
+            TCMB tek bir referans satış kuru yayınlar. Bankalar buna kendi
+            alış-satış marjını ekler:
+          </p>
+
+          <DefinitionList
+            items={[
+              {
+                icon: TrendingUp,
+                term: "Banka satış kuru",
+                description: "TCMB referans + 0.05-0.20 TL marj",
+              },
+              {
+                icon: TrendingDown,
+                term: "Banka alış kuru",
+                description: "TCMB referans − 0.05-0.20 TL marj",
+              },
+              {
+                icon: Calculator,
+                term: "Kambiyo bürosu",
+                description: "Makas genelde 0.20-0.50 TL — daha geniş",
+              },
+              {
+                icon: DollarSign,
+                term: "Online platformlar",
+                description: "Forex broker'lar 0.001-0.01 TL spread (kurumsal)",
+              },
+            ]}
+          />
+
+          <Callout type="warning" title="Spread maliyeti hesaplaması">
+            500.000 TL'lik dolar alımı yaparken banka spread'i 0.15 TL ise{" "}
+            <strong>~3.000 TL ek maliyet</strong> doğar. Büyük tutarlarda mutlaka
+            bankayla pazarlık et — kurumsal müşterilerde referans+0.02 TL bandı
+            mümkün.
+          </Callout>
+        </ContentSection>
+
+        <ContentSection
+          icon={AlertTriangle}
+          title="Yatırım amaçlı dövize giriş"
+          accent="amber"
+        >
+          <p>
+            Döviz yatırımı yapıyorsan dikkat etmen gereken 4 şey:
+          </p>
+
+          <DefinitionList
+            items={[
+              {
+                icon: Building2,
+                term: "Reel getiri",
+                description:
+                  "Kur artışı + faiz − enflasyon = reel getiri. TÜFE %30 + USD %35 artış varsa reel getirin sadece %5.",
+              },
+              {
+                icon: Calculator,
+                term: "Spread'i hesaba kat",
+                description:
+                  "Giriş + çıkış spread'i = toplam %0.5-1.5 maliyet. Kısa vadeli trade'lerde bu önemli.",
+              },
+              {
+                icon: Percent,
+                term: "Faiz farkı",
+                description:
+                  "TL faizi %50, USD faizi %5 ise carry trade ile TL'de kalmak avantajlı. Faiz değişimleri kur yönünü değiştirir.",
+              },
+              {
+                icon: TrendingDown,
+                term: "Müdahale riski",
+                description:
+                  "TCMB acil rezerv satışı yapabilir — beklenmedik kur düşüşleri olur. Stop-loss kullan.",
+              },
+            ]}
+          />
+        </ContentSection>
+
+        <ContentSection
+          icon={Calendar}
+          title="Veri güncellik garantisi"
+          accent="purple"
+        >
+          <Callout type="success" title="Saatlik senkron">
+            EVDS API'den her saat başı otomatik fetch yapılır. TCMB resmi
+            yayını günde 1 kez (15:30), gercekveri 24 saat bu değeri canlı
+            tutar. Stale veri durumunda kart üzerinde "eski veri" badge
+            görünür.
+          </Callout>
+
+          <p>
+            Veri kaynak: <code className="rounded bg-muted px-1.5 py-0.5 text-xs">TP.DK.USD.S</code>{" "}
+            ve <code className="rounded bg-muted px-1.5 py-0.5 text-xs">TP.DK.EUR.S</code>{" "}
+            serileri — TCMB'nin döviz kurları endeksinde resmi tanımlı kodlar.
+          </p>
+        </ContentSection>
+
+        <ContentSection
+          icon={LineChart}
+          title="Döviz ile birlikte bakılması gerekenler"
+          accent="emerald"
+        >
+          <RelatedDataGrid
+            links={[
+              {
+                title: "USD/TL Detaylı",
+                description:
+                  "Anlık dolar + 12 aylık tarihçe grafiği + analiz.",
+                href: "/doviz/usd-try",
+                icon: DollarSign,
+                accent: "emerald",
+              },
+              {
+                title: "EUR/TL Detaylı",
+                description: "Anlık Euro + tarihçe + Euro-USD parity analizi.",
+                href: "/doviz/eur-try",
+                icon: DollarSign,
+                accent: "blue",
+              },
+              {
+                title: "TCMB Politika Faizi",
+                description:
+                  "Kur'un en güçlü belirleyicisi — yüksek faiz TL'yi cazip yapar.",
+                href: "/faiz",
+                icon: Percent,
+                accent: "purple",
+              },
+              {
+                title: "TÜFE Enflasyon",
+                description:
+                  "Kur enflasyona, enflasyon kura yansır — birbirini besler.",
+                href: "/tufe",
+                icon: TrendingUp,
+                accent: "rose",
+              },
+              {
+                title: "Konut Enflasyon Karnesi",
+                description:
+                  "Kur yüksekken konut fiyatları nasıl seyrediyor — 19 bölge analizi.",
+                href: "/konut-enflasyon",
+                icon: Home,
+                accent: "amber",
+              },
+              {
+                title: "Maaş Endeksi",
+                description:
+                  "Dolar bazında reel maaşın ne kadar değişti — anonim halk verisi.",
+                href: "/maaslar",
+                icon: Calculator,
+                accent: "muted",
+              },
+            ]}
+          />
+        </ContentSection>
+      </div>
+
+      <div className="mt-12 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+        <Calendar className="h-3 w-3" />
+        Veri kaynağı:{" "}
+        <a
+          href="https://evds2.tcmb.gov.tr/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline-offset-2 hover:underline"
+        >
+          TCMB EVDS
+        </a>{" "}
+        · saatlik senkron · 2 döviz çifti aktif (USD, EUR)
+      </div>
     </div>
   );
 }
