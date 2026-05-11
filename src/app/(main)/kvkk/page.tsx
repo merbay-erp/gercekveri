@@ -1,10 +1,33 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import {
+  Scale,
+  ShieldCheck,
+  Database,
+  FileText,
+  Lock,
+  Mail,
+  AlertCircle,
+  CheckCircle2,
+  Settings,
+  Cookie,
+  Cpu,
+  Server,
+  Globe,
+  KeyRound,
+} from "lucide-react";
 
+import {
+  ContentSection,
+  Callout,
+  DefinitionList,
+  RelatedDataGrid,
+} from "@/components/content/article-blocks";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: `KVKK Aydınlatma Metni — ${siteConfig.name}`,
-  description: `6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında aydınlatma metni.`,
+  description: `6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında detaylı aydınlatma metni — veri sorumlusu, işleme amacı, haklar.`,
   alternates: { canonical: "/kvkk" },
 };
 
@@ -12,76 +35,367 @@ const LAST_UPDATED = "Mayıs 2026";
 
 export default function KvkkPage() {
   return (
-    <article className="container mx-auto max-w-3xl px-4 py-12 prose prose-neutral dark:prose-invert">
-      <h1>KVKK Aydınlatma Metni</h1>
-      <p className="text-sm text-muted-foreground">Son güncelleme: {LAST_UPDATED}</p>
+    <div className="container mx-auto max-w-4xl px-4 py-12">
+      <header className="mb-10 max-w-3xl">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Yasal · KVKK Madde 10
+        </p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+          KVKK Aydınlatma Metni
+        </h1>
+        <p className="mt-3 text-muted-foreground">
+          6698 sayılı Kişisel Verilerin Korunması Kanunu uyarınca veri
+          sorumlusu olarak {siteConfig.name} platformunda işlenen kişisel
+          veriler hakkında detaylı bilgilendirme.
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Son güncelleme: <strong>{LAST_UPDATED}</strong>
+        </p>
+      </header>
 
-      <p>
-        6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, veri
-        sorumlusu olarak {siteConfig.name} platformunda işlenen kişisel veriler
-        hakkında bu metin sizi bilgilendirmektedir.
-      </p>
+      <Callout type="success" title="Tek satırda KVKK uyumu">
+        Platform anonim — kişisel veri talep etmiyoruz. Sadece IP/UA hash'i
+        (spam koruması, 90 gün) ve paylaşım içeriği (anonim) işlenir. Madde 5/2-(f)
+        kapsamında meşru menfaat gerekçeli.
+      </Callout>
 
-      <h2>1. Veri Sorumlusu</h2>
-      <p>
-        {siteConfig.name} platformunu işleten kişisel kullanıcı:{" "}
-        <span className="font-medium">Mustafa Erbay</span>.
-        İletişim için: <a href="/iletisim">/iletisim</a> sayfası.
-      </p>
+      <div className="mt-10 space-y-10">
+        {/* 1. Veri Sorumlusu */}
+        <ContentSection
+          icon={ShieldCheck}
+          title="1. Veri sorumlusunun kimliği"
+          accent="emerald"
+        >
+          <p>KVKK Madde 3/ı kapsamında veri sorumlusu kimliği:</p>
+          <DefinitionList
+            items={[
+              {
+                icon: FileText,
+                term: "Veri Sorumlusu",
+                description: "Mustafa Erbay (bireysel — System Architect)",
+              },
+              {
+                icon: Globe,
+                term: "Yerleşim yeri",
+                description: "Bursa, Türkiye",
+              },
+              {
+                icon: Mail,
+                term: "İletişim",
+                description: (
+                  <Link
+                    href="/iletisim"
+                    className="font-medium text-foreground underline-offset-2 hover:underline"
+                  >
+                    /iletisim sayfası
+                  </Link>
+                ),
+              },
+              {
+                icon: KeyRound,
+                term: "Otorite kimlik",
+                description:
+                  "Wikidata Q139679043 · ORCID 0009-0005-9624-4249 — kanonik kimlik referansı.",
+              },
+            ]}
+          />
+        </ContentSection>
 
-      <h2>2. İşlenen Kişisel Veriler</h2>
-      <p>Platform tasarımı gereği <strong>kişisel veri talep edilmemekte</strong> ve aşağıdaki minimal teknik veriler işlenmektedir:</p>
-      <ul>
-        <li>Bağlantı IP adresinin <strong>tek yönlü hash</strong>'i (orijinal IP saklanmaz)</li>
-        <li>Tarayıcı User-Agent ve dil tercihi <strong>hash</strong>'i</li>
-        <li>Kullanıcının kendi serbestçe paylaştığı, tanımlayıcı olmayan veri (tutar, şehir, m² vs.)</li>
-      </ul>
-      <p>
-        İsim, e-posta, telefon, TC kimlik numarası, finansal hesap bilgisi, konum
-        bilgisi <strong>kesinlikle talep edilmez ve işlenmez</strong>.
-      </p>
+        {/* 2. İşlenen Kişisel Veriler */}
+        <ContentSection
+          icon={Database}
+          title="2. İşlenen kişisel veriler"
+          accent="blue"
+        >
+          <Callout type="info" title="Platform anonim — minimal veri">
+            Bu platform tasarımı gereği <strong>kişisel veri talep etmez</strong>.
+            Tek istisna teknik koruma çerçevesinde minimal işlem yapılan
+            hash'lerdir.
+          </Callout>
 
-      <h2>3. Kişisel Verilerin İşlenme Amaçları</h2>
-      <ul>
-        <li>Anonim agregat istatistik üretimi (medyan, ortalama, kategori dağılımı)</li>
-        <li>Otomatik spam/suistimal tespiti (aynı IP hash'inden yığın paylaşımı bloklamak)</li>
-        <li>Aykırı (outlier) veri tespiti</li>
-      </ul>
+          <p>İşlenen teknik veriler:</p>
+          <DefinitionList
+            items={[
+              {
+                icon: Lock,
+                term: "IP adres hash'i",
+                description:
+                  "Bağlantı IP adresinin SHA-256 ile tek yönlü hash'i. Orijinal IP saklanmaz, hash'ten geri çevrilemez. Spam/suistimal tespiti için 90 gün saklanır.",
+              },
+              {
+                icon: Lock,
+                term: "Tarayıcı parmak izi hash'i",
+                description:
+                  "User-Agent + Accept-Language değerlerinin hash'i. Aynı tarayıcıdan tekrarlı paylaşım tespiti için.",
+              },
+              {
+                icon: Database,
+                term: "Paylaşım içeriği (anonim)",
+                description:
+                  "Kullanıcının formdan paylaştığı veri (tutar, şehir, m², pozisyon vb.). Hiçbir kişisel tanımlayıcı içermez.",
+              },
+            ]}
+          />
 
-      <h2>4. İşlemenin Hukuki Sebebi</h2>
-      <p>
-        KVKK madde 5/2-(f) — "İlgili kişinin temel hak ve özgürlüklerine zarar
-        vermemek kaydıyla, veri sorumlusunun meşru menfaatleri için veri işlenmesinin
-        zorunlu olması" hükmü uyarınca işlem yapılmaktadır.
-      </p>
+          <Callout type="warning" title="Toplanmayan veriler">
+            <ul className="ml-4 list-disc space-y-0.5">
+              <li>İsim, e-posta, telefon</li>
+              <li>TC kimlik numarası, vergi no</li>
+              <li>IBAN, kredi kartı, finansal hesap</li>
+              <li>GPS konum, ev/iş adresi</li>
+              <li>Sağlık verisi, biyometrik veri</li>
+              <li>Cookie tabanlı kullanıcı kimlik (hesap yok)</li>
+            </ul>
+          </Callout>
+        </ContentSection>
 
-      <h2>5. Aktarım</h2>
-      <ul>
-        <li>Hosting: Vercel Inc. (ABD/AB sunucular).</li>
-        <li>Veritabanı: Neon Inc. (AB sunucu — Frankfurt).</li>
-        <li>AI özet servisi: Google LLC (yalnızca agregat sayılar gönderilir, bireysel veri değil).</li>
-      </ul>
+        {/* 3. İşleme Amaçları */}
+        <ContentSection icon={Cpu} title="3. Kişisel verilerin işlenme amaçları" accent="purple">
+          <DefinitionList
+            items={[
+              {
+                icon: Database,
+                term: "Anonim agregat istatistik üretimi",
+                description:
+                  "Kategori × şehir bazında medyan, ortalama, p25, p75 dağılımları. K-anonymity (min 3 katkı) uygulanır — bireysel veriyi gizler.",
+              },
+              {
+                icon: Settings,
+                term: "Otomatik spam/suistimal tespiti",
+                description:
+                  "Aynı IP hash'inden yığın paylaşımı bloklama (24 saatte 10+ paylaşım = otomatik blok).",
+              },
+              {
+                icon: AlertCircle,
+                term: "Aykırı veri (outlier) tespiti",
+                description:
+                  "Şehir ortalamasından çok sapan veriler IQR yöntemi ile işaretlenir, agregat istatistiklerden çıkarılır.",
+              },
+              {
+                icon: CheckCircle2,
+                term: "AI özet üretimi",
+                description:
+                  "Bireysel paylaşım değil — yalnızca agregat sayılar Google Gemini API'ye gönderilir. Insan-okur içgörü üretimi.",
+              },
+            ]}
+          />
+        </ContentSection>
 
-      <h2>6. KVKK Madde 11 Uyarınca Haklarınız</h2>
-      <p>
-        Anonim platform yapısı sebebiyle "kendi kişisel verilerinizin işlenip
-        işlenmediğini öğrenme" gibi haklar pratik olarak uygulanamamaktadır,
-        çünkü herhangi bir paylaşımı sizinle eşleştirme imkanımız yoktur.
-      </p>
-      <p>
-        Yine de yanlışlıkla yapılmış / kaldırılmasını istediğiniz bir paylaşım
-        varsa, paylaşımın <code>publicId</code>'sini belirterek{" "}
-        <a href="/iletisim">/iletisim</a> üzerinden bize ulaşmanız halinde derhal
-        kaldırılır.
-      </p>
+        {/* 4. Hukuki Sebep */}
+        <ContentSection icon={Scale} title="4. İşlemenin hukuki sebebi" accent="rose">
+          <Callout type="info" title="KVKK Madde 5/2-(f)">
+            "İlgili kişinin temel hak ve özgürlüklerine zarar vermemek
+            kaydıyla, veri sorumlusunun meşru menfaatleri için veri
+            işlenmesinin zorunlu olması" hükmü gereği işlem yapılır.
+          </Callout>
 
-      <h2>7. Veri Güvenliği</h2>
-      <p>
-        Tüm trafik HTTPS üzerinden iletilir. IP ve UA hash'leri SHA-256 ile
-        salt'lanarak üretilir; orijinal değerler hiçbir aşamada saklanmaz.
-        Yönetim paneli erişimi bcrypt-hash'li parola + signed JWT cookie ile
-        korunur.
-      </p>
-    </article>
+          <p>
+            Meşru menfaat:{" "}
+            <strong className="text-foreground">
+              spam ve sahte veri saldırılarına karşı platformun bütünlüğünü
+              korumak
+            </strong>
+            . IP hash'i bu meşru menfaatin yegane teknik koruma aracıdır;
+            kullanıcının kimliğini tespit etmek için kullanılmaz.
+          </p>
+        </ContentSection>
+
+        {/* 5. Aktarım */}
+        <ContentSection
+          icon={Server}
+          title="5. Kişisel verilerin aktarımı (üçüncü taraf)"
+          accent="amber"
+        >
+          <p>Altyapı hizmetleri için aktarılan teknik veriler:</p>
+          <DefinitionList
+            items={[
+              {
+                icon: Server,
+                term: "Vercel Inc.",
+                description:
+                  "Hosting hizmeti. Sunucu konumu: ABD/AB. GDPR uyumlu DPA imzalı. KVKK Madde 9 çerçevesinde yurt dışı transfer.",
+              },
+              {
+                icon: Database,
+                term: "Neon Inc.",
+                description:
+                  "PostgreSQL veritabanı. Sunucu konumu: Frankfurt (AB). DPA imzalı.",
+              },
+              {
+                icon: Cpu,
+                term: "Google LLC (AI)",
+                description:
+                  "AI özet servisi. Yalnızca agregat sayılar gönderilir, bireysel veri DEĞİL. KVKK Madde 9 çerçevesinde sınırlı transfer.",
+              },
+              {
+                icon: Globe,
+                term: "Google Ireland Ltd. (AdSense)",
+                description:
+                  "Reklam yayını. Çerez tabanlı veri akışı, Consent Mode v2 ile yönetilir.",
+              },
+              {
+                icon: Server,
+                term: "TCMB EVDS",
+                description:
+                  "Tek yönlü veri çekimi — bize döviz/faiz/TÜFE verisi gönderir, biz hiçbir veri göndermeyiz.",
+              },
+            ]}
+          />
+        </ContentSection>
+
+        {/* 6. Haklar */}
+        <ContentSection icon={KeyRound} title="6. KVKK Madde 11 — Haklarınız" accent="emerald">
+          <Callout type="warning" title="Anonim platformda pratik sınırlama">
+            Anonim platform yapısı sebebiyle "kendi verilerimin işlenip
+            işlenmediğini öğrenme" hakkı pratik olarak uygulanamaz — herhangi
+            bir paylaşımı sizinle eşleştirme imkanımız yoktur.
+          </Callout>
+
+          <p>Yine de aşağıdaki haklara sahipsiniz:</p>
+          <DefinitionList
+            items={[
+              {
+                term: "Bilgi talep etme",
+                description:
+                  "Hangi kategorideki verilerin işlendiğini öğrenme (genel açıklama, bu metinde mevcut).",
+              },
+              {
+                term: "Düzeltme",
+                description:
+                  "Hatalı paylaşım için publicId belirterek başvuru.",
+              },
+              {
+                term: "Silme / Anonimleştirme",
+                description:
+                  "Paylaşımın yayından kaldırılması. publicId ile başvuru, 7 iş günü içinde işlenir.",
+              },
+              {
+                term: "İtiraz hakkı",
+                description: "Otomatik karar mekanizmalarına itiraz.",
+              },
+              {
+                term: "Zarar tazmin hakkı",
+                description: "Hukuka aykırı işlemeden doğan zararın tazmini.",
+              },
+            ]}
+          />
+
+          <Callout type="tip" title="Başvuru süreci">
+            Paylaşımının altındaki <strong>publicId</strong>'yi (örn. abc123def)
+            kopyala,{" "}
+            <Link
+              href="/iletisim"
+              className="font-medium text-foreground underline-offset-2 hover:underline"
+            >
+              iletişim
+            </Link>{" "}
+            sayfasından bu ID ile başvur. KVKK Madde 13 uyarınca en geç{" "}
+            <strong>30 gün</strong> içinde yanıtlanır (genelde 7 iş gününde).
+          </Callout>
+        </ContentSection>
+
+        {/* 7. Veri Güvenliği */}
+        <ContentSection icon={Lock} title="7. Veri güvenliği önlemleri" accent="purple">
+          <DefinitionList
+            items={[
+              {
+                icon: ShieldCheck,
+                term: "HTTPS / TLS 1.3",
+                description: "Tüm trafik şifreli. SSL Labs A+ seviyesi.",
+              },
+              {
+                icon: Lock,
+                term: "SHA-256 tek yönlü hash",
+                description:
+                  "IP/UA değerleri salt'lanarak hash'lenir. Hiçbir aşamada orijinal değer saklanmaz.",
+              },
+              {
+                icon: KeyRound,
+                term: "Yönetim paneli koruması",
+                description:
+                  "Admin erişimi bcrypt-hash parola + signed JWT cookie + audit log (180 gün).",
+              },
+              {
+                icon: Database,
+                term: "Veritabanı şifreleme",
+                description:
+                  "Neon Postgres at-rest encryption (AES-256). Connection: TLS only.",
+              },
+              {
+                icon: AlertCircle,
+                term: "Audit & monitoring",
+                description:
+                  "Tüm admin işlemleri loglanır. Anomali tespit + otomatik alarm.",
+              },
+            ]}
+          />
+        </ContentSection>
+
+        {/* 8. Saklama Süresi */}
+        <ContentSection
+          icon={FileText}
+          title="8. Saklama süresi"
+          accent="muted"
+        >
+          <DefinitionList
+            items={[
+              {
+                term: "Paylaşım verisi (anonim)",
+                description:
+                  "Süresiz — toplulaştırılarak yayında kalır. Anonim olduğu için saklama süresi sınırı yoktur (KVKK Madde 7 kapsamı dışı).",
+              },
+              {
+                term: "IP/UA hash",
+                description: "90 gün, sonrasında null'lanır.",
+              },
+              {
+                term: "AI özet cache",
+                description: "7 gün.",
+              },
+              {
+                term: "Audit log (admin)",
+                description: "180 gün (KVKK Madde 12 denetim gereği).",
+              },
+            ]}
+          />
+        </ContentSection>
+
+        {/* İlgili sayfalar */}
+        <ContentSection icon={FileText} title="İlgili yasal belgeler" accent="muted">
+          <RelatedDataGrid
+            links={[
+              {
+                title: "Gizlilik Politikası",
+                description: "Detaylı gizlilik tercihleri, kullanıcı hakları.",
+                href: "/gizlilik",
+                icon: ShieldCheck,
+                accent: "emerald",
+              },
+              {
+                title: "Çerez Politikası",
+                description: "Hangi çerezler kullanılır, AdSense ayarları.",
+                href: "/cerez",
+                icon: Cookie,
+                accent: "blue",
+              },
+              {
+                title: "Kullanım Şartları",
+                description: "Platform kullanım koşulları, sorumluluk.",
+                href: "/sartlar",
+                icon: FileText,
+                accent: "purple",
+              },
+              {
+                title: "İletişim",
+                description: "Veri silme, düzeltme, KVKK başvuru.",
+                href: "/iletisim",
+                icon: Mail,
+                accent: "amber",
+              },
+            ]}
+          />
+        </ContentSection>
+      </div>
+    </div>
   );
 }
