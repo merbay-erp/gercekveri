@@ -291,6 +291,295 @@ export function tekstilSchemas(opts: { recordCount?: number } = {}) {
   );
 }
 
+// =============== USD/TRY ===============
+export function usdTrySchemas(opts: {
+  lastValue?: number;
+  lastDate?: string;
+}) {
+  const faqs: FaqItem[] = [
+    {
+      question: "Dolar TL ne kadar?",
+      answer:
+        opts.lastValue
+          ? `Türkiye Cumhuriyet Merkez Bankası (TCMB) son verisine göre 1 USD ≈ ${opts.lastValue.toFixed(4)} TL (${opts.lastDate ?? "güncel"}). Veri TCMB EVDS API'den saatte bir çekilir.`
+          : "TCMB Konjonktür Bülteni'nde günlük yayınlanan resmi USD/TL satış kurudur. Bu sayfada anlık değer + 12 ay tarihçe gösterilir.",
+    },
+    {
+      question: "TCMB USD kuru neden değişir?",
+      answer:
+        "Döviz arz-talep, faiz farkı, enflasyon beklentisi, dış ticaret dengesi ve uluslararası para piyasaları kuru günlük belirler. TCMB serbest kur sistemi uygular; müdahale ancak kriz anlarında olur.",
+    },
+    {
+      question: "Hangi banka USD kuru en iyi?",
+      answer:
+        "TCMB kuru referans alınır ama her bankanın 'alış' ve 'satış' kuru farklıdır. Ortalama makas (spread) 0.05-0.20 TL bandındadır. Yüksek hacimli işlemde bankanızla pazarlık edilebilir.",
+    },
+    {
+      question: "Bu sayfa ne sıklıkla güncellenir?",
+      answer:
+        "TCMB EVDS API'sinden saatte bir otomatik fetch + DB cache. 1 saatlik gecikme dışında anlık veri.",
+    },
+  ];
+
+  return jsonLdGraph(
+    datasetSchema({
+      name: "USD/TRY Döviz Kuru Tarihçesi — TCMB Resmi Veri",
+      description:
+        "Türkiye Cumhuriyet Merkez Bankası (TCMB) tarafından yayınlanan günlük USD/TL satış kurunun 12 aylık tarihçesi + son değer.",
+      url: "/doviz/usd-try",
+      keywords: [
+        "dolar tl",
+        "usd try",
+        "tcmb dolar",
+        "dolar kuru",
+        "dolar fiyatı",
+        "anlık dolar",
+        "döviz kuru",
+        "merkez bankası dolar",
+      ],
+      variableMeasured: ["USD/TRY satış kuru"],
+      measurementTechnique:
+        "TCMB EVDS API serisi TP.DK.USD.S (USD/TL satış kuru) hourly fetch",
+      citation:
+        "Türkiye Cumhuriyet Merkez Bankası, USD/TL Satış Kuru (TP.DK.USD.S), https://evds2.tcmb.gov.tr/",
+      temporalCoverage: "2024/..",
+    }),
+    faqSchema(faqs),
+    breadcrumbSchema([
+      { name: "Ana Sayfa", url: "/" },
+      { name: "Döviz", url: "/doviz" },
+      { name: "USD/TRY", url: "/doviz/usd-try" },
+    ]),
+  );
+}
+
+// =============== EUR/TRY ===============
+export function eurTrySchemas(opts: {
+  lastValue?: number;
+  lastDate?: string;
+}) {
+  const faqs: FaqItem[] = [
+    {
+      question: "Euro TL ne kadar?",
+      answer:
+        opts.lastValue
+          ? `TCMB son verisine göre 1 EUR ≈ ${opts.lastValue.toFixed(4)} TL (${opts.lastDate ?? "güncel"}). Veri saatte bir TCMB EVDS API'den çekilir.`
+          : "TCMB Konjonktür Bülteni'nde günlük yayınlanan resmi EUR/TL satış kurudur. Bu sayfada anlık değer + tarihçe gösterilir.",
+    },
+    {
+      question: "Euro neden USD'den farklı hareket eder?",
+      answer:
+        "Avrupa Merkez Bankası (ECB) ve Fed'in farklı para politikaları, Eurozone ekonomisi ile ABD ekonomisinin asenkron seyri EUR/USD paritesi üzerinden TL'ye yansır.",
+    },
+    {
+      question: "Bu sayfa güncel mi?",
+      answer: "TCMB EVDS API'den saatte bir fetch — 1 saatlik gecikme dışında anlık.",
+    },
+  ];
+
+  return jsonLdGraph(
+    datasetSchema({
+      name: "EUR/TRY Döviz Kuru Tarihçesi — TCMB Resmi Veri",
+      description:
+        "TCMB tarafından yayınlanan günlük EUR/TL satış kurunun 12 aylık tarihçesi + son değer.",
+      url: "/doviz/eur-try",
+      keywords: [
+        "euro tl",
+        "eur try",
+        "tcmb euro",
+        "euro kuru",
+        "euro fiyatı",
+        "anlık euro",
+        "euro tl kuru",
+      ],
+      variableMeasured: ["EUR/TRY satış kuru"],
+      measurementTechnique:
+        "TCMB EVDS API serisi TP.DK.EUR.S hourly fetch",
+      citation:
+        "Türkiye Cumhuriyet Merkez Bankası, EUR/TL Satış Kuru (TP.DK.EUR.S), https://evds2.tcmb.gov.tr/",
+      temporalCoverage: "2024/..",
+    }),
+    faqSchema(faqs),
+    breadcrumbSchema([
+      { name: "Ana Sayfa", url: "/" },
+      { name: "Döviz", url: "/doviz" },
+      { name: "EUR/TRY", url: "/doviz/eur-try" },
+    ]),
+  );
+}
+
+// =============== Döviz hub ===============
+export function dovizHubSchemas() {
+  const faqs: FaqItem[] = [
+    {
+      question: "Bu sayfadaki döviz verisi nereden geliyor?",
+      answer:
+        "Tüm değerler Türkiye Cumhuriyet Merkez Bankası (TCMB) Elektronik Veri Dağıtım Sistemi (EVDS) resmi API'sinden çekilir. Saatte bir otomatik güncellenir.",
+    },
+    {
+      question: "Bankalardaki kur neden farklı?",
+      answer:
+        "TCMB referans satış kurunu yayınlar. Bankalar buna kendi 'alış' ve 'satış' marjını ekler (0.05-0.20 TL spread). Bu sayfada TCMB resmi kuru görüntülenir.",
+    },
+    {
+      question: "GBP, CHF, JPY kuru var mı?",
+      answer:
+        "Şu an USD ve EUR aktif. İlerleyen sürümlerde diğer dövizler eklenecek. TCMB API'den çekilen tüm dövizler için sayfa otomatik üretilebilir.",
+    },
+  ];
+
+  return jsonLdGraph(
+    datasetSchema({
+      name: "TCMB Döviz Kurları — USD, EUR Resmi Veri",
+      description:
+        "TCMB EVDS API'den çekilen günlük USD/TL ve EUR/TL satış kurları. Anlık değer + 12 aylık tarihçe + yıllık değişim oranları.",
+      url: "/doviz",
+      keywords: [
+        "döviz",
+        "tcmb döviz",
+        "döviz kuru",
+        "dolar euro",
+        "anlık döviz",
+        "merkez bankası kur",
+      ],
+      variableMeasured: ["USD/TRY", "EUR/TRY"],
+      measurementTechnique: "TCMB EVDS API hourly fetch",
+      citation:
+        "Türkiye Cumhuriyet Merkez Bankası EVDS, https://evds2.tcmb.gov.tr/",
+      temporalCoverage: "2024/..",
+    }),
+    faqSchema(faqs),
+    breadcrumbSchema([
+      { name: "Ana Sayfa", url: "/" },
+      { name: "Döviz", url: "/doviz" },
+    ]),
+  );
+}
+
+// =============== Faiz ===============
+export function faizSchemas(opts: {
+  lastValue?: number;
+  lastDate?: string;
+}) {
+  const faqs: FaqItem[] = [
+    {
+      question: "Politika faizi nedir?",
+      answer:
+        opts.lastValue
+          ? `TCMB politika faizi (1 hafta repo / APİ fonlama oranı) şu an %${opts.lastValue.toFixed(2)} seviyesinde (${opts.lastDate ?? "güncel"}). Bu, bankaların TCMB'den borçlandığı temel maliyettir.`
+          : "Türkiye Cumhuriyet Merkez Bankası'nın bankalara açtığı kısa vadeli fonlama maliyetidir. Mevduat, kredi ve döviz piyasası üzerindeki en güçlü etken.",
+    },
+    {
+      question: "Faiz neden artar/azalır?",
+      answer:
+        "Enflasyon yüksekse TCMB faizi artırır (sıkılaşma) → kredi pahalanır → harcama azalır → talep enflasyonu düşer. Enflasyon düşükse tersi olur.",
+    },
+    {
+      question: "Faiz mevduata nasıl yansır?",
+      answer:
+        "Bankalar mevduat faizi politika faizinin %80-110 bandında belirler. Politika %50 ise mevduat genelde %40-55 bandında olur. Vergi (%5-15) sonrası net getirir.",
+    },
+    {
+      question: "Bu sayfa güncel mi?",
+      answer:
+        "TCMB EVDS API'sinden saatte bir fetch + DB cache (TP.APIFON4 serisi). 1 saatlik gecikme dışında anlık veri.",
+    },
+  ];
+
+  return jsonLdGraph(
+    datasetSchema({
+      name: "TCMB Politika Faizi Tarihçesi — Resmi Veri",
+      description:
+        "Türkiye Cumhuriyet Merkez Bankası (TCMB) APİ Fonlama Oranı (1 hafta repo) son değer + 12 aylık tarihçe. Mevduat, kredi ve döviz piyasası temel referansı.",
+      url: "/faiz",
+      keywords: [
+        "tcmb faiz",
+        "politika faizi",
+        "merkez bankası faiz",
+        "api fonlama",
+        "1 hafta repo",
+        "anlık faiz",
+        "faiz oranı",
+      ],
+      variableMeasured: ["APİ Fonlama Oranı (1 hafta repo)"],
+      measurementTechnique: "TCMB EVDS API serisi TP.APIFON4 hourly fetch",
+      citation:
+        "Türkiye Cumhuriyet Merkez Bankası, APİ Fonlama (TP.APIFON4), https://evds2.tcmb.gov.tr/",
+      temporalCoverage: "2024/..",
+    }),
+    faqSchema(faqs),
+    breadcrumbSchema([
+      { name: "Ana Sayfa", url: "/" },
+      { name: "Faiz", url: "/faiz" },
+    ]),
+  );
+}
+
+// =============== TÜFE ===============
+export function tufeSchemas(opts: {
+  yoyPct?: number;
+  lastDate?: string;
+}) {
+  const faqs: FaqItem[] = [
+    {
+      question: "TÜFE nedir?",
+      answer:
+        "Tüketici Fiyat Endeksi — bir tüketicinin satın aldığı tipik mal/hizmet sepetinin zaman içindeki fiyat değişimi. TÜİK yayınlar, TCMB EVDS API üzerinden de erişilebilir. Enflasyon ölçütüdür.",
+    },
+    {
+      question: "Yıllık TÜFE şu an ne kadar?",
+      answer:
+        opts.yoyPct !== undefined
+          ? `Son veriye göre yıllık TÜFE artışı %${opts.yoyPct.toFixed(2)} (${opts.lastDate ?? "güncel"}). Bu, 1 yıl önce 100 TL olan bir sepetin bugün ne kadar olduğunu gösterir.`
+          : "TÜİK her ayın 3. iş günü açıklar. gercekveri.com saatte bir TCMB EVDS API'den çeker.",
+    },
+    {
+      question: "TÜFE ve ÜFE farkı?",
+      answer:
+        "TÜFE tüketici (perakende), ÜFE üretici (toptan) fiyatlarını ölçer. Genelde ÜFE daha volatil ve TÜFE'den önce hareket eder.",
+    },
+    {
+      question: "Çekirdek TÜFE (C) nedir?",
+      answer:
+        "Enerji, gıda, alkol-tütün ve altın hariç tutulan, daha az dalgalı bir endeks. Para politikasında daha güvenilir referans olarak kullanılır.",
+    },
+    {
+      question: "Konut TÜFE'nin altında mı kalır?",
+      answer:
+        "gercekveri.com/konut-enflasyon sayfasında 19 NUTS-2 bölgesi için TÜFE vs KFE karşılaştırması canlı gösterilir.",
+    },
+  ];
+
+  return jsonLdGraph(
+    datasetSchema({
+      name: "Türkiye TÜFE Enflasyon Tarihçesi — TCMB Resmi Veri",
+      description:
+        "Tüketici Fiyat Endeksi (TÜFE) son değer, yıllık değişim ve 12 aylık tarihçe. TÜİK kaynak, TCMB EVDS API üzerinden saatlik fetch.",
+      url: "/tufe",
+      keywords: [
+        "tüfe",
+        "enflasyon",
+        "tüfe oranı",
+        "yıllık enflasyon",
+        "tcmb enflasyon",
+        "tüik tüfe",
+        "fiyat artışı",
+      ],
+      variableMeasured: ["TÜFE genel endeks", "Yıllık değişim (%)"],
+      measurementTechnique:
+        "TCMB EVDS API serisi TP.FE.OKTG01 (TÜFE) hourly fetch",
+      citation:
+        "TÜİK / TCMB EVDS, TÜFE Genel Endeks (TP.FE.OKTG01), https://evds2.tcmb.gov.tr/",
+      temporalCoverage: "2024/..",
+    }),
+    faqSchema(faqs),
+    breadcrumbSchema([
+      { name: "Ana Sayfa", url: "/" },
+      { name: "TÜFE", url: "/tufe" },
+    ]),
+  );
+}
+
 // =============== DETAIL PAGE BREADCRUMBS ===============
 // Sub-page breadcrumb preset'leri — kategori sayfasindan detay sayfasina yol.
 

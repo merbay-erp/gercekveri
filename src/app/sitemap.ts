@@ -77,6 +77,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     u("/hakkinda", 0.4, "monthly"),
     u("/sss", 0.5, "monthly"),
     u("/konut-enflasyon", 0.85, "daily"),
+    // Yeni TCMB sayfalari — yuksek arama hacmi
+    u("/doviz", 0.85, "daily"),
+    u("/doviz/usd-try", 0.95, "daily"),
+    u("/doviz/eur-try", 0.9, "daily"),
+    u("/faiz", 0.85, "daily"),
+    u("/tufe", 0.9, "daily"),
   ];
 
   const konutCityEntries = cities.map((c) =>
