@@ -253,6 +253,23 @@ export function aggregateRatingSchema(opts: {
   };
 }
 
+// ============ SiteNavigationElement ============
+// Header menu items — AdSense Auto Ads icin sayfa anlamlandirmasi gucludur.
+// Google bot icin "bu sayfa hangi alanin parcasi" sinyali.
+export function siteNavigationSchema(items: { name: string; url: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Site navigation",
+    itemListElement: items.map((item, i) => ({
+      "@type": "SiteNavigationElement",
+      position: i + 1,
+      name: item.name,
+      url: item.url.startsWith("http") ? item.url : `${SITE_URL}${item.url}`,
+    })),
+  };
+}
+
 // ============ Graph combiner (cok schema'yi tek script'te) ============
 export function jsonLdGraph(...schemas: object[]) {
   return {

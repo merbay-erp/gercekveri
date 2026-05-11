@@ -4,11 +4,14 @@ import "./globals.css";
 
 import { Providers } from "@/components/providers";
 import { SchemaOrg } from "@/components/schema-org";
+import { AdSenseScript } from "@/components/adsense-script";
+import { CookieConsent } from "@/components/cookie-consent";
 import { siteConfig } from "@/lib/site-config";
 import {
   organizationSchema,
   websiteSchema,
   personMustafaErbay,
+  siteNavigationSchema,
   jsonLdGraph,
 } from "@/lib/schema-org";
 
@@ -77,13 +80,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     organizationSchema(),
     websiteSchema(),
     personMustafaErbay(),
+    siteNavigationSchema([
+      { name: "Maaşlar", url: "/maaslar" },
+      { name: "Kira", url: "/kira" },
+      { name: "Internet", url: "/internet" },
+      { name: "Fatura", url: "/fatura" },
+      { name: "Aidat", url: "/aidat" },
+      { name: "Tekstil", url: "/tekstil" },
+      { name: "Konut Enflasyon", url: "/konut-enflasyon" },
+      { name: "Karşılaştır", url: "/karsilastir" },
+      { name: "Harita", url: "/harita" },
+      { name: "İstatistikler", url: "/istatistikler" },
+    ]),
   );
 
   return (
     <html lang="tr" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        {/* AdSense verification + Auto Ads.
+            ENV NEXT_PUBLIC_ADSENSE_CLIENT_ID yoksa render olmaz (dev safe).
+            Production'da Vercel env'inden cekilir. */}
+        <AdSenseScript />
+      </head>
       <body className="min-h-full bg-background font-sans text-foreground">
         <Providers>{children}</Providers>
         <SchemaOrg data={rootJsonLd} />
+        <CookieConsent />
       </body>
     </html>
   );
