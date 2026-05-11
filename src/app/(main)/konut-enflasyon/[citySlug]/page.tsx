@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TcmbHousingPanel } from "@/components/data-display/tcmb-housing-panel";
 import { KonutKarneTable } from "@/components/data-display/konut-karne-table";
+import { SchemaOrg } from "@/components/schema-org";
+import { konutCityBreadcrumb } from "@/lib/schema-presets";
 import { findCityBySlug, cities } from "@/lib/cities";
 import { getKonutKarne, getCityKonutKarne } from "@/lib/konut-karne";
 import { getHousingIndex } from "@/lib/tcmb-snapshot";
@@ -97,6 +99,9 @@ export default async function CityKonutEnflasyonPage({ params }: PageProps) {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg
+        data={konutCityBreadcrumb({ cityName: city.name, citySlug: city.slug })}
+      />
       <Link
         href="/konut-enflasyon"
         className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground transition hover:text-foreground"

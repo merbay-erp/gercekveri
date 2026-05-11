@@ -7,6 +7,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { AdSlot } from "@/components/ad-slot";
+import { SchemaOrg } from "@/components/schema-org";
+import { positionDetailBreadcrumb } from "@/lib/schema-presets";
 import { MaasList } from "@/modules/maas/components/maas-list";
 import { AmountStatsPanel } from "@/components/data-display/amount-stats";
 import { AmountHistogram } from "@/components/data-display/amount-histogram";
@@ -102,6 +104,9 @@ export default async function PositionPage({ params }: { params: Params }) {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg
+        data={positionDetailBreadcrumb({ positionName, positionSlug })}
+      />
       <Link
         href="/maaslar"
         className="inline-flex items-center text-sm text-muted-foreground transition hover:text-foreground"

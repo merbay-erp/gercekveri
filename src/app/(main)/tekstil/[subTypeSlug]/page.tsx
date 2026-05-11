@@ -5,6 +5,8 @@ import { ChevronLeft, Plus } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { AdSlot } from "@/components/ad-slot";
+import { SchemaOrg } from "@/components/schema-org";
+import { tekstilSubTypeBreadcrumb } from "@/lib/schema-presets";
 import { AmountStatsPanel } from "@/components/data-display/amount-stats";
 import { AmountHistogram } from "@/components/data-display/amount-histogram";
 import { TekstilList } from "@/modules/tekstil/components/tekstil-list";
@@ -70,6 +72,12 @@ export default async function TekstilSubTypePage({ params }: { params: Params })
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg
+        data={tekstilSubTypeBreadcrumb({
+          subTypeLabel: label,
+          subTypeSlug,
+        })}
+      />
       <Link
         href="/tekstil"
         className="inline-flex items-center text-sm text-muted-foreground transition hover:text-foreground"

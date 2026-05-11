@@ -6,6 +6,8 @@ import { ChevronLeft, Plus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AdSlot } from "@/components/ad-slot";
+import { SchemaOrg } from "@/components/schema-org";
+import { cityDetailBreadcrumb } from "@/lib/schema-presets";
 import { AmountStatsPanel } from "@/components/data-display/amount-stats";
 import { AmountHistogram } from "@/components/data-display/amount-histogram";
 import { AmountAiInsight } from "@/components/data-display/amount-ai-insight";
@@ -102,6 +104,14 @@ export default async function KiraCityPage({ params }: { params: Params }) {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg
+        data={cityDetailBreadcrumb({
+          categoryLabel: "Kiralar",
+          categoryPath: "/kira",
+          cityName: cityRecord.name,
+          citySlug,
+        })}
+      />
       <Link
         href="/kira"
         className="inline-flex items-center text-sm text-muted-foreground transition hover:text-foreground"

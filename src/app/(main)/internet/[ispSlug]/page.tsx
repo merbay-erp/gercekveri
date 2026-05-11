@@ -6,6 +6,8 @@ import { ChevronLeft, Plus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AdSlot } from "@/components/ad-slot";
+import { SchemaOrg } from "@/components/schema-org";
+import { ispDetailBreadcrumb } from "@/lib/schema-presets";
 import { AmountAiInsight } from "@/components/data-display/amount-ai-insight";
 import { InternetList } from "@/modules/internet/components/internet-list";
 import { InternetStatsPanel } from "@/modules/internet/components/internet-stats-panel";
@@ -82,6 +84,9 @@ export default async function IspPage({ params }: { params: Params }) {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg
+        data={ispDetailBreadcrumb({ ispName: isp.name, ispSlug })}
+      />
       <Link
         href="/internet"
         className="inline-flex items-center text-sm text-muted-foreground transition hover:text-foreground"

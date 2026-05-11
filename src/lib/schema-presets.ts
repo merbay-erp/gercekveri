@@ -291,6 +291,104 @@ export function tekstilSchemas(opts: { recordCount?: number } = {}) {
   );
 }
 
+// =============== DETAIL PAGE BREADCRUMBS ===============
+// Sub-page breadcrumb preset'leri — kategori sayfasindan detay sayfasina yol.
+
+export function cityDetailBreadcrumb(opts: {
+  categoryLabel: string;
+  categoryPath: string;
+  cityName: string;
+  citySlug: string;
+}) {
+  return breadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: opts.categoryLabel, url: opts.categoryPath },
+    {
+      name: opts.cityName,
+      url: `${opts.categoryPath}/sehir/${opts.citySlug}`,
+    },
+  ]);
+}
+
+export function positionDetailBreadcrumb(opts: {
+  positionName: string;
+  positionSlug: string;
+}) {
+  return breadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: "Maaşlar", url: "/maaslar" },
+    {
+      name: opts.positionName,
+      url: `/maaslar/${opts.positionSlug}`,
+    },
+  ]);
+}
+
+export function ispDetailBreadcrumb(opts: { ispName: string; ispSlug: string }) {
+  return breadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: "Internet", url: "/internet" },
+    { name: opts.ispName, url: `/internet/${opts.ispSlug}` },
+  ]);
+}
+
+export function utilityDetailBreadcrumb(opts: {
+  utilityLabel: string;
+  utilitySlug: string;
+}) {
+  return breadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: "Faturalar", url: "/fatura" },
+    {
+      name: opts.utilityLabel,
+      url: `/fatura/${opts.utilitySlug}`,
+    },
+  ]);
+}
+
+export function tekstilSubTypeBreadcrumb(opts: {
+  subTypeLabel: string;
+  subTypeSlug: string;
+}) {
+  return breadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: "Tekstil", url: "/tekstil" },
+    {
+      name: opts.subTypeLabel,
+      url: `/tekstil/${opts.subTypeSlug}`,
+    },
+  ]);
+}
+
+// 4-level breadcrumb: Maaşlar → Position → City
+export function positionCityBreadcrumb(opts: {
+  positionName: string;
+  positionSlug: string;
+  cityName: string;
+  citySlug: string;
+}) {
+  return breadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: "Maaşlar", url: "/maaslar" },
+    { name: opts.positionName, url: `/maaslar/${opts.positionSlug}` },
+    {
+      name: `${opts.positionName} — ${opts.cityName}`,
+      url: `/maaslar/${opts.positionSlug}/${opts.citySlug}`,
+    },
+  ]);
+}
+
+export function konutCityBreadcrumb(opts: { cityName: string; citySlug: string }) {
+  return breadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: "Konut Enflasyon", url: "/konut-enflasyon" },
+    {
+      name: opts.cityName,
+      url: `/konut-enflasyon/${opts.citySlug}`,
+    },
+  ]);
+}
+
 // =============== KONUT ENFLASYON (TCMB) ===============
 export function konutEnflasyonSchemas() {
   const faqs: FaqItem[] = [
