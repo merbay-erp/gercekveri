@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Sparkles, ShieldCheck, MapPin, Briefcase, Building2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -118,9 +119,9 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* HERO — dramatic, big numbers, social proof */}
+      {/* HERO — split layout: text left + Istanbul image right (desktop) */}
       <section className="relative overflow-hidden border-b border-border/40">
-        {/* Background gradient mesh */}
+        {/* Background gradient mesh (mobile + desktop) */}
         <div
           className="absolute inset-0 -z-10 opacity-50"
           style={{
@@ -131,53 +132,108 @@ export default async function HomePage() {
         />
 
         <div className="container mx-auto px-4 py-16 sm:py-24">
-          <div className="max-w-4xl space-y-6">
-            <Badge variant="secondary" className="font-normal">
-              <Sparkles className="mr-1.5 h-3 w-3" /> Beta · TCMB + anonim halk verisi
-            </Badge>
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl lg:text-7xl">
-              Türkiye'nin{" "}
-              <span className="bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
-                gerçek verisi.
-              </span>
-            </h1>
-            <p className="max-w-3xl text-lg text-muted-foreground sm:text-xl">
-              Maaş, kira, fatura, internet — TCMB resmi veri + anonim halk
-              katkısı. Tek bir platformda, ücretsiz, K-anonymity korumalı.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link href="/karsilastir" className={buttonVariants({ size: "lg" })}>
-                Sen nerede duruyorsun? <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-              <Link href="/maaslar/yeni" className={buttonVariants({ size: "lg", variant: "outline" })}>
-                Verini paylaş
-              </Link>
+          <div className="grid items-center gap-12 lg:grid-cols-[1.4fr_1fr]">
+            {/* SOL: text content */}
+            <div className="space-y-6">
+              <Badge variant="secondary" className="font-normal">
+                <Sparkles className="mr-1.5 h-3 w-3" /> Beta · TCMB + anonim halk verisi
+              </Badge>
+              <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl lg:text-7xl">
+                Türkiye'nin{" "}
+                <span className="bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+                  gerçek verisi.
+                </span>
+              </h1>
+              <p className="max-w-3xl text-lg text-muted-foreground sm:text-xl">
+                Maaş, kira, fatura, internet — TCMB resmi veri + anonim halk
+                katkısı. Tek bir platformda, ücretsiz, K-anonymity korumalı.
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link href="/karsilastir" className={buttonVariants({ size: "lg" })}>
+                  Sen nerede duruyorsun? <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+                <Link href="/maaslar/yeni" className={buttonVariants({ size: "lg", variant: "outline" })}>
+                  Verini paylaş
+                </Link>
+              </div>
+
+              <div className="pt-2">
+                <GlobalSearch entries={searchEntries} variant="hero" />
+              </div>
+
+              <div className="pt-2">
+                <HeroLiveCounters
+                  totalApproved={publicOverview?.totalApproved ?? 0}
+                  totalLast24h={publicOverview?.totalLast24h ?? 0}
+                  cities={coverage.cities}
+                  districts={coverage.districts}
+                  lastSubmissionAt={publicOverview?.lastSubmissionAt ?? null}
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> %100 anonim · KVKK uyumlu
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-500" /> AI özetler · saatlik güncel
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Building2 className="h-3.5 w-3.5 text-blue-500" /> TCMB EVDS · resmi veri
+                </span>
+              </div>
             </div>
 
-            <div className="pt-2">
-              <GlobalSearch entries={searchEntries} variant="hero" />
-            </div>
+            {/* SAĞ: Istanbul Bosphorus visual — desktop only, mobile'da gizli */}
+            <div className="relative hidden lg:block">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-border/50">
+                <Image
+                  src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=900&q=80&auto=format&fit=crop"
+                  alt="İstanbul Boğaz manzarası — Türkiye gerçek hayat verisi"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 0vw, 40vw"
+                  className="object-cover"
+                />
+                {/* Gradient overlay — text okunabilir kalsın */}
+                <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
 
-            <div className="pt-2">
-              <HeroLiveCounters
-                totalApproved={publicOverview?.totalApproved ?? 0}
-                totalLast24h={publicOverview?.totalLast24h ?? 0}
-                cities={coverage.cities}
-                districts={coverage.districts}
-                lastSubmissionAt={publicOverview?.lastSubmissionAt ?? null}
+                {/* Floating chip: TCMB live ticker (visual interest) */}
+                <div className="absolute left-4 right-4 top-4 flex justify-between">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-background/85 px-3 py-1 text-[11px] font-medium backdrop-blur-md ring-1 ring-border/50">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    TCMB · Canlı
+                  </span>
+                  <span className="inline-flex items-center rounded-full bg-background/85 px-3 py-1 text-[11px] font-medium backdrop-blur-md ring-1 ring-border/50">
+                    81 il
+                  </span>
+                </div>
+
+                {/* Bottom overlay: hızlı erişim */}
+                <div className="absolute inset-x-4 bottom-4 grid grid-cols-2 gap-2">
+                  <Link
+                    href="/doviz/usd-try"
+                    className="rounded-lg bg-background/90 px-3 py-2 text-center text-xs font-medium backdrop-blur-md ring-1 ring-border/50 transition hover:bg-background"
+                  >
+                    Dolar TL →
+                  </Link>
+                  <Link
+                    href="/tufe"
+                    className="rounded-lg bg-background/90 px-3 py-2 text-center text-xs font-medium backdrop-blur-md ring-1 ring-border/50 transition hover:bg-background"
+                  >
+                    TÜFE →
+                  </Link>
+                </div>
+              </div>
+              {/* Decorative gradient blob behind image */}
+              <div
+                className="absolute -inset-4 -z-10 rounded-3xl opacity-30 blur-3xl"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(56,189,174,0.4) 0%, rgba(112,165,253,0.4) 50%, rgba(168,85,247,0.4) 100%)",
+                }}
+                aria-hidden
               />
-            </div>
-
-            <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> %100 anonim · KVKK uyumlu
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-amber-500" /> AI özetler · saatlik güncel
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Building2 className="h-3.5 w-3.5 text-blue-500" /> TCMB EVDS · resmi veri
-              </span>
             </div>
           </div>
         </div>
