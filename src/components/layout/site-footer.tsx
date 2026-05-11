@@ -8,6 +8,7 @@ import {
   Mail,
   ExternalLink,
   Heart,
+  Globe,
 } from "lucide-react";
 
 import { footerNav, siteConfig } from "@/lib/site-config";
@@ -63,13 +64,24 @@ export function SiteFooter() {
               </span>
             </p>
 
-            {/* Social icons row */}
-            <div className="flex items-center gap-2 pt-1">
+            {/* Social icons row — founder/brand cross-link (knowledge graph) */}
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <a
+                href={siteConfig.links.blog}
+                target="_blank"
+                rel="noopener noreferrer me author"
+                aria-label="mustafaerbay.com.tr — founder blog"
+                title="mustafaerbay.com.tr"
+                className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition hover:border-foreground/30 hover:bg-muted hover:text-foreground"
+              >
+                <Globe className="h-3.5 w-3.5" />
+              </a>
               <a
                 href={siteConfig.links.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
+                title="GitHub"
                 className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition hover:border-foreground/30 hover:bg-muted hover:text-foreground"
               >
                 <Code2 className="h-3.5 w-3.5" />
@@ -77,8 +89,9 @@ export function SiteFooter() {
               <a
                 href={siteConfig.links.twitter}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener noreferrer me"
                 aria-label="X / Twitter"
+                title="X (@merbay86)"
                 className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition hover:border-foreground/30 hover:bg-muted hover:text-foreground"
               >
                 {/* X / Twitter inline SVG (lucide-react doesn't ship a Twitter icon) */}
@@ -91,35 +104,104 @@ export function SiteFooter() {
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </a>
+              <a
+                href={siteConfig.links.bluesky}
+                target="_blank"
+                rel="noopener noreferrer me"
+                aria-label="Bluesky"
+                title="Bluesky"
+                className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition hover:border-foreground/30 hover:bg-muted hover:text-foreground"
+              >
+                {/* Bluesky butterfly inline SVG (lucide doesn't ship it) */}
+                <svg
+                  className="h-3.5 w-3.5"
+                  viewBox="0 0 600 530"
+                  fill="currentColor"
+                  aria-hidden
+                >
+                  <path d="M135.72 44.03C202.21 93.93 273.74 195.1 300 249.39c26.26-54.29 97.79-155.46 164.28-205.36C512.27 8.01 590-19.51 590 68.13c0 17.5-10.04 147.06-15.93 168.09-20.49 73.11-94.97 91.74-161.18 80.45 115.7 19.7 145.13 84.81 81.55 149.7-120.41 122.55-172.36-30.94-185.74-70.27-2.45-7.21-3.6-10.65-3.62-7.72-.02-2.93-1.17.51-3.62 7.72-13.38 39.33-65.33 192.82-185.74 70.27-63.58-64.89-34.15-130 81.55-149.7-66.21 11.29-140.69-7.34-161.18-80.45C29.2 215.19 19.16 85.63 19.16 68.13c0-87.64 77.73-60.12 116.56-24.1z" />
+                </svg>
+              </a>
+              <a
+                href={siteConfig.links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer me"
+                aria-label="LinkedIn"
+                title="LinkedIn"
+                className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition hover:border-foreground/30 hover:bg-muted hover:text-foreground"
+              >
+                {/* LinkedIn inline SVG */}
+                <svg
+                  className="h-3.5 w-3.5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden
+                >
+                  <path d="M20.45 20.45h-3.55v-5.56c0-1.33-.03-3.03-1.85-3.03-1.85 0-2.13 1.44-2.13 2.93v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.59 0 4.26 2.36 4.26 5.43v6.31zM5.34 7.43a2.06 2.06 0 110-4.13 2.06 2.06 0 010 4.13zm-1.78 13.02h3.55V9H3.56v11.45z" />
+                </svg>
+              </a>
+              <a
+                href={siteConfig.links.mastodon}
+                target="_blank"
+                rel="noopener noreferrer me"
+                aria-label="Mastodon"
+                title="Mastodon"
+                className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition hover:border-foreground/30 hover:bg-muted hover:text-foreground"
+              >
+                {/* Mastodon inline SVG (M logo) */}
+                <svg
+                  className="h-3.5 w-3.5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden
+                >
+                  <path d="M23.193 7.88c0-5.207-3.413-6.733-3.413-6.733C18.057.353 15.103.045 12.036.02h-.075c-3.067.025-6.02.333-7.74 1.127 0 0-3.413 1.526-3.413 6.732 0 1.193-.024 2.62.013 4.131.123 5.092.933 10.11 5.637 11.355 2.169.574 4.032.694 5.531.611 2.72-.151 4.247-.971 4.247-.971l-.09-1.974s-1.944.613-4.126.539c-2.16-.075-4.44-.236-4.79-2.89a5.43 5.43 0 01-.048-.748s2.123.519 4.815.642c1.646.075 3.19-.097 4.758-.283 3.008-.359 5.625-2.211 5.955-3.903.52-2.667.477-6.508.477-6.508zm-4.045 6.749h-2.512v-6.157c0-1.298-.546-1.957-1.638-1.957-1.207 0-1.812.78-1.812 2.323v3.365h-2.498V8.838c0-1.543-.605-2.323-1.812-2.323-1.092 0-1.638.659-1.638 1.957v6.157H4.726V8.495c0-1.296.33-2.326.992-3.09.683-.764 1.578-1.156 2.69-1.156 1.285 0 2.257.493 2.906 1.479L12 6.732l.686-1.004c.65-.986 1.621-1.479 2.906-1.479 1.112 0 2.007.392 2.69 1.156.662.764.992 1.794.992 3.09v6.134z" />
+                </svg>
+              </a>
               <Link
                 href="/iletisim"
                 aria-label="İletişim"
+                title="İletişim"
                 className="grid h-8 w-8 place-items-center rounded-md border border-border/60 text-muted-foreground transition hover:border-foreground/30 hover:bg-muted hover:text-foreground"
               >
                 <Mail className="h-3.5 w-3.5" />
               </Link>
             </div>
 
-            {/* Founder credit */}
-            <div className="space-y-1 pt-1">
+            {/* Founder + brand cross-link (E-A-T + Knowledge Graph backlink) */}
+            <div className="space-y-1.5 rounded-lg border border-border/40 bg-card/40 p-3">
               <p className="text-[11px] text-muted-foreground">
                 Geliştiren:{" "}
                 <a
-                  href="https://mustafaerbay.com.tr/"
+                  href={siteConfig.links.blog}
                   target="_blank"
                   rel="noopener noreferrer me author"
-                  className="font-medium text-foreground/80 transition hover:text-foreground"
+                  className="font-semibold text-foreground transition hover:underline underline-offset-2"
                 >
                   Mustafa Erbay
-                </a>
+                </a>{" "}
+                <span className="text-muted-foreground/70">·</span>{" "}
+                System Architect
               </p>
-              <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+              <p className="text-[10px] leading-relaxed text-muted-foreground">
+                Teknoloji + sistem mimarisi yazıları:{" "}
+                <a
+                  href={siteConfig.links.blog}
+                  target="_blank"
+                  rel="noopener noreferrer me"
+                  className="font-medium text-foreground/80 transition hover:text-foreground hover:underline underline-offset-2"
+                >
+                  mustafaerbay.com.tr
+                </a>{" "}
+                <span className="text-muted-foreground/60">(970+ post · TR + EN)</span>
+              </p>
+              <div className="flex items-center gap-2 pt-0.5 text-[10px] text-muted-foreground">
                 <a
                   href="https://orcid.org/0009-0005-9624-4249"
                   target="_blank"
                   rel="noopener noreferrer me"
                   className="inline-flex items-center gap-0.5 transition hover:text-foreground"
-                  title="ORCID iD"
+                  title="ORCID iD — 0009-0005-9624-4249"
                 >
                   ORCID <ExternalLink className="h-2.5 w-2.5" />
                 </a>
@@ -129,7 +211,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer me"
                   className="inline-flex items-center gap-0.5 transition hover:text-foreground"
-                  title="Wikidata"
+                  title="Wikidata — Q139679043"
                 >
                   Wikidata <ExternalLink className="h-2.5 w-2.5" />
                 </a>

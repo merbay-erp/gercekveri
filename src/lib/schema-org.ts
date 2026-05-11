@@ -96,9 +96,19 @@ export function organizationSchema() {
       name: "Türkiye",
       identifier: "TR",
     },
+    // sameAs: knowledge graph icin ana backlink kanali.
+    // mustafaerbay.com.tr (founder blog) burada → gercekveri ↔ blog otorite
+    // baglantisi (DA transferi + Knowledge Graph entity merge).
     sameAs: [
+      "https://mustafaerbay.com.tr/",
       "https://github.com/merbay-erp/gercekveri",
-      "https://twitter.com/gercekveri",
+      "https://github.com/merbay-erp",
+      "https://x.com/merbay86",
+      "https://bsky.app/profile/mustafaerbay.bsky.social",
+      "https://www.linkedin.com/in/mustafa-e-6a891370/",
+      "https://mastodon.social/@mustafaerbay",
+      "https://www.wikidata.org/wiki/Q139679043",
+      "https://orcid.org/0009-0005-9624-4249",
     ],
     contactPoint: {
       "@type": "ContactPoint",

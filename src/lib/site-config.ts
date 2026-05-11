@@ -10,8 +10,14 @@ export const siteConfig = {
   locale: "tr",
   ogImage: "/og.png",
   links: {
-    twitter: "https://twitter.com/gercekveri",
+    twitter: "https://x.com/merbay86",
     github: "https://github.com/merbay-erp/gercekveri",
+    bluesky: "https://bsky.app/profile/mustafaerbay.bsky.social",
+    linkedin: "https://www.linkedin.com/in/mustafa-e-6a891370/",
+    mastodon: "https://mastodon.social/@mustafaerbay",
+    blog: "https://mustafaerbay.com.tr/",
+    devto: "https://dev.to/merbayerp",
+    hashnode: "https://mustafaerbay.hashnode.dev/",
   },
 } as const;
 
