@@ -19,6 +19,36 @@ export function SiteFooter() {
             <p className="text-sm text-muted-foreground max-w-xs">
               {siteConfig.tagline}. Anonim, doğru, ücretsiz.
             </p>
+            <p className="text-xs text-muted-foreground max-w-xs">
+              <a
+                href="https://mustafaerbay.com.tr/"
+                target="_blank"
+                rel="noopener noreferrer me author"
+                className="hover:text-foreground transition-colors underline-offset-2 hover:underline"
+              >
+                Mustafa Erbay
+              </a>{" "}
+              tarafından geliştirildi · System Architect ·{" "}
+              <a
+                href="https://orcid.org/0009-0005-9624-4249"
+                target="_blank"
+                rel="noopener noreferrer me"
+                className="hover:text-foreground transition-colors"
+                title="ORCID iD"
+              >
+                ORCID
+              </a>{" "}
+              ·{" "}
+              <a
+                href="https://www.wikidata.org/wiki/Q139679043"
+                target="_blank"
+                rel="noopener noreferrer me"
+                className="hover:text-foreground transition-colors"
+                title="Wikidata entry"
+              >
+                Wikidata
+              </a>
+            </p>
           </div>
 
           <FooterCol title="Ürün" items={footerNav.product} />

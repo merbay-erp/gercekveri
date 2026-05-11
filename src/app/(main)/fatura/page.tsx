@@ -5,6 +5,8 @@ import { Plus, Zap, Flame, Droplet } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AdSlot } from "@/components/ad-slot";
+import { SchemaOrg } from "@/components/schema-org";
+import { faturaSchemas } from "@/lib/schema-presets";
 import { AmountStatsPanel } from "@/components/data-display/amount-stats";
 import { AmountHistogram } from "@/components/data-display/amount-histogram";
 import { AmountAiInsight } from "@/components/data-display/amount-ai-insight";
@@ -83,6 +85,7 @@ export default async function FaturaPage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg data={faturaSchemas({ recordCount: stats.count })} />
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">

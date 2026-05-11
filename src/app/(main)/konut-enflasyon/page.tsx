@@ -5,6 +5,8 @@ import { Building2, TrendingDown, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { KonutKarneTable } from "@/components/data-display/konut-karne-table";
 import { TcmbHousingPanel } from "@/components/data-display/tcmb-housing-panel";
+import { SchemaOrg } from "@/components/schema-org";
+import { konutEnflasyonSchemas } from "@/lib/schema-presets";
 import { getKonutKarne } from "@/lib/konut-karne";
 import { getHousingIndex } from "@/lib/tcmb-snapshot";
 import { cities as CITIES } from "@/lib/cities";
@@ -45,6 +47,7 @@ export default async function KonutEnflasyonPage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg data={konutEnflasyonSchemas()} />
       <header className="mb-8 max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           TCMB · Resmi Veri

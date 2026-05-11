@@ -3,7 +3,14 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { Providers } from "@/components/providers";
+import { SchemaOrg } from "@/components/schema-org";
 import { siteConfig } from "@/lib/site-config";
+import {
+  organizationSchema,
+  websiteSchema,
+  personMustafaErbay,
+  jsonLdGraph,
+} from "@/lib/schema-org";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -60,10 +67,20 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Root-level JSON-LD: Organization + WebSite + Person (kanonik kimlikler).
+  // Tek <script> icinde @graph ile birlikte verilir → Google parse'i kolay,
+  // duplicate @context yok, knowledge graph entity birlestirmesi daha guclu.
+  const rootJsonLd = jsonLdGraph(
+    organizationSchema(),
+    websiteSchema(),
+    personMustafaErbay(),
+  );
+
   return (
     <html lang="tr" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full bg-background font-sans text-foreground">
         <Providers>{children}</Providers>
+        <SchemaOrg data={rootJsonLd} />
       </body>
     </html>
   );

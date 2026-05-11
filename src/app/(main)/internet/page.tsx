@@ -4,6 +4,8 @@ import { Plus } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { AdSlot } from "@/components/ad-slot";
+import { SchemaOrg } from "@/components/schema-org";
+import { internetSchemas } from "@/lib/schema-presets";
 import { AmountAiInsight } from "@/components/data-display/amount-ai-insight";
 import { InternetList } from "@/modules/internet/components/internet-list";
 import { InternetStatsPanel } from "@/modules/internet/components/internet-stats-panel";
@@ -63,6 +65,7 @@ export default async function InternetPage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg data={internetSchemas({ recordCount: stats.count })} />
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">

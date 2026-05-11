@@ -5,6 +5,8 @@ import { Plus, Scissors } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AdSlot } from "@/components/ad-slot";
+import { SchemaOrg } from "@/components/schema-org";
+import { tekstilSchemas } from "@/lib/schema-presets";
 import { TekstilList } from "@/modules/tekstil/components/tekstil-list";
 import { TekstilFilterBar } from "@/modules/tekstil/components/tekstil-filter-bar";
 import {
@@ -51,8 +53,11 @@ export default async function TekstilPage() {
     }),
   );
 
+  const totalCount = perSubType.reduce((acc, p) => acc + (p.stats.count || 0), 0);
+
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg data={tekstilSchemas({ recordCount: totalCount })} />
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">

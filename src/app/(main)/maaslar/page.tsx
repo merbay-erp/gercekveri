@@ -4,6 +4,8 @@ import { Plus } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { AdSlot } from "@/components/ad-slot";
+import { SchemaOrg } from "@/components/schema-org";
+import { maaslarSchemas } from "@/lib/schema-presets";
 import { MaasList } from "@/modules/maas/components/maas-list";
 import { AmountStatsPanel } from "@/components/data-display/amount-stats";
 import { AmountHistogram } from "@/components/data-display/amount-histogram";
@@ -62,6 +64,7 @@ export default async function MaaslarPage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <SchemaOrg data={maaslarSchemas({ recordCount: stats.count })} />
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Maaşlar</h1>
