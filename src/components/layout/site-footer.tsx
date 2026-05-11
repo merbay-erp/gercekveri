@@ -10,8 +10,8 @@ export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border/60 bg-muted/20">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid gap-10 md:grid-cols-5">
-          <div className="space-y-3 md:col-span-2">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
+          <div className="space-y-3 sm:col-span-2">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <BrandMark className="h-7 w-7 shrink-0" />
               <span>{siteConfig.name}</span>
