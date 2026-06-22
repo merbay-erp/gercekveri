@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Building2, Globe, Phone, Search, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { lookupPath } from "@/lib/lookup-path";
 
 const TABS = [
   { key: "web", label: "Web sitesi", icon: Globe, placeholder: "ör. hizliodeme-kargo.com", live: true },
@@ -29,13 +30,17 @@ export function LookupHero({ autoFocus = false, initialTab = "web" }: { autoFocu
   const active = TABS.find((t) => t.key === tab)!;
 
   function go(value?: string) {
-    const v = (value ?? q).trim();
+    let v = (value ?? q).trim();
     if (!v) return;
     if (!active.live) {
       toast("Bu sorgu türü çok yakında", { description: `${active.label} sorgusu hazırlanıyor.` });
       return;
     }
-    router.push(`/sorgu/${tab}/${encodeURIComponent(v)}`);
+    // ilan: bağlantıyı temizle (protokol/www/query) → host/path slash'leri segment olur
+    if (tab === "ilan") {
+      v = v.replace(/^https?:\/\//i, "").replace(/^www\./i, "").split("#")[0]!.split("?")[0]!;
+    }
+    router.push(lookupPath(tab, v));
   }
 
   return (

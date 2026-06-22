@@ -3,6 +3,7 @@ import { Building2, Globe, Phone, Tag, type LucideIcon } from "lucide-react";
 import type { FraudFeedItem } from "@/modules/lookup/types";
 import { reportCategoryLabel, type LookupKind } from "@/services/risk/registry";
 import { bandSoft } from "./risk-tokens";
+import { lookupPath } from "@/lib/lookup-path";
 import { cn } from "@/lib/utils";
 
 const KIND_ICON: Record<LookupKind, LucideIcon> = {
@@ -27,7 +28,7 @@ export function RecentFraudFeed({ items }: { items: FraudFeedItem[] }) {
         return (
           <Link
             key={`${it.kind}-${it.key}`}
-            href={`/sorgu/${it.kind}/${it.key}`}
+            href={lookupPath(it.kind, it.key)}
             className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:bg-muted/50"
           >
             <Icon className="size-[18px] shrink-0 text-muted-foreground" aria-hidden />

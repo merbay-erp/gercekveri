@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { kindFromEntity } from "@/services/risk/registry";
+import { lookupPath } from "@/lib/lookup-path";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gercekveri.com";
 
@@ -38,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .catch(() => [] as { kind: string; key: string; updatedAt: Date }[]);
 
   const entityEntries: MetadataRoute.Sitemap = entities.map((e) => ({
-    url: `${SITE_URL}/sorgu/${kindFromEntity(e.kind).kind}/${e.key}`,
+    url: `${SITE_URL}${lookupPath(kindFromEntity(e.kind).kind, e.key)}`,
     lastModified: e.updatedAt,
     changeFrequency: "weekly",
     priority: 0.7,

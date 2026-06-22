@@ -10,12 +10,12 @@ import { RecentFraudFeed } from "@/components/risk/recent-fraud-feed";
 
 export const dynamic = "force-dynamic";
 
-type Params = Promise<{ kind: string; value: string }>;
+type Params = Promise<{ kind: string; value: string[] }>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { kind, value } = await params;
   const def = kindFromSlug(kind);
-  const raw = decodeURIComponent(value);
+  const raw = (value ?? []).join("/");
   if (!def) return { title: "Sorgu — GerçekVeri" };
   const key = def.normalize(raw);
   const display = key ? def.display(key) : raw;
@@ -32,7 +32,7 @@ export default async function LookupPage({ params }: { params: Params }) {
   const def = kindFromSlug(kind);
   if (!def) notFound();
 
-  const entity = await getOrScanEntity(kind, decodeURIComponent(value));
+  const entity = await getOrScanEntity(kind, (value ?? []).join("/"));
   if (!entity) notFound();
   const recent = await listRecentFraud({ limit: 6 });
 

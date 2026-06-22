@@ -7,10 +7,11 @@ import { SignalRow } from "./signal-row";
 import { ShareButton } from "./share-button";
 import { bandSoft } from "./risk-tokens";
 import { siteConfig } from "@/lib/site-config";
+import { lookupPath } from "@/lib/lookup-path";
 import { cn } from "@/lib/utils";
 
 export function RiskCard({ entity }: { entity: EntityView }) {
-  const shareUrl = `https://${siteConfig.domain}/sorgu/${entity.kind}/${entity.key}`;
+  const shareUrl = `https://${siteConfig.domain}${lookupPath(entity.kind, entity.key)}`;
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
       <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">

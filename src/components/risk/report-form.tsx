@@ -5,6 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { submitFraudReport } from "@/modules/lookup/server/actions";
 import { REGISTRY, type LookupKind } from "@/services/risk/registry";
+import { lookupPath } from "@/lib/lookup-path";
 
 const KIND_OPTIONS: LookupKind[] = ["web", "iban", "phone", "ilan"];
 
@@ -39,7 +40,7 @@ export function ReportForm({
       const res = await submitFraudReport({ kind, value, category, note, website });
       if (res.ok) {
         toast.success("İhbarın alındı. Teşekkürler.");
-        if (res.key) router.push(`/sorgu/${res.kind}/${res.key}`);
+        if (res.key) router.push(lookupPath(res.kind, res.key));
       } else {
         toast.error(res.error);
       }
