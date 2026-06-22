@@ -391,3 +391,73 @@ model TcmbSnapshot {
   lastError       String?
   lastErrorAt     DateTime?
 }
+
+// =============================================================================
+// DOLANDIRICILIK / GÜVEN SORGUSU (fraud / trust lookup)
+// Eski Submission/City/Category modellerine dokunulmaz — bu katman additive.
+// =============================================================================
+
+enum EntityKind {
+  WEB     // alan adı / web sitesi
+  IBAN
+  PHONE
+  LISTING // ilan
+}
+
+enum RiskBand {
+  SAFE        // düşük risk
+  SUSPICIOUS  // şüpheli
+  DANGER      // yüksek risk
+  UNKNOWN     // doğrulanmadı / yeterli sinyal yok
+}
+
+enum FraudReportStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+// Sorgulanan varlık (domain/iban/telefon/ilan) — kanonik kayıt + skor önbelleği.
+model FraudEntity {
+  id          String        @id @default(cuid())
+  kind        EntityKind
+  // normalize anahtar: küçük-harf domain, boşluksuz IBAN, +90 telefon
+  key         String
+  // kullanıcıya gösterilen ham hali
+  display     String
+  riskScore   Int           @default(0) // 0-100
+  band        RiskBand      @default(UNKNOWN)
+  // son otomatik taramanın sinyalleri (JSON: Signal[])
+  signals     Json?
+  // AI sade-dil özeti + tavsiye
+  aiSummary   String?
+  reportCount Int           @default(0)
+  viewCount   Int           @default(0)
+  lastScanAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  reports     FraudReport[]
+
+  @@unique([kind, key])
+  @@index([band])
+  @@index([reportCount])
+  @@index([updatedAt])
+}
+
+// Halk ihbarı (anonim) — bir varlığa bağlı.
+model FraudReport {
+  id          String            @id @default(cuid())
+  entityId    String
+  entity      FraudEntity       @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  category    String            // kargo-taklidi | sahte-banka | kapora | sahte-ilan | diger
+  note        String?           // kısa açıklama (PII maskelenir)
+  status      FraudReportStatus @default(PENDING)
+  ipHash      String?
+  fingerprint String?
+  country     String?
+  createdAt   DateTime          @default(now())
+
+  @@index([entityId])
+  @@index([status])
+  @@index([createdAt])
+}

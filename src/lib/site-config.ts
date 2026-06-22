@@ -5,8 +5,8 @@ export const siteConfig = {
   name: "GerçekVeri",
   domain: "gercekveri.com",
   description:
-    "Türkiye'nin anonim gerçek veri platformu. Maaş, kira, internet ve daha fazlası — gerçek kullanıcılardan, gerçek verilerle.",
-  tagline: "Türkiye'nin gerçek verisi",
+    "Ödeme yapmadan önce sor. Web sitesi, IBAN, telefon ya da ilanın gerçek mi sahte mi olduğunu domain yaşı, kara liste ve halk ihbarıyla saniyede sorgula.",
+  tagline: "Bu gerçek mi, sahte mi?",
   locale: "tr",
   ogImage: "/og.png",
   links: {
@@ -122,37 +122,26 @@ export const liveCategories = categories.filter((c) => c.status === "live");
 export const upcomingCategories = categories.filter((c) => c.status === "soon");
 
 export const mainNav = [
-  { label: "Maaşlar", href: "/maaslar" },
-  { label: "Kira", href: "/kira" },
-  { label: "Aidat", href: "/aidat" },
-  { label: "Fatura", href: "/fatura" },
-  { label: "İnternet", href: "/internet" },
-  { label: "Döviz", href: "/doviz" },
-  { label: "TÜFE", href: "/tufe" },
-  { label: "Faiz", href: "/faiz" },
-  { label: "Karşılaştır", href: "/karsilastir" },
+  { label: "Sorgula", href: "/" },
+  { label: "İhbar et", href: "/ihbar" },
+  { label: "Son dolandırıcılıklar", href: "/son-dolandiriciliklar" },
+  { label: "Nasıl çalışır", href: "/hakkinda" },
+  { label: "SSS", href: "/sss" },
 ];
 
 export const footerNav = {
   product: [
-    { label: "Maaşlar", href: "/maaslar" },
-    { label: "Kiralar", href: "/kira" },
-    { label: "Aidatlar", href: "/aidat" },
-    { label: "Faturalar", href: "/fatura" },
-    { label: "İnternet sağlayıcıları", href: "/internet" },
-    { label: "Tekstil fiyatları", href: "/tekstil" },
-    { label: "Maaş paylaş", href: "/maaslar/yeni" },
-    { label: "Kira paylaş", href: "/kira/yeni" },
-    { label: "Fatura paylaş", href: "/fatura/yeni" },
-    { label: "Tekstil fiyat paylaş", href: "/tekstil/yeni" },
+    { label: "Web sitesi sorgula", href: "/" },
+    { label: "Dolandırıcılık ihbar et", href: "/ihbar" },
+    { label: "Son dolandırıcılıklar", href: "/son-dolandiriciliklar" },
+    { label: "IBAN sorgu (yakında)", href: "/" },
+    { label: "Telefon sorgu (yakında)", href: "/" },
+    { label: "İlan sorgu (yakında)", href: "/" },
   ],
   economy: [
-    { label: "Döviz Hub", href: "/doviz" },
-    { label: "USD/TRY", href: "/doviz/usd-try" },
-    { label: "EUR/TRY", href: "/doviz/eur-try" },
-    { label: "TÜFE Enflasyon", href: "/tufe" },
-    { label: "Politika Faizi", href: "/faiz" },
-    { label: "Konut Enflasyon Karnesi", href: "/konut-enflasyon" },
+    { label: "Nasıl çalışır", href: "/hakkinda" },
+    { label: "Sık sorulan sorular", href: "/sss" },
+    { label: "İletişim", href: "/iletisim" },
   ],
   legal: [
     { label: "Gizlilik Politikası", href: "/gizlilik" },
@@ -162,8 +151,6 @@ export const footerNav = {
   ],
   about: [
     { label: "Hakkında", href: "/hakkinda" },
-    { label: "İstatistikler", href: "/istatistikler" },
-    { label: "Veri haritası", href: "/harita" },
     { label: "İletişim", href: "/iletisim" },
     { label: "SSS", href: "/sss" },
   ],
