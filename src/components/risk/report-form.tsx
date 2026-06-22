@@ -1,26 +1,45 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { submitFraudReport } from "@/modules/web/server/actions";
-import { reportCategories } from "@/modules/web/config";
+import { submitFraudReport } from "@/modules/lookup/server/actions";
+import { REGISTRY, type LookupKind } from "@/services/risk/registry";
 
-export function ReportForm({ defaultDomain = "" }: { defaultDomain?: string }) {
+const KIND_OPTIONS: LookupKind[] = ["web", "iban", "phone"];
+
+export function ReportForm({
+  defaultKind = "web",
+  defaultValue = "",
+}: {
+  defaultKind?: string;
+  defaultValue?: string;
+}) {
   const router = useRouter();
-  const [domain, setDomain] = useState(defaultDomain);
-  const [category, setCategory] = useState<string>(reportCategories[0].key);
+  const [kind, setKind] = useState<LookupKind>(
+    (KIND_OPTIONS.includes(defaultKind as LookupKind) ? defaultKind : "web") as LookupKind,
+  );
+  const [value, setValue] = useState(defaultValue);
+  const cats = REGISTRY[kind].categories;
+  const [category, setCategory] = useState<string>(cats[0].key);
   const [note, setNote] = useState("");
   const [website, setWebsite] = useState(""); // honeypot
   const [pending, startTransition] = useTransition();
 
+  const def = useMemo(() => REGISTRY[kind], [kind]);
+
+  function onKindChange(k: LookupKind) {
+    setKind(k);
+    setCategory(REGISTRY[k].categories[0].key);
+  }
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     startTransition(async () => {
-      const res = await submitFraudReport({ domain, category, note, website });
+      const res = await submitFraudReport({ kind, value, category, note, website });
       if (res.ok) {
         toast.success("İhbarın alındı. Teşekkürler.");
-        if (res.key) router.push(`/sorgu/web/${res.key}`);
+        if (res.key) router.push(`/sorgu/${res.kind}/${res.key}`);
       } else {
         toast.error(res.error);
       }
@@ -40,12 +59,32 @@ export function ReportForm({ defaultDomain = "" }: { defaultDomain?: string }) {
       />
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium">Web adresi</label>
+        <label className="mb-1.5 block text-sm font-medium">Tür</label>
+        <div className="flex gap-1 rounded-lg bg-muted p-1">
+          {KIND_OPTIONS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => onKindChange(k)}
+              aria-selected={kind === k}
+              className={
+                "flex-1 rounded-md px-2 py-1.5 text-[13px] transition-colors " +
+                (kind === k ? "bg-background font-medium text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")
+              }
+            >
+              {REGISTRY[k].label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="mb-1.5 block text-sm font-medium">{def.label}</label>
         <input
           required
-          value={domain}
-          onChange={(e) => setDomain(e.target.value)}
-          placeholder="ör. hizliodeme-kargo.com"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder={def.placeholder}
           className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
         />
       </div>
@@ -57,7 +96,7 @@ export function ReportForm({ defaultDomain = "" }: { defaultDomain?: string }) {
           onChange={(e) => setCategory(e.target.value)}
           className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
         >
-          {reportCategories.map((c) => (
+          {cats.map((c) => (
             <option key={c.key} value={c.key}>
               {c.label}
             </option>
@@ -89,7 +128,7 @@ export function ReportForm({ defaultDomain = "" }: { defaultDomain?: string }) {
 
       <p className="text-xs leading-relaxed text-muted-foreground">
         İhbarlar anonimdir ve doğrulanana kadar &quot;bekliyor&quot; olarak işaretlenir. Kötü niyetli/asılsız ihbar
-        engellenir; bir adresi yanlışlıkla işaretlersek itiraz edebilirsin.
+        engellenir; bir kaydı yanlışlıkla işaretlersek itiraz edebilirsin.
       </p>
     </form>
   );

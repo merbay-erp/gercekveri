@@ -2,6 +2,7 @@ import {
   Ban,
   Calendar,
   Circle,
+  CircleCheck,
   Flag,
   Globe,
   History,
@@ -27,6 +28,7 @@ const MAP: Record<string, LucideIcon> = {
   tag: Tag,
   phone: Phone,
   "building-bank": Landmark,
+  checkbox: CircleCheck,
   flag: Flag,
 };
 

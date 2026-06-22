@@ -10,11 +10,12 @@ export const metadata: Metadata = {
   alternates: { canonical: "/ihbar" },
 };
 
-type SearchParams = Promise<{ domain?: string }>;
+type SearchParams = Promise<{ kind?: string; value?: string }>;
 
 export default async function IhbarPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams;
-  const domain = typeof sp.domain === "string" ? sp.domain : "";
+  const kind = typeof sp.kind === "string" ? sp.kind : "web";
+  const value = typeof sp.value === "string" ? sp.value : "";
 
   return (
     <div className="container mx-auto max-w-lg px-4 py-12">
@@ -29,7 +30,7 @@ export default async function IhbarPage({ searchParams }: { searchParams: Search
       </div>
 
       <div className="rounded-xl border border-border bg-card p-5">
-        <ReportForm defaultDomain={domain} />
+        <ReportForm defaultKind={kind} defaultValue={value} />
       </div>
     </div>
   );

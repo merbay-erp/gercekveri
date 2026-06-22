@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AlertTriangle, Flag, MessageSquareWarning, Sparkles } from "lucide-react";
-import type { WebEntityView } from "@/modules/web/types";
+import type { EntityView } from "@/modules/lookup/types";
 import { BAND_LABEL } from "@/services/risk/types";
 import { ScoreRing } from "./score-ring";
 import { SignalRow } from "./signal-row";
@@ -9,8 +9,8 @@ import { bandSoft } from "./risk-tokens";
 import { siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
-export function RiskCard({ entity }: { entity: WebEntityView }) {
-  const shareUrl = `https://${siteConfig.domain}/sorgu/web/${entity.key}`;
+export function RiskCard({ entity }: { entity: EntityView }) {
+  const shareUrl = `https://${siteConfig.domain}/sorgu/${entity.kind}/${entity.key}`;
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
       <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
@@ -43,7 +43,7 @@ export function RiskCard({ entity }: { entity: WebEntityView }) {
 
       <div className="flex flex-col gap-2 border-t border-border bg-muted/40 p-4 sm:flex-row">
         <Link
-          href={`/ihbar?domain=${encodeURIComponent(entity.key)}`}
+          href={`/ihbar?kind=${entity.kind}&value=${encodeURIComponent(entity.key)}`}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors hover:bg-muted"
         >
           <Flag className="size-4" aria-hidden />

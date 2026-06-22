@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Flame } from "lucide-react";
-import { listRecentFraud } from "@/modules/web/server/queries";
+import { listRecentFraud } from "@/modules/lookup/server/queries";
 import { RecentFraudFeed } from "@/components/risk/recent-fraud-feed";
 import { LookupHero } from "@/components/risk/lookup-hero";
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RecentPage() {
-  const items = await listRecentFraud(50);
+  const items = await listRecentFraud({ limit: 50 });
   return (
     <div className="container mx-auto max-w-2xl px-4 py-12">
       <div className="mb-6 flex items-center gap-3">

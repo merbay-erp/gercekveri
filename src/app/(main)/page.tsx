@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Building2, Globe, Keyboard, Lock, Phone, Radar, Search, ShieldCheck, Tag } from "lucide-react";
-import { getFraudStats, listRecentFraud } from "@/modules/web/server/queries";
+import { getFraudStats, listRecentFraud } from "@/modules/lookup/server/queries";
 import { LookupHero } from "@/components/risk/lookup-hero";
 import { RecentFraudFeed } from "@/components/risk/recent-fraud-feed";
 import { cn } from "@/lib/utils";
@@ -23,13 +23,13 @@ const STEPS = [
 
 const VERTICALS = [
   { label: "Web sitesi", desc: "Sahte e-ticaret, kargo/banka taklidi, phishing.", icon: Globe, live: true },
-  { label: "IBAN", desc: "Kapora ve havale dolandırıcılığı.", icon: Building2, live: false },
-  { label: "Telefon", desc: "Sahte banka araması, vishing.", icon: Phone, live: false },
+  { label: "IBAN", desc: "Kapora ve havale dolandırıcılığı.", icon: Building2, live: true },
+  { label: "Telefon", desc: "Sahte banka araması, vishing.", icon: Phone, live: true },
   { label: "İlan", desc: "Pazaryeri / sahibinden sahte ilanlar.", icon: Tag, live: false },
 ];
 
 export default async function HomePage() {
-  const [stats, recent] = await Promise.all([getFraudStats(), listRecentFraud(5)]);
+  const [stats, recent] = await Promise.all([getFraudStats(), listRecentFraud({ limit: 5 })]);
 
   return (
     <div className="container mx-auto max-w-3xl px-4">

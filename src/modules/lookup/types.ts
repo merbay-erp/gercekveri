@@ -1,6 +1,8 @@
 import type { RiskBand, Signal } from "@/services/risk/types";
+import type { LookupKind } from "@/services/risk/registry";
 
-export interface WebEntityView {
+export interface EntityView {
+  kind: LookupKind;
   key: string;
   display: string;
   score: number;
@@ -12,6 +14,7 @@ export interface WebEntityView {
 }
 
 export interface FraudFeedItem {
+  kind: LookupKind;
   key: string;
   display: string;
   band: RiskBand;

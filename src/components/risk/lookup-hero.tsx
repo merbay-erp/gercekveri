@@ -8,28 +8,34 @@ import { cn } from "@/lib/utils";
 
 const TABS = [
   { key: "web", label: "Web sitesi", icon: Globe, placeholder: "ör. hizliodeme-kargo.com", live: true },
-  { key: "iban", label: "IBAN", icon: Building2, placeholder: "ör. TR47 0001 0009 …", live: false },
-  { key: "phone", label: "Telefon", icon: Phone, placeholder: "ör. 0850 840 12 34", live: false },
+  { key: "iban", label: "IBAN", icon: Building2, placeholder: "ör. TR47 0001 0009 9912 3456 78", live: true },
+  { key: "phone", label: "Telefon", icon: Phone, placeholder: "ör. 0850 840 12 34", live: true },
   { key: "ilan", label: "İlan", icon: Tag, placeholder: "ör. ilan bağlantısı", live: false },
 ] as const;
 
-const EXAMPLES = ["hizliodeme-kargo.com", "trendyol.com"];
+const EXAMPLES: Record<string, string[]> = {
+  web: ["hizliodeme-kargo.com", "trendyol.com"],
+  iban: ["TR47 0001 0009 9912 3456 78"],
+  phone: ["0850 840 12 34"],
+  ilan: [],
+};
 
-export function LookupHero({ autoFocus = false }: { autoFocus?: boolean }) {
+export function LookupHero({ autoFocus = false, initialTab = "web" }: { autoFocus?: boolean; initialTab?: string }) {
   const router = useRouter();
-  const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("web");
+  const [tab, setTab] = useState<(typeof TABS)[number]["key"]>(
+    (TABS.find((t) => t.key === initialTab)?.key ?? "web") as (typeof TABS)[number]["key"],
+  );
   const [q, setQ] = useState("");
   const active = TABS.find((t) => t.key === tab)!;
 
   function go(value?: string) {
     const v = (value ?? q).trim();
     if (!v) return;
-    if (tab !== "web") {
+    if (!active.live) {
       toast("Bu sorgu türü çok yakında", { description: `${active.label} sorgusu hazırlanıyor.` });
       return;
     }
-    const domain = v.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0];
-    router.push(`/sorgu/web/${encodeURIComponent(domain)}`);
+    router.push(`/sorgu/${tab}/${encodeURIComponent(v)}`);
   }
 
   return (
@@ -40,7 +46,10 @@ export function LookupHero({ autoFocus = false }: { autoFocus?: boolean }) {
           return (
             <button
               key={t.key}
-              onClick={() => setTab(t.key)}
+              onClick={() => {
+                setTab(t.key);
+                setQ("");
+              }}
               aria-selected={tab === t.key}
               className={cn(
                 "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[13px] transition-colors",
@@ -76,21 +85,22 @@ export function LookupHero({ autoFocus = false }: { autoFocus?: boolean }) {
         </button>
       </div>
 
-      <div className="mt-2.5 flex flex-wrap justify-center gap-2">
-        {EXAMPLES.map((ex) => (
-          <button
-            key={ex}
-            onClick={() => {
-              setTab("web");
-              setQ(ex);
-              go(ex);
-            }}
-            className="rounded-full border border-border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-border/80 hover:text-foreground"
-          >
-            {ex}
-          </button>
-        ))}
-      </div>
+      {EXAMPLES[tab].length > 0 && (
+        <div className="mt-2.5 flex flex-wrap justify-center gap-2">
+          {EXAMPLES[tab].map((ex) => (
+            <button
+              key={ex}
+              onClick={() => {
+                setQ(ex);
+                go(ex);
+              }}
+              className="rounded-full border border-border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-border/80 hover:text-foreground"
+            >
+              {ex}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

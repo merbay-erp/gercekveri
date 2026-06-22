@@ -2,31 +2,39 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { getOrScanWebEntity, listRecentFraud } from "@/modules/web/server/queries";
+import { getOrScanEntity, listRecentFraud } from "@/modules/lookup/server/queries";
+import { kindFromSlug } from "@/services/risk/registry";
 import { RiskCard } from "@/components/risk/risk-card";
 import { LookupHero } from "@/components/risk/lookup-hero";
 import { RecentFraudFeed } from "@/components/risk/recent-fraud-feed";
 
 export const dynamic = "force-dynamic";
 
-type Params = Promise<{ domain: string }>;
+type Params = Promise<{ kind: string; value: string }>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { domain } = await params;
-  const d = decodeURIComponent(domain);
+  const { kind, value } = await params;
+  const def = kindFromSlug(kind);
+  const raw = decodeURIComponent(value);
+  if (!def) return { title: "Sorgu — GerçekVeri" };
+  const key = def.normalize(raw);
+  const display = key ? def.display(key) : raw;
   return {
-    title: `${d} güvenli mi? Dolandırıcılık sorgusu`,
-    description: `${d} gerçek mi, sahte mi? Domain yaşı, kara liste, halk ihbarı ve daha fazlasıyla anlık risk değerlendirmesi — GerçekVeri.`,
-    alternates: { canonical: `/sorgu/web/${d}` },
+    title: def.metaTitle(display),
+    description: def.metaDescription(display),
+    alternates: { canonical: `/sorgu/${kind}/${key ?? raw}` },
     robots: { index: true, follow: true },
   };
 }
 
-export default async function WebLookupPage({ params }: { params: Params }) {
-  const { domain } = await params;
-  const entity = await getOrScanWebEntity(decodeURIComponent(domain));
+export default async function LookupPage({ params }: { params: Params }) {
+  const { kind, value } = await params;
+  const def = kindFromSlug(kind);
+  if (!def) notFound();
+
+  const entity = await getOrScanEntity(kind, decodeURIComponent(value));
   if (!entity) notFound();
-  const recent = await listRecentFraud(6);
+  const recent = await listRecentFraud({ limit: 6 });
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-10">
@@ -38,8 +46,8 @@ export default async function WebLookupPage({ params }: { params: Params }) {
       <RiskCard entity={entity} />
 
       <div className="mt-10">
-        <h2 className="mb-3 text-base font-medium">Başka bir adresi sorgula</h2>
-        <LookupHero />
+        <h2 className="mb-3 text-base font-medium">Başka bir şey sorgula</h2>
+        <LookupHero initialTab={kind} />
       </div>
 
       {recent.length > 0 && (

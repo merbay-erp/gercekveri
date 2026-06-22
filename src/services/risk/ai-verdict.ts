@@ -31,15 +31,17 @@ export async function generateVerdict(input: {
   band: RiskBand;
   score: number;
   signals: Signal[];
+  /** "web sitesi" | "IBAN" | "telefon numarası" — prompt bağlamı */
+  subject?: string;
 }): Promise<string> {
-  const { display, band, score, signals } = input;
+  const { display, band, score, signals, subject = "adres" } = input;
   const ai = client();
   if (!ai) return fallbackSummary(display, band, signals);
 
   const sigText = signals.map((s) => `- ${s.label}: ${s.value} (${s.status})`).join("\n");
-  const prompt = `Sen bir dolandırıcılık-koruma asistanısın. Aşağıdaki web sitesi için 2-3 cümlelik, sade, panik yapmayan ama net bir Türkçe değerlendirme yaz. Teknik jargon kullanma. Son cümle somut bir tavsiye olsun.
+  const prompt = `Sen bir dolandırıcılık-koruma asistanısın. Aşağıdaki ${subject} için 2-3 cümlelik, sade, panik yapmayan ama net bir Türkçe değerlendirme yaz. Teknik jargon kullanma. Son cümle somut bir tavsiye olsun.
 
-Site: ${display}
+Sorgu: ${display}
 Risk skoru: ${score}/100 (${BAND_LABEL[band]})
 Sinyaller:
 ${sigText}

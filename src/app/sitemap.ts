@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
+import { kindFromEntity } from "@/services/risk/registry";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gercekveri.com";
 
@@ -29,15 +30,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // En çok ihbar alan sorgu sayfaları — SEO yüzeyi ("X dolandırıcı mı").
   const entities = await db.fraudEntity
     .findMany({
-      where: { kind: "WEB", reportCount: { gt: 0 } },
+      where: { reportCount: { gt: 0 } },
       orderBy: { reportCount: "desc" },
       take: 5000,
-      select: { key: true, updatedAt: true },
+      select: { kind: true, key: true, updatedAt: true },
     })
-    .catch(() => [] as { key: string; updatedAt: Date }[]);
+    .catch(() => [] as { kind: string; key: string; updatedAt: Date }[]);
 
   const entityEntries: MetadataRoute.Sitemap = entities.map((e) => ({
-    url: `${SITE_URL}/sorgu/web/${e.key}`,
+    url: `${SITE_URL}/sorgu/${kindFromEntity(e.kind).kind}/${e.key}`,
     lastModified: e.updatedAt,
     changeFrequency: "weekly",
     priority: 0.7,
