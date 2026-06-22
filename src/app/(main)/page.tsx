@@ -25,7 +25,7 @@ const VERTICALS = [
   { label: "Web sitesi", desc: "Sahte e-ticaret, kargo/banka taklidi, phishing.", icon: Globe, live: true },
   { label: "IBAN", desc: "Kapora ve havale dolandırıcılığı.", icon: Building2, live: true },
   { label: "Telefon", desc: "Sahte banka araması, vishing.", icon: Phone, live: true },
-  { label: "İlan", desc: "Pazaryeri / sahibinden sahte ilanlar.", icon: Tag, live: false },
+  { label: "İlan", desc: "Pazaryeri / sahibinden sahte ilanlar.", icon: Tag, live: true },
 ];
 
 export default async function HomePage() {

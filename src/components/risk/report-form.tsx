@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { submitFraudReport } from "@/modules/lookup/server/actions";
 import { REGISTRY, type LookupKind } from "@/services/risk/registry";
 
-const KIND_OPTIONS: LookupKind[] = ["web", "iban", "phone"];
+const KIND_OPTIONS: LookupKind[] = ["web", "iban", "phone", "ilan"];
 
 export function ReportForm({
   defaultKind = "web",

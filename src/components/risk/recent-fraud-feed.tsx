@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Building2, Globe, Phone, type LucideIcon } from "lucide-react";
+import { Building2, Globe, Phone, Tag, type LucideIcon } from "lucide-react";
 import type { FraudFeedItem } from "@/modules/lookup/types";
 import { reportCategoryLabel, type LookupKind } from "@/services/risk/registry";
 import { bandSoft } from "./risk-tokens";
@@ -9,6 +9,7 @@ const KIND_ICON: Record<LookupKind, LucideIcon> = {
   web: Globe,
   iban: Building2,
   phone: Phone,
+  ilan: Tag,
 };
 
 export function RecentFraudFeed({ items }: { items: FraudFeedItem[] }) {

@@ -10,14 +10,14 @@ const TABS = [
   { key: "web", label: "Web sitesi", icon: Globe, placeholder: "ör. hizliodeme-kargo.com", live: true },
   { key: "iban", label: "IBAN", icon: Building2, placeholder: "ör. TR47 0001 0009 9912 3456 78", live: true },
   { key: "phone", label: "Telefon", icon: Phone, placeholder: "ör. 0850 840 12 34", live: true },
-  { key: "ilan", label: "İlan", icon: Tag, placeholder: "ör. ilan bağlantısı", live: false },
+  { key: "ilan", label: "İlan", icon: Tag, placeholder: "ör. sahibinden.com/ilan/... bağlantısı", live: true },
 ] as const;
 
 const EXAMPLES: Record<string, string[]> = {
   web: ["hizliodeme-kargo.com", "trendyol.com"],
   iban: ["TR47 0001 0009 9912 3456 78"],
   phone: ["0850 840 12 34"],
-  ilan: [],
+  ilan: ["sahibinden.com/ilan/123456"],
 };
 
 export function LookupHero({ autoFocus = false, initialTab = "web" }: { autoFocus?: boolean; initialTab?: string }) {

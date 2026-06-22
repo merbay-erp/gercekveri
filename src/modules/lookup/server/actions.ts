@@ -9,7 +9,7 @@ import { generateVerdict } from "@/services/risk/ai-verdict";
 import { kindFromSlug } from "@/services/risk/registry";
 
 const reportSchema = z.object({
-  kind: z.enum(["web", "iban", "phone"]),
+  kind: z.enum(["web", "iban", "phone", "ilan"]),
   value: z.string().min(3).max(253),
   category: z.string().min(2).max(40),
   note: z.string().max(500).optional().or(z.literal("")),

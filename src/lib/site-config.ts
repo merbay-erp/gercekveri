@@ -29,11 +29,11 @@ export const mainNav = [
 export const footerNav = {
   product: [
     { label: "Web sitesi sorgula", href: "/" },
+    { label: "IBAN sorgula", href: "/" },
+    { label: "Telefon sorgula", href: "/" },
+    { label: "İlan sorgula", href: "/" },
     { label: "Dolandırıcılık ihbar et", href: "/ihbar" },
     { label: "Son dolandırıcılıklar", href: "/son-dolandiriciliklar" },
-    { label: "IBAN sorgu (yakında)", href: "/" },
-    { label: "Telefon sorgu (yakında)", href: "/" },
-    { label: "İlan sorgu (yakında)", href: "/" },
   ],
   economy: [
     { label: "Nasıl çalışır", href: "/hakkinda" },

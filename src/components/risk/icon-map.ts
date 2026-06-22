@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   Ban,
   Calendar,
   Circle,
@@ -29,6 +30,7 @@ const MAP: Record<string, LucideIcon> = {
   phone: Phone,
   "building-bank": Landmark,
   checkbox: CircleCheck,
+  "alert-triangle": AlertTriangle,
   flag: Flag,
 };
 

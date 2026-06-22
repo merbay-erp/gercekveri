@@ -2,11 +2,12 @@ import type { ScanResult } from "./types";
 import { normalizeDomain, scanWeb } from "./web";
 import { formatIban, normalizeIban, scanIban } from "./iban";
 import { formatPhone, normalizePhone, scanPhone } from "./phone";
+import { formatListing, normalizeListing, scanListing } from "./listing";
 
 // Tek sorgu türü kaydı: normalize + tara + görüntüle + ihbar kategorileri.
 // Yeni dikey eklemek = buraya bir satır + bir scanner.
 
-export type LookupKind = "web" | "iban" | "phone";
+export type LookupKind = "web" | "iban" | "phone" | "ilan";
 
 export interface ReportCategory {
   key: string;
@@ -16,7 +17,7 @@ export interface ReportCategory {
 export interface KindDef {
   kind: LookupKind;
   /** Prisma EntityKind değeri */
-  entityKind: "WEB" | "IBAN" | "PHONE";
+  entityKind: "WEB" | "IBAN" | "PHONE" | "LISTING";
   label: string;
   /** hero giriş placeholder'ı */
   placeholder: string;
@@ -57,6 +58,14 @@ const PHONE_CATS: ReportCategory[] = [
   { key: "smishing", label: "Dolandırıcı SMS (smishing)" },
   { key: "sahte-kampanya", label: "Sahte kampanya / ödül" },
   { key: "taciz", label: "Taciz / istenmeyen arama" },
+  { key: "diger", label: "Diğer" },
+];
+
+const LISTING_CATS: ReportCategory[] = [
+  { key: "sahte-ilan", label: "Sahte ilan" },
+  { key: "kapora", label: "Kapora dolandırıcılığı" },
+  { key: "gormeden-satis", label: "Görmeden satış / kargo tuzağı" },
+  { key: "sahte-urun", label: "Sahte / taklit ürün" },
   { key: "diger", label: "Diğer" },
 ];
 
@@ -105,6 +114,21 @@ export const REGISTRY: Record<LookupKind, KindDef> = {
     metaTitle: (d) => `${d} dolandırıcı mı? Telefon sorgusu`,
     metaDescription: (d) =>
       `${d} numarası dolandırıcı mı? Hat türü ve halk ihbarıyla risk değerlendirmesi — GerçekVeri.`,
+  },
+  ilan: {
+    kind: "ilan",
+    entityKind: "LISTING",
+    label: "İlan",
+    placeholder: "ör. sahibinden.com/ilan/... bağlantısı",
+    icon: "tag",
+    normalize: normalizeListing,
+    display: formatListing,
+    scan: scanListing,
+    reputationOnly: false,
+    categories: LISTING_CATS,
+    metaTitle: (d) => `${d} güvenli mi? İlan / satıcı sorgusu`,
+    metaDescription: (d) =>
+      `${d} ilanı güvenilir mi? Pazaryeri tanıma, site analizi ve halk ihbarıyla risk değerlendirmesi — GerçekVeri.`,
   },
 };
 
