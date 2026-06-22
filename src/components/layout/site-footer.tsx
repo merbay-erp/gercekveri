@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   Package,
-  TrendingUp,
+  BookOpen,
   Info,
   Scale,
   Code2,
@@ -15,13 +15,13 @@ import { footerNav, siteConfig } from "@/lib/site-config";
 import { BrandMark } from "@/components/brand-mark";
 
 const COL_META = {
-  product: { icon: Package, label: "Ürün", items: footerNav.product },
+  product: { icon: Package, label: "Sorgu", items: footerNav.product },
   economy: {
-    icon: TrendingUp,
-    label: "Ekonomi (TCMB)",
+    icon: BookOpen,
+    label: "Kaynaklar",
     items: footerNav.economy,
   },
-  about: { icon: Info, label: "Hakkında", items: footerNav.about },
+  about: { icon: Info, label: "Kurumsal", items: footerNav.about },
   legal: { icon: Scale, label: "Yasal", items: footerNav.legal },
 };
 
@@ -58,9 +58,9 @@ export function SiteFooter() {
               </span>
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground leading-relaxed">
-              {siteConfig.tagline}.{" "}
+              {siteConfig.tagline}{" "}
               <span className="text-foreground font-medium">
-                Anonim, doğru, ücretsiz.
+                Ödeme yapmadan önce sor — anonim, hızlı, ücretsiz.
               </span>
             </p>
 
@@ -255,7 +255,7 @@ export function SiteFooter() {
           <div className="flex flex-col items-center justify-between gap-3 text-xs text-muted-foreground sm:flex-row">
             <p>
               © {year} <span className="font-medium">{siteConfig.name}</span>.
-              Tüm veriler kullanıcı katkısıdır, doğruluğu garanti edilmez.
+              Sorgular bilgilendirme amaçlıdır; kesin hüküm değildir.
             </p>
             <p className="inline-flex items-center gap-1.5">
               Made with{" "}

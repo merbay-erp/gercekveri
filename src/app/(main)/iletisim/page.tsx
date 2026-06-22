@@ -73,13 +73,13 @@ export default function IletisimPage() {
             <MessageSquare className="h-4 w-4" />
           </span>
           <div>
-            <p className="font-medium">Veri kaldırma talebi</p>
+            <p className="font-medium">İtiraz / kayıt kaldırma talebi</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Yanlışlıkla yapılmış ya da kaldırılmasını istediğin bir paylaşım varsa,
-              e-posta gövdesine paylaşımın <code className="rounded bg-muted px-1 py-0.5">publicId</code>{" "}
-              değerini yaz (kart üzerinde URL'de bulabilirsin: <code className="rounded bg-muted px-1 py-0.5">/maaslar/abc123def</code>{" "}
-              gibi). Yanıt vermeden önce sahiplik doğrulaması yapmıyoruz çünkü
-              platform anonim — talebin haklı olduğuna inanırsak hızlıca kaldırırız.
+              Bir adres hakkında yanlış sonuç olduğunu düşünüyorsan ya da bir kaydın
+              kaldırılmasını istiyorsan, e-posta gövdesine ilgili adresi yaz (risk
+              kartının URL&apos;sinde görebilirsin: <code className="rounded bg-muted px-1 py-0.5">/sorgu/web/ornek-site.com</code>{" "}
+              gibi). Platform anonim olduğu için kimlik doğrulaması yapmayız —
+              itirazın haklı olduğuna kanaat getirirsek kaydı hızlıca düzeltir veya kaldırırız.
             </p>
           </div>
         </div>

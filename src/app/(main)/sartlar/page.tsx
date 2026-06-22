@@ -74,21 +74,21 @@ export default function SartlarPage() {
             items={[
               {
                 icon: Database,
-                term: "Anonim halk verisi",
+                term: "Dolandırıcılık sorgusu & risk skoru",
                 description:
-                  "Maaş, kira, aidat, fatura, internet hızı, tekstil fiyatları — kullanıcı katkısı.",
+                  "Web sitesi, IBAN, telefon ya da ilan için ücretsiz teknik sinyaller (domain yaşı, kara liste, barındırma) + halk ihbarından üretilen 0-100 risk skoru.",
               },
               {
                 icon: Database,
-                term: "TCMB resmi verisi",
+                term: "Anonim halk ihbarı",
                 description:
-                  "Döviz kurları (USD/TL, EUR/TL), TÜFE enflasyon, politika faizi, konut fiyat endeksi (KFE) — EVDS API'den çekilir.",
+                  "Kullanıcıların anonim olarak bildirdiği sahte site / dolandırıcılık kayıtları.",
               },
               {
                 icon: Database,
-                term: "AI özetler + istatistikler",
+                term: "AI özet",
                 description:
-                  "Agregat değerlerden Google Gemini API ile insan-okur özetler.",
+                  "Risk kartı için Google Gemini ile (anahtar yoksa sinyallerden kural-tabanlı) üretilen sade-dil değerlendirme.",
               },
             ]}
           />
@@ -105,9 +105,9 @@ export default function SartlarPage() {
             items={[
               {
                 icon: CheckCircle2,
-                term: "Doğruluk",
+                term: "İyi niyet & doğruluk",
                 description:
-                  "Paylaştığın rakamların kendi gerçek deneyimine dayalı olduğunu. Uydurma rakamlar AI kalite skoru tarafından düşük puan alır ve istatistiklerden çıkarılır.",
+                  "Yaptığın ihbarın kendi gerçek deneyimine ya da somut bir gerekçeye dayandığını. Bir adresi haksız yere karalamak için sahte ihbar üretmezsin.",
               },
               {
                 icon: XCircle,
@@ -138,15 +138,15 @@ export default function SartlarPage() {
             items={[
               {
                 icon: XCircle,
-                term: "Sahte paylaşım üretmek",
+                term: "Sahte / kötü niyetli ihbar",
                 description:
-                  "Toplu/scriptli paylaşım, aynı IP'den yığın gönderim. 24 saatte 10+ paylaşım otomatik bloklanır + IP hash 90 gün cezalı.",
+                  "Bir rakibi ya da kişiyi haksız yere karalamak için toplu/scriptli ihbar, aynı IP'den yığın gönderim. Oran sınırı ve bot koruması bunu engeller; tespit edilen IP hash'i cezalandırılır.",
               },
               {
                 icon: XCircle,
                 term: "Hakaret ve ifşa",
                 description:
-                  "Free-text alanlara hakaret, kişiye yönelik suçlama, üçüncü tarafın özel hayatını ihlal eden içerik yazılmaz.",
+                  "İhbar açıklamasına hakaret, kişiye yönelik asılsız suçlama veya üçüncü tarafın özel hayatını ihlal eden içerik yazılmaz.",
               },
               {
                 icon: XCircle,
@@ -171,14 +171,14 @@ export default function SartlarPage() {
           accent="purple"
         >
           <p>
-            Anonim olarak paylaştığın veri{" "}
+            Yaptığın anonim ihbar{" "}
             <strong className="text-foreground">
-              kamuya açık agregat istatistik üretiminde
+              kamuya açık dolandırıcılık istatistiği üretiminde
             </strong>{" "}
             kullanılır.
           </p>
           <Callout type="info" title="Sahiplik ve lisanslama">
-            Agregat verileri{" "}
+            Agregat (toplu) verileri{" "}
             <a
               href="https://creativecommons.org/licenses/by/4.0/"
               target="_blank"
@@ -188,7 +188,7 @@ export default function SartlarPage() {
               CC-BY-4.0
             </a>{" "}
             lisansı altında yayınlanır. Atıf zorunlu, ticari kullanım serbest.
-            Bireysel paylaşımı sahiplenme hakkın bulunmaz çünkü platform kimlik
+            Bireysel ihbarı sahiplenme hakkın bulunmaz çünkü platform kimlik
             tespiti yapmaz (anonim mimari).
           </Callout>
         </ContentSection>
@@ -199,26 +199,28 @@ export default function SartlarPage() {
           title="5. Garanti reddi ve sorumluluk sınırı"
           accent="amber"
         >
-          <Callout type="warning" title="ÖNEMLİ — Tavsiye değildir">
-            <strong>Bu site finansal, hukuki veya yatırım tavsiyesi vermez.</strong>{" "}
-            Sayılar anonim kullanıcı katkısıyla oluşur, doğruluğu garanti
-            edilmez. TCMB verisi de "as-is" (olduğu gibi) gösterilir.
+          <Callout type="warning" title="ÖNEMLİ — Kesin hüküm değildir">
+            <strong>
+              Risk skoru bilgilendirme amaçlıdır; bir adresin gerçekten
+              dolandırıcı olup olmadığına dair kesin hüküm değildir.
+            </strong>{" "}
+            &quot;Güvenli görünüyor&quot; düşük risk demektir, sıfır risk değil;
+            &quot;Yüksek risk&quot; ise bir uyarıdır, mahkeme kararı değil.
+            Sinyaller ve ihbarlar &quot;olduğu gibi&quot; (as-is) gösterilir.
           </Callout>
 
-          <p>Aşağıdaki kararları aldığında sorumluluğu kendin alırsın:</p>
+          <p>Aşağıdaki durumlarda sorumluluğu kendin alırsın:</p>
           <ul className="my-2 ml-4 list-disc space-y-1 text-sm">
-            <li>Maaş pazarlığında verileri referans alma</li>
-            <li>Kira kararı, ev seçimi</li>
-            <li>Yatırım/döviz pozisyonu</li>
-            <li>Üretim teklifi hazırlama</li>
-            <li>Kredi/borç planlama</li>
-            <li>Vergi hesaplaması</li>
+            <li>Skora bakıp bir siteye ödeme yapma ya da yapmama</li>
+            <li>Bir IBAN&apos;a havale/EFT gönderme</li>
+            <li>Bir ilan veya satıcıyla işleme girme</li>
+            <li>Bir telefon numarasını engelleme/yanıtlama</li>
           </ul>
 
-          <Callout type="tip" title="Resmi kaynaklara da bak">
-            Önemli kararlarda TCMB, TÜİK, SGK gibi resmi otoritelerin güncel
-            verilerini de kontrol et. gercekveri agregat veri sunar — son söz
-            resmi otoritenin.
+          <Callout type="tip" title="Resmi mercilere de başvur">
+            Dolandırıldığını düşünüyorsan vakit kaybetmeden bankanı ara, BTK ve
+            Cumhuriyet Savcılığına başvur. {siteConfig.name} bir rehberdir — son
+            söz resmi mercilerindir.
           </Callout>
         </ContentSection>
 

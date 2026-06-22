@@ -28,7 +28,7 @@ import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: `Gizlilik Politikası — ${siteConfig.name}`,
-  description: `${siteConfig.name} platformunda toplanan veriler, kullanım amacı ve kullanıcı hakları. Anonim, K-anonymity korumalı, KVKK uyumlu.`,
+  description: `${siteConfig.name} dolandırıcılık sorgu platformunda toplanan veriler, kullanım amacı ve kullanıcı hakları. Anonim ihbar mimarisi, KVKK uyumlu.`,
   alternates: { canonical: "/gizlilik" },
 };
 
@@ -45,9 +45,9 @@ export default function GizlilikPage() {
           Gizlilik Politikası
         </h1>
         <p className="mt-3 text-muted-foreground">
-          {siteConfig.name}, anonim katkıya dayalı bir veri platformudur. Bu
-          politika hangi verileri topladığımızı, neden topladığımızı ve hangi
-          haklara sahip olduğunu açıklar.
+          {siteConfig.name}, anonim ihbara dayalı bir dolandırıcılık sorgu
+          platformudur. Bu politika hangi verileri topladığımızı, neden
+          topladığımızı ve hangi haklara sahip olduğunu açıklar.
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
           Son güncelleme: <strong>{LAST_UPDATED}</strong>
@@ -55,9 +55,9 @@ export default function GizlilikPage() {
       </header>
 
       <Callout type="success" title="Tek satırda özet">
-        Hesap yok, e-posta yok, telefon yok. Sadece paylaştığın veri + IP/UA
-        hash'i (spam koruması için). Hiç PII saklamıyoruz, K-anonymity ile
-        kombine bireysel veriyi gizliyoruz.
+        Hesap yok, e-posta yok, telefon yok. Sadece sorguladığın/ihbar ettiğin
+        değer + IP/UA hash'i (spam koruması için). Hiç PII saklamıyoruz;
+        ihbarlar kimliğe bağlanamaz (anonim mimari).
       </Callout>
 
       <div className="mt-10 space-y-10">
@@ -100,15 +100,15 @@ export default function GizlilikPage() {
           <p>
             <strong className="text-foreground">{siteConfig.name}</strong>{" "}
             kullanıcı kaydı, hesap, e-posta veya telefon numarası talep etmiyor.
-            Bir paylaşım oluşturduğunda saklanan tek şeyler:
+            Bir sorgu veya ihbar oluşturduğunda saklanan tek şeyler:
           </p>
           <DefinitionList
             items={[
               {
                 icon: FileText,
-                term: "Paylaşım içeriği",
+                term: "İhbar içeriği",
                 description:
-                  "Form alanları (tutar, şehir, m², pozisyon adı, ISP, fatura tipi vb.) — kategoriye özel.",
+                  "Sorgulanan değer (web adresi / IBAN / telefon / ilan), dolandırıcılık kategorisi ve opsiyonel açıklama (açıklamadaki IBAN/telefon otomatik maskelenir).",
               },
               {
                 icon: Lock,
@@ -143,42 +143,41 @@ export default function GizlilikPage() {
             items={[
               {
                 icon: Database,
-                term: "Agregat istatistikler",
+                term: "Dolandırıcılık kayıtları ve risk skorları",
                 description:
-                  "Kategori × şehir × pozisyon bazında medyan, ortalama, p25, p75 dağılımları. K-anonymity (min 3 katkı) uygulanır.",
+                  "Her sorgulanan değer için ihbar sayıları, görüntülenme sayıları ve 0-100 arası risk skorları toplulaştırılır. İhbarlar kimliğe bağlanamaz.",
               },
               {
                 icon: XCircle,
                 term: "Spam ve suistimal önleme",
                 description:
-                  "24 saatte 10+ paylaşım yapan IP otomatik bloklanır. Outlier tespit (IQR yöntemi) ile aykırı veriler işaretlenir.",
+                  "24 saatte 10+ ihbar yapan IP otomatik bloklanır. IP/UA hash'i yalnızca bu amaçla kullanılır.",
               },
               {
                 icon: CheckCircle2,
                 term: "AI özet üretimi",
                 description:
-                  "Bireysel paylaşım değil — yalnızca agregat istatistikler (median/avg) Google Gemini API'ye gönderilir. Tek bir kullanıcının verisi AI'ya ulaşmaz.",
+                  "Kişisel veri değil — yalnızca sorgulanan değer (ör. web adresi) ve teknik risk sinyalleri Google Gemini API'ye gönderilir. Bireysel kişisel veri AI'ya ulaşmaz.",
               },
             ]}
           />
         </ContentSection>
 
-        {/* 4. K-anonymity */}
-        <ContentSection icon={Shield} title="4. K-anonymity koruması" accent="emerald">
+        {/* 4. Anonim mimari */}
+        <ContentSection icon={Shield} title="4. Anonim ihbar mimarisi" accent="emerald">
           <p>
-            Bireysel paylaşımı tespit edilemez kılan teknik kuralımız:
+            İhbarcının kimliğini tespit edilemez kılan teknik tasarımımız:
           </p>
-          <Callout type="success" title="Min 3 katkı kuralı">
-            Bir <strong>şehir × kategori × özellik</strong> kombinasyonunda en
-            az 3 farklı paylaşım yoksa, o veri agregat olarak gösterilmez.
-            Örnek: <em>Trabzon × Yazılım Mühendisi × Senior</em> kombinasyonunda
-            2 kişi varsa, bu pozisyon Trabzon sayfasında medyan
-            hesaplamasından çıkartılır.
+          <Callout type="success" title="İhbarlar kimliğe bağlanamaz">
+            Tekil bir ihbarın sahibini tespit edemeyiz. Hesap, e-posta veya
+            telefon talep etmediğimiz için bir ihbarı belirli bir kişiyle
+            eşleştirmek mümkün değildir. Açıklama metnindeki IBAN/telefon/e-posta
+            değerleri kaydetmeden önce otomatik maskelenir.
           </Callout>
           <p>
             Bu, dolaylı tanımlama (re-identification) saldırılarına karşı
-            koruma sağlar. Akademik literatürdeki k=3 minimum standardına
-            sadıktır.
+            koruma sağlar — ihbar verisi yalnızca sorgulanan kamuya açık değer
+            etrafında toplulaştırılır.
           </p>
         </ContentSection>
 
@@ -203,7 +202,7 @@ export default function GizlilikPage() {
                 icon: Cpu,
                 term: "AI özetler — Google Gemini",
                 description:
-                  "Yalnızca agregat istatistikler (medyan, ortalama, dağılım sayıları) gönderilir. Bireysel paylaşım VERİSİ asla gönderilmez.",
+                  "Yalnızca sorgulanan değer (ör. web adresi) ve teknik risk sinyalleri gönderilir. Bireysel kişisel veri ASLA gönderilmez.",
               },
               {
                 icon: DollarSign,
@@ -223,9 +222,9 @@ export default function GizlilikPage() {
               },
               {
                 icon: Server,
-                term: "TCMB EVDS API",
+                term: "Risk sinyali servisleri (ücretsiz)",
                 description:
-                  "Döviz, faiz, TÜFE verileri TCMB'den çekilir. Bu tek yönlü bir veri alımıdır — sana ait hiçbir veri TCMB'ye gönderilmez.",
+                  "Bir web adresinin risk skorunu üretmek için yalnızca sorgulanan kamuya açık değer şu ücretsiz servislere iletilir; hiçbir kişisel veri gönderilmez: RDAP (rdap.org — alan adı kayıt yaşı), Cloudflare DNS-over-HTTPS (cloudflare-dns.com — MX/DMARC/A kayıtları), Google Safe Browsing (kara liste kontrolü), Internet Archive / Wayback (web.archive.org — site geçmişi), ipwho.is (çözümlenen IP'nin barındırma ülkesi). Bu servislere yalnızca kamuya açık alan adı gönderilir — sana ait hiçbir veri iletilmez.",
               },
             ]}
           />
@@ -286,12 +285,12 @@ export default function GizlilikPage() {
               {
                 term: "Düzeltme hakkı",
                 description:
-                  "Eksik/yanlış bir paylaşımın düzeltilmesi. publicId belirterek talep edebilirsin.",
+                  "Eksik/yanlış bir kaydın düzeltilmesi. İlgili adresi (risk kartının URL'si) belirterek talep edebilirsin.",
               },
               {
                 term: "Silme hakkı",
                 description:
-                  "Bir paylaşımın yayından kaldırılması. publicId ile başvur, 7 iş günü içinde işlenir.",
+                  "Bir kaydın yayından kaldırılması. İlgili adres ile başvur, 7 iş günü içinde işlenir.",
               },
               {
                 term: "İtiraz hakkı",
@@ -299,16 +298,19 @@ export default function GizlilikPage() {
               },
             ]}
           />
-          <Callout type="tip" title="Paylaşım silme nasıl yapılır?">
-            Paylaşımının altındaki <strong>publicId</strong>'yi (örn. abc123def)
-            kopyala,{" "}
+          <Callout type="tip" title="Kayıt silme nasıl yapılır?">
+            İlgili risk kartının URL'sini (örn.{" "}
+            <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+              /sorgu/web/ornek-site.com
+            </code>
+            ) kopyala,{" "}
             <Link
               href="/iletisim"
               className="font-medium text-foreground underline-offset-2 hover:underline"
             >
               iletişim
             </Link>{" "}
-            sayfasından bu ID ile başvur. 7 iş günü içinde silinir.
+            sayfasından bu adres ile başvur. 7 iş günü içinde işlenir.
           </Callout>
         </ContentSection>
 
@@ -317,7 +319,7 @@ export default function GizlilikPage() {
           <DefinitionList
             items={[
               {
-                term: "Paylaşım verileri",
+                term: "İhbar verileri",
                 description: "Süresiz (toplulaştırılarak yayında kalır).",
               },
               {

@@ -27,7 +27,7 @@ import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: `KVKK Aydınlatma Metni — ${siteConfig.name}`,
-  description: `6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında detaylı aydınlatma metni — veri sorumlusu, işleme amacı, haklar.`,
+  description: `6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında detaylı aydınlatma metni — dolandırıcılık sorgu platformunda veri sorumlusu, işleme amacı, haklar.`,
   alternates: { canonical: "/kvkk" },
 };
 
@@ -55,7 +55,7 @@ export default function KvkkPage() {
 
       <Callout type="success" title="Tek satırda KVKK uyumu">
         Platform anonim — kişisel veri talep etmiyoruz. Sadece IP/UA hash'i
-        (spam koruması, 90 gün) ve paylaşım içeriği (anonim) işlenir. Madde 5/2-(f)
+        (spam koruması, 90 gün) ve ihbar içeriği (anonim) işlenir. Madde 5/2-(f)
         kapsamında meşru menfaat gerekçeli.
       </Callout>
 
@@ -126,13 +126,13 @@ export default function KvkkPage() {
                 icon: Lock,
                 term: "Tarayıcı parmak izi hash'i",
                 description:
-                  "User-Agent + Accept-Language değerlerinin hash'i. Aynı tarayıcıdan tekrarlı paylaşım tespiti için.",
+                  "User-Agent + Accept-Language değerlerinin hash'i. Aynı tarayıcıdan tekrarlı ihbar tespiti için.",
               },
               {
                 icon: Database,
-                term: "Paylaşım içeriği (anonim)",
+                term: "İhbar içeriği (anonim)",
                 description:
-                  "Kullanıcının formdan paylaştığı veri (tutar, şehir, m², pozisyon vb.). Hiçbir kişisel tanımlayıcı içermez.",
+                  "Sorgulanan değer (web adresi / IBAN / telefon / ilan), dolandırıcılık kategorisi ve opsiyonel açıklama. Açıklamadaki IBAN/telefon otomatik maskelenir; hiçbir kişisel tanımlayıcı saklanmaz.",
               },
             ]}
           />
@@ -155,27 +155,27 @@ export default function KvkkPage() {
             items={[
               {
                 icon: Database,
-                term: "Anonim agregat istatistik üretimi",
+                term: "Anonim dolandırıcılık kaydı üretimi",
                 description:
-                  "Kategori × şehir bazında medyan, ortalama, p25, p75 dağılımları. K-anonymity (min 3 katkı) uygulanır — bireysel veriyi gizler.",
+                  "Her sorgulanan değer için ihbar sayıları, görüntülenme ve 0-100 risk skorları toplulaştırılır. İhbarlar kimliğe bağlanamaz — tekil ihbarın sahibini tespit edemeyiz (anonim mimari).",
               },
               {
                 icon: Settings,
                 term: "Otomatik spam/suistimal tespiti",
                 description:
-                  "Aynı IP hash'inden yığın paylaşımı bloklama (24 saatte 10+ paylaşım = otomatik blok).",
+                  "Aynı IP hash'inden yığın ihbarı bloklama (24 saatte 10+ ihbar = otomatik blok).",
               },
               {
                 icon: AlertCircle,
-                term: "Aykırı veri (outlier) tespiti",
+                term: "Risk sinyali değerlendirmesi",
                 description:
-                  "Şehir ortalamasından çok sapan veriler IQR yöntemi ile işaretlenir, agregat istatistiklerden çıkarılır.",
+                  "Sorgulanan kamuya açık değer (ör. web adresi) ücretsiz üçüncü taraf servislerle değerlendirilerek risk skoru üretilir. Bu servislere hiçbir kişisel veri gönderilmez.",
               },
               {
                 icon: CheckCircle2,
                 term: "AI özet üretimi",
                 description:
-                  "Bireysel paylaşım değil — yalnızca agregat sayılar Google Gemini API'ye gönderilir. Insan-okur içgörü üretimi.",
+                  "Kişisel veri değil — yalnızca sorgulanan değer ve teknik risk sinyalleri Google Gemini API'ye gönderilir. İnsan-okur içgörü üretimi.",
               },
             ]}
           />
@@ -225,7 +225,7 @@ export default function KvkkPage() {
                 icon: Cpu,
                 term: "Google LLC (AI)",
                 description:
-                  "AI özet servisi. Yalnızca agregat sayılar gönderilir, bireysel veri DEĞİL. KVKK Madde 9 çerçevesinde sınırlı transfer.",
+                  "AI özet servisi. Yalnızca sorgulanan değer ve teknik risk sinyalleri gönderilir, bireysel kişisel veri DEĞİL. KVKK Madde 9 çerçevesinde sınırlı transfer.",
               },
               {
                 icon: Globe,
@@ -235,9 +235,9 @@ export default function KvkkPage() {
               },
               {
                 icon: Server,
-                term: "TCMB EVDS",
+                term: "Risk sinyali servisleri (ücretsiz)",
                 description:
-                  "Tek yönlü veri çekimi — bize döviz/faiz/TÜFE verisi gönderir, biz hiçbir veri göndermeyiz.",
+                  "RDAP (rdap.org), Cloudflare DNS-over-HTTPS (cloudflare-dns.com), Google Safe Browsing, Internet Archive / Wayback (web.archive.org) ve ipwho.is servislerine yalnızca sorgulanan kamuya açık değer (ör. web adresi) iletilir. Bu servislere sana ait hiçbir kişisel veri gönderilmez.",
               },
             ]}
           />
@@ -248,7 +248,7 @@ export default function KvkkPage() {
           <Callout type="warning" title="Anonim platformda pratik sınırlama">
             Anonim platform yapısı sebebiyle "kendi verilerimin işlenip
             işlenmediğini öğrenme" hakkı pratik olarak uygulanamaz — herhangi
-            bir paylaşımı sizinle eşleştirme imkanımız yoktur.
+            bir ihbarı sizinle eşleştirme imkanımız yoktur.
           </Callout>
 
           <p>Yine de aşağıdaki haklara sahipsiniz:</p>
@@ -262,12 +262,12 @@ export default function KvkkPage() {
               {
                 term: "Düzeltme",
                 description:
-                  "Hatalı paylaşım için publicId belirterek başvuru.",
+                  "Hatalı kayıt için ilgili adresi (risk kartının URL'si) belirterek başvuru.",
               },
               {
                 term: "Silme / Anonimleştirme",
                 description:
-                  "Paylaşımın yayından kaldırılması. publicId ile başvuru, 7 iş günü içinde işlenir.",
+                  "Kaydın yayından kaldırılması. İlgili adres ile başvuru, 7 iş günü içinde işlenir.",
               },
               {
                 term: "İtiraz hakkı",
@@ -281,15 +281,18 @@ export default function KvkkPage() {
           />
 
           <Callout type="tip" title="Başvuru süreci">
-            Paylaşımının altındaki <strong>publicId</strong>'yi (örn. abc123def)
-            kopyala,{" "}
+            İlgili risk kartının URL'sini (örn.{" "}
+            <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+              /sorgu/web/ornek-site.com
+            </code>
+            ) kopyala,{" "}
             <Link
               href="/iletisim"
               className="font-medium text-foreground underline-offset-2 hover:underline"
             >
               iletişim
             </Link>{" "}
-            sayfasından bu ID ile başvur. KVKK Madde 13 uyarınca en geç{" "}
+            sayfasından bu adres ile başvur. KVKK Madde 13 uyarınca en geç{" "}
             <strong>30 gün</strong> içinde yanıtlanır (genelde 7 iş gününde).
           </Callout>
         </ContentSection>
@@ -340,7 +343,7 @@ export default function KvkkPage() {
           <DefinitionList
             items={[
               {
-                term: "Paylaşım verisi (anonim)",
+                term: "İhbar verisi (anonim)",
                 description:
                   "Süresiz — toplulaştırılarak yayında kalır. Anonim olduğu için saklama süresi sınırı yoktur (KVKK Madde 7 kapsamı dışı).",
               },
