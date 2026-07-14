@@ -1,147 +1,89 @@
 # GerçekVeri
 
-> **Türkiye'nin anonim gerçek veri platformu.**
-> Maaş, kira, internet ve daha fazlası — gerçek kullanıcılardan, gerçek verilerle.
+GerçekVeri, web sitesi, IBAN, telefon ve ilan bağlantılarındaki risk sinyallerini açıklanabilir bir kartta gösteren; dolandırıcılıktan korunma rehberleri yayımlayan bağımsız bir Türkçe güvenlik platformudur.
 
-[gercekveri.com](https://gercekveri.com) · Anonim katkı, AI insight'lar, programmatic SEO sayfaları, gerçek istatistikler.
+Canlı adres: [gercekveri.com](https://gercekveri.com)
 
-## Vizyon
+## Ürün yüzeyleri
 
-Tek cümle: **"Türkiye'nin gerçek hayat verisinin tek kaynağı."** Anonim gönderim, agresif analiz, ücretsiz erişim.
+- Dört sorgu türü: web sitesi, IBAN, telefon ve ilan
+- Açıklanabilir 0–100 risk skoru; her sinyal ayrı görünür
+- Anonim topluluk bildirimi, oran sınırlama ve PII maskeleme
+- Kaynaklı korunma rehberleri, yazar/inceleme tarihi ve resmi başvurular
+- İtiraz ve kayıt düzeltme kanalı
+- AdSense için araç ekranı / yayıncı içeriği ayrımı
+- Metadata, Article/FAQ/Breadcrumb JSON-LD, temiz sitemap ve robots politikası
 
-## Hızlı başlangıç
+## Risk motoru
+
+Web sorgusu şu kaynakları hata toleranslı ve paralel biçimde değerlendirir:
+
+- ICANN uyumlu RDAP: alan adı kayıt zamanı
+- Google Cloud Web Risk: ticari kullanıma uygun URL tehdit listesi
+- Internet Archive CDX: ilk arşiv geçmişi
+- Cloudflare DNS-over-HTTPS: A, MX ve DMARC kayıtları
+- ipwho.is: barındırma bağlamı
+- GerçekVeri topluluk bildirimleri
+
+Bir kaynağın yanıt vermemesi güvenli sonuç sayılmaz. IBAN ve telefon gibi yalnızca biçim/hat bağlamı üreten sorgular, ihbar yoksa `UNKNOWN` bandında kalır.
+
+## Teknoloji
+
+| Katman | Seçim |
+|---|---|
+| Uygulama | Next.js 16 App Router, React 19, TypeScript |
+| UI | Tailwind CSS 4, shadcn/ui, Lucide |
+| Veri | PostgreSQL, Prisma 7, pg adapter |
+| AI özeti | Google Gemini; anahtar yoksa kural tabanlı yedek |
+| Form | React Hook Form, Zod |
+| Dağıtım | Vercel + harici PostgreSQL |
+
+## Yerel geliştirme
+
+Prisma 7 nedeniyle Node.js `20.19+`, `22.12+` veya `24+` kullan.
 
 ```bash
-# 1. Bağımlılıklar
 pnpm install
-
-# 2. Ortam değişkenleri
 cp .env.example .env.local
-# DATABASE_URL, HASH_SECRET değerlerini doldur (Neon free tier öneririz)
-
-# 3. Veritabanı şeması + temel veri
-pnpm db:push      # Schema → DB
-pnpm db:seed      # 81 il, ilçeler, kategoriler
-
-# 4. Geliştirme sunucusu
-pnpm dev          # http://localhost:3000
+pnpm db:generate
+pnpm dev
 ```
 
-## Teknoloji yığını
+Kalite kapıları:
 
-| Katman | Seçim | Not |
-|---|---|---|
-| Framework | **Next.js 16** App Router + Turbopack | Server Components + Server Actions |
-| UI | **Tailwind 4** + **shadcn/ui** + Framer Motion | OKLCH renkler, dark mode |
-| State | TanStack Query + Zustand | sunucu state + lightweight client state |
-| DB | **PostgreSQL** + Prisma 7 + pg adapter | serverless-uyumlu adapter pattern |
-| Form | react-hook-form + Zod 4 | şema-merkezli validasyon |
-| Cache | Upstash Redis (HTTP) | edge-friendly |
-| Queue | Upstash QStash | sunucusuz HTTP cron / job |
-| AI | Google Gemini Flash (free tier) | insight summary üretimi |
-| Charts | Recharts | server-friendly |
-
-Tüm seçimler **$0 free tier** üzerinde duruyor.
-
-## Klasör yapısı
-
-```
-src/
-  app/                       # Next.js routes
-    (main)/                  # public site (header + footer)
-      page.tsx               #   /
-      maaslar/page.tsx       #   /maaslar
-      maaslar/yeni/page.tsx  #   /maaslar/yeni
-    layout.tsx               # root layout (providers, fonts, metadata)
-    not-found.tsx            # global 404
-  components/
-    layout/                  # site-header, site-footer
-    ui/                      # shadcn primitives
-    providers.tsx            # QueryClient + ThemeProvider + Toaster
-    theme-toggle.tsx
-    ad-slot.tsx              # AdSense-safe placeholder
-  modules/                   # bir modül = bir kategori
-    maas/                    #   salary modülü (template)
-      config.ts              #     module identity
-      schema.ts              #     zod input schema
-      types.ts               #     domain types
-      positions.ts           #     curated job titles
-      server/
-        actions.ts           #     server actions ("use server")
-        queries.ts           #     read queries
-      components/
-        maas-form.tsx
-        maas-card.tsx
-        maas-list.tsx
-        maas-stats.tsx
-  lib/
-    db.ts                    # Prisma client (adapter pattern)
-    env.ts                   # zod-validated env
-    site-config.ts           # siteConfig + categories + nav
-    cities.ts                # 81 il
-    money.ts                 # TRY formatters
-    fingerprint.ts           # hash IP / UA — anonim
-    utils.ts                 # cn helper
-  generated/prisma/          # auto — Prisma client output
-prisma/
-  schema.prisma              # DB schema
-  seed.ts                    # cities + categories + districts
+```bash
+pnpm lint
+pnpm typecheck
+pnpm build
 ```
 
-## Mimarinin altın kuralı: **modül = kategori**
+## Gerekli ortam değişkenleri
 
-Her veri kategorisi (`maas`, `kira`, `internet`, `aidat`, ...) `src/modules/<slug>/` altında **kendi kendine yeten** bir modüldür.
-- Generic schema (`Submission` + `data: Json` + opsiyonel `Category` + `CategoryField`) sayesinde yeni kategori eklemek **şemayı değiştirmeden** çalışır.
-- Yeni modül eklemek = `maas` klasörünü kopyala, `config.ts` + `schema.ts` + `positions.ts` (ya da eşdeğeri) ayarla.
-- Shared layer'larda (lib, components/ui) modül-spesifik kod **yasak**.
+Asgari:
 
-## Faz planı
+- `DATABASE_URL`
+- `HASH_SECRET`
+- `NEXT_PUBLIC_SITE_URL`
 
-| Faz | Hedef | Süre |
-|---|---|---|
-| 0 | İskelet + maaş submission/listing | 1-2 hf ✅ |
-| 1 | Programmatic SEO sayfaları (şehir/pozisyon), chartlar, analytics motoru | 2-3 hf |
-| 2 | Moderation pipeline + trust score + kira modülü | 2-3 hf |
-| 3 | Internet modülü + viral compare + admin panel | 3-4 hf |
-| 4 | AI insight pipeline + AdSense başvurusu + launch | 2-3 hf |
+İsteğe bağlı yetenekler:
 
-## Komutlar
+- `GOOGLE_WEB_RISK_API_KEY`
+- `GOOGLE_GENERATIVE_AI_API_KEY`
+- `NEXT_PUBLIC_ADSENSE_CLIENT_ID`
 
-| Komut | Yapar |
-|---|---|
-| `pnpm dev` | Geliştirme sunucusu (Turbopack) |
-| `pnpm build` | Production build |
-| `pnpm start` | Production server |
-| `pnpm typecheck` | TypeScript kontrol |
-| `pnpm lint` | ESLint |
-| `pnpm db:generate` | Prisma client üret |
-| `pnpm db:push` | Schema → DB (migrasyon dosyası yaratmadan) |
-| `pnpm db:migrate` | Migrasyon dosyası oluştur + uygula |
-| `pnpm db:studio` | Prisma Studio (DB GUI) |
-| `pnpm db:seed` | Temel veri (iller + kategoriler) |
+Tam liste ve örnek değerler için [.env.example](./.env.example) dosyasını kullan.
 
-## Ortam değişkenleri
+## İçerik ve indeksleme ilkesi
 
-Tam liste için `.env.example` dosyasına bak. Asgari (MVP):
+Arama motorlarının indekslediği ana yüzeyler; ana sayfa, kurumsal/yasal sayfalar ve özgün rehberlerdir. Kullanıcı tarafından oluşturulan sorgu sonuçları, ihbar formu ve topluluk akışı `noindex` olarak işaretlenir ve sitemap'e alınmaz. AdSense betiği de bu araç ekranlarında yüklenmez.
 
-- `DATABASE_URL` — Postgres connection string (Neon → free tier)
-- `HASH_SECRET` — IP/fingerprint hash için 32 byte hex (`openssl rand -hex 32`)
-- `NEXT_PUBLIC_SITE_URL` — canonical URL (`https://gercekveri.com`)
+Rehberlerin tümü:
 
-Faz 1+ için: `UPSTASH_REDIS_*`, `QSTASH_*`, `GOOGLE_GENERATIVE_AI_API_KEY`, `ADMIN_BOOTSTRAP_*`.
+- belirli bir kullanıcı sorusunu çözer,
+- resmi/birincil kaynaklara bağlantı verir,
+- yazar ve son inceleme tarihini gösterir,
+- aracın sınırlarını ve resmi başvuru yollarını açıklar.
 
-## Deployment
+## Sorumluluk sınırı
 
-İki yol:
-- **Vercel hobby** — `vercel deploy`. Daha pürüzsüz; Prisma + Neon out-of-the-box.
-- **Cloudflare Pages** — `@opennextjs/cloudflare` adapter. Tek ekosistem (DNS + CDN + R2 + Pages); Prisma için Neon driver adapter gerekir.
-
-## Gizlilik & yasal
-
-- **%100 anonim** — kayıt, e-posta, hesap istemiyoruz.
-- IP ve user agent **tek yönlü hash**leniyor (`HASH_SECRET` ile salted SHA-256). Ham PII saklanmıyor.
-- KVKK + GDPR uyumlu mimari hedefleniyor; k-anonymity (özellikle maaş için: şirket+pozisyon+şehir kombinasyonu fişleyebilir) Faz 1'de uygulanacak.
-
-## Lisans
-
-Bu repo şimdilik özel.
+Risk skoru bilgilendirme ve karar desteği amaçlıdır. Mahkeme kararı, resmi suç tespiti veya ödeme güvenliği garantisi değildir. Maddi kayıp durumunda banka ve yetkili resmi mercilere başvurulmalıdır.

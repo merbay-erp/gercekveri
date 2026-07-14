@@ -10,8 +10,8 @@ const serverSchema = z.object({
   QSTASH_CURRENT_SIGNING_KEY: z.string().optional().or(z.literal("")),
   QSTASH_NEXT_SIGNING_KEY: z.string().optional().or(z.literal("")),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional().or(z.literal("")),
-  // Google Safe Browsing Lookup API (ücretsiz) — domain kara-liste sinyali. Yoksa atlanır.
-  GOOGLE_SAFE_BROWSING_API_KEY: z.string().optional().or(z.literal("")),
+  // Google Cloud Web Risk Lookup API — ticari URL tehdit kontrolü. Yoksa atlanır.
+  GOOGLE_WEB_RISK_API_KEY: z.string().optional().or(z.literal("")),
   ADMIN_BOOTSTRAP_EMAIL: z.string().email().optional().or(z.literal("")),
   ADMIN_BOOTSTRAP_PASSWORD: z.string().optional().or(z.literal("")),
 });

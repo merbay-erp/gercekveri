@@ -6,6 +6,7 @@ import { Providers } from "@/components/providers";
 import { SchemaOrg } from "@/components/schema-org";
 import { AdSenseScript } from "@/components/adsense-script";
 import { CookieConsent } from "@/components/cookie-consent";
+import { ConsentModeDefaults } from "@/components/consent-mode-defaults";
 import { siteConfig } from "@/lib/site-config";
 import {
   organizationSchema,
@@ -62,6 +63,12 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
   authors: [{ name: siteConfig.name }],
+  creator: "Mustafa Erbay",
+  publisher: siteConfig.name,
+  category: "technology",
+  other: {
+    "google-adsense-account": "ca-pub-1903288869126718",
+  },
 };
 
 export const viewport: Viewport = {
@@ -83,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     personMustafaErbay(),
     siteNavigationSchema([
       { name: "Sorgula", url: "/" },
+      { name: "Korunma rehberleri", url: "/rehber" },
       { name: "Dolandırıcılık ihbar et", url: "/ihbar" },
       { name: "Son dolandırıcılıklar", url: "/son-dolandiriciliklar" },
       { name: "Nasıl çalışır", url: "/hakkinda" },
@@ -94,13 +102,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="tr" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
-        {/* AdSense verification + Auto Ads.
-            ENV NEXT_PUBLIC_ADSENSE_CLIENT_ID yoksa render olmaz (dev safe).
-            Production'da Vercel env'inden cekilir. */}
-        <AdSenseScript />
+        <ConsentModeDefaults />
       </head>
       <body className="min-h-full bg-background font-sans text-foreground">
         <Providers>{children}</Providers>
+        <AdSenseScript />
         <SchemaOrg data={rootJsonLd} />
         <CookieConsent />
       </body>

@@ -224,7 +224,7 @@ export default function GizlilikPage() {
                 icon: Server,
                 term: "Risk sinyali servisleri (ücretsiz)",
                 description:
-                  "Bir web adresinin risk skorunu üretmek için yalnızca sorgulanan kamuya açık değer şu ücretsiz servislere iletilir; hiçbir kişisel veri gönderilmez: RDAP (rdap.org — alan adı kayıt yaşı), Cloudflare DNS-over-HTTPS (cloudflare-dns.com — MX/DMARC/A kayıtları), Google Safe Browsing (kara liste kontrolü), Internet Archive / Wayback (web.archive.org — site geçmişi), ipwho.is (çözümlenen IP'nin barındırma ülkesi). Bu servislere yalnızca kamuya açık alan adı gönderilir — sana ait hiçbir veri iletilmez.",
+                  "Bir web adresinin risk skorunu üretmek için yalnızca sorgulanan kamuya açık değer şu servislere iletilir; kullanıcıya ait kişisel veri gönderilmez: RDAP (rdap.org — alan adı kayıt yaşı), Cloudflare DNS-over-HTTPS (cloudflare-dns.com — MX/DMARC/A kayıtları), Google Cloud Web Risk (tehdit listesi kontrolü), Internet Archive / Wayback (web.archive.org — site geçmişi), ipwho.is (çözümlenen IP'nin barındırma ülkesi). Bu servislere sorgu konusu olan kamuya açık alan adı gönderilir.",
               },
             ]}
           />

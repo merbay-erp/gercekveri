@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   FileText,
   Shield,
@@ -231,8 +230,9 @@ export default function SartlarPage() {
           accent="muted"
         >
           <p>
-            Platform Google AdSense ile reklam yayınlar. Bu, hizmetin ücretsiz
-            kalması için gerekli gelir kaynağıdır.
+            Platform, hizmetin ücretsiz kalması için yayıncı içeriği bulunan
+            sayfalarda Google AdSense reklamları gösterebilir. Sorgu sonucu ve
+            ihbar formu gibi araç ekranlarında reklam kodu yüklenmez.
           </p>
           <Callout type="success" title="Editorial bağımsızlık">
             Reklam veren hiçbir kurumla sponsorlu içerik anlaşmamız yoktur. AdSense

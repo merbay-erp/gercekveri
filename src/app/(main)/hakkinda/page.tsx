@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ShieldCheck, Radar, Sparkles, Lock } from "lucide-react";
+import { BookOpenCheck, ExternalLink, ShieldCheck, Radar, Sparkles, Lock, UserRoundCheck } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
@@ -69,8 +69,8 @@ export default function HakkindaPage() {
               </span>
               <h3 className="font-medium">Ücretsiz</h3>
               <p className="text-sm text-muted-foreground">
-                Sorgu da ihbar da herkese sonsuza kadar ücretsiz. Sadece reklamla desteklenir,
-                yanıltıcı tasarım yok.
+                Sorgu ve ihbar herkese ücretsiz. Rehber içeriklerinde gösterilecek reklamlarla
+                sürdürülebilir olması planlanır; araç ve form ekranlarında reklam yüklenmez.
               </p>
             </Card>
           </div>
@@ -82,7 +82,7 @@ export default function HakkindaPage() {
             <li>Bir web adresi, IBAN, telefon ya da ilan girersin. 5 saniye sürer.</li>
             <li>
               Sistem ücretsiz ve bağımsız kaynaklardan teknik sinyalleri paralel toplar: domain
-              yaşı (RDAP), kara liste (Safe Browsing), internet geçmişi (Wayback), barındırma ve
+              yaşı (RDAP), tehdit listesi (Google Cloud Web Risk), internet geçmişi (Wayback), barındırma ve
               mail altyapısı.
             </li>
             <li>
@@ -108,6 +108,66 @@ export default function HakkindaPage() {
             </Link>{" "}
             sayfasından itiraz edebilirsin.
           </p>
+        </section>
+
+        <section id="yayin-ilkeleri" className="scroll-mt-24 space-y-5">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">Yayın ilkeleri ve içerik sorumluluğu</h2>
+            <p className="mt-2 text-muted-foreground leading-relaxed">
+              GerçekVeri&apos;deki rehberler arama trafiği üretmek için otomatik çoğaltılmaz. Her içerik
+              belirli bir kullanıcı sorusunu çözmek üzere özgün hazırlanır; resmi veya birincil kaynaklara
+              bağlantı verir, son inceleme tarihini gösterir ve aracın yapamayacağı şeyleri açıkça belirtir.
+              Maddi veya hukuki karar gerektiren konularda kesin sonuç, garanti ya da kişiye özel hukuk
+              danışmanlığı verilmez.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card className="p-5">
+              <UserRoundCheck className="h-5 w-5 text-info" aria-hidden />
+              <h3 className="mt-3 font-medium">Yazar ve sorumlu</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                Platform ve yayın içeriği, sistem mimarisi ve altyapı alanında çalışan Mustafa Erbay
+                tarafından hazırlanır. Teknik iddialar kaynak belgeler ve çalışan uygulama koduyla
+                karşılaştırılır.
+              </p>
+              <a
+                href={siteConfig.links.blog}
+                target="_blank"
+                rel="noopener noreferrer author"
+                className="mt-3 inline-flex items-center gap-1 text-sm font-medium hover:underline"
+              >
+                Yazar profili <ExternalLink className="size-3.5" aria-hidden />
+              </a>
+            </Card>
+            <Card className="p-5">
+              <BookOpenCheck className="h-5 w-5 text-info" aria-hidden />
+              <h3 className="mt-3 font-medium">Düzeltme ve güncelleme</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                Kaynak değiştiğinde veya yeni bir dolandırıcılık yöntemi ortaya çıktığında içerik yeniden
+                incelenir. Doğrulanabilir bir hata için iletişim kanalından bildirim yapılabilir; gerekli
+                düzeltme içerik ve tarih bilgisine yansıtılır.
+              </p>
+              <Link href="/iletisim" className="mt-3 inline-flex items-center gap-1 text-sm font-medium hover:underline">
+                Düzeltme bildir
+              </Link>
+            </Card>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl font-semibold tracking-tight">Başlıca teknik ve resmi kaynaklar</h2>
+          <p className="text-muted-foreground leading-relaxed">
+            Alan adı kayıt zamanı için ICANN&apos;ın RDAP standardı; ticari zararlı URL kontrolü için
+            Google Cloud Web Risk; Türkiye&apos;de yayımlanan zararlı bağlantılar ve ihbar yönlendirmesi
+            için T.C. Siber Güvenlik Başkanlığı kaynakları esas alınır. Dış kaynak yanıt vermediğinde
+            sistem bunu güvenli sonuç saymaz, kartta bilinmiyor veya atlandı olarak gösterir.
+          </p>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <a href="https://www.icann.org/rdap/" target="_blank" rel="noopener noreferrer" className="rounded-md border px-3 py-1.5 hover:bg-muted">ICANN RDAP</a>
+            <a href="https://docs.cloud.google.com/web-risk/docs/lookup-api" target="_blank" rel="noopener noreferrer" className="rounded-md border px-3 py-1.5 hover:bg-muted">Google Web Risk</a>
+            <a href="https://siberguvenlik.gov.tr/zararli-baglantilar" target="_blank" rel="noopener noreferrer" className="rounded-md border px-3 py-1.5 hover:bg-muted">SGB Zararlı Bağlantılar</a>
+          </div>
         </section>
 
         <section className="rounded-xl border bg-muted/30 p-6">

@@ -18,11 +18,10 @@ export function SchemaOrg({ data }: SchemaOrgProps) {
     <>
       {list.map((schema, i) => (
         <script
-          // eslint-disable-next-line react/no-danger
           key={i}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(schema),
+            __html: JSON.stringify(schema).replace(/</g, "\\u003c"),
           }}
         />
       ))}

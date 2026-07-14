@@ -8,14 +8,14 @@
  * - Kullanıcı seçim yapana kadar görünür
  * - 3 seçenek: "Tümünü Kabul" / "Sadece Zorunlu" / "Tercihler" (cerez sayfası)
  * - localStorage'da seçim saklanır (NO server-side fingerprint)
- * - Kabul edilirse window.adsbygoogle yüklenir (zaten yüklü, request consent)
- * - Reddedilirse AdSense kişiselleştirilmemiş reklam moduna geçer (npa=1)
+ * - Seçim Google Consent Mode v2 kuyruğuna update olarak yazılır
+ * - Varsayılan durum reklam etiketi yüklenmeden önce denied olarak kurulur
  *
  * AdSense uyumluluk: Google Consent Mode v2 kullanılır (gtag).
  * Türkiye için KVKK uyumu da gerekiyor (Aydınlatma + Açık Rıza).
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Cookie, Check, Settings2 } from "lucide-react";
 
@@ -28,25 +28,27 @@ interface ConsentState {
   timestamp: number;
 }
 
+const subscribe = () => () => {};
+
+function readStoredChoice(): ConsentChoice {
+  if (typeof window === "undefined") return "pending";
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return "pending";
+    const parsed = JSON.parse(raw) as ConsentState;
+    return parsed.choice === "all" || parsed.choice === "essential" ? parsed.choice : "pending";
+  } catch {
+    return "pending";
+  }
+}
+
 export function CookieConsent() {
-  const [mounted, setMounted] = useState(false);
-  const [choice, setChoice] = useState<ConsentChoice>("pending");
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
+  const [choice, setChoice] = useState<ConsentChoice>(readStoredChoice);
 
   useEffect(() => {
-    setMounted(true);
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as ConsentState;
-        if (parsed.choice === "all" || parsed.choice === "essential") {
-          setChoice(parsed.choice);
-          applyConsent(parsed.choice);
-        }
-      }
-    } catch {
-      // localStorage devre dışı / korumalı — banner göster
-    }
-  }, []);
+    if (choice !== "pending") applyConsent(choice);
+  }, [choice]);
 
   const handle = (next: "all" | "essential") => {
     setChoice(next);
@@ -58,7 +60,6 @@ export function CookieConsent() {
     } catch {
       /* sessiz */
     }
-    applyConsent(next);
   };
 
   // SSR mismatch'i önle — sadece client'ta render et.
@@ -135,8 +136,8 @@ export function CookieConsent() {
  * - ad_user_data: reklam icin user data
  * - ad_personalization: kisisellestirilmis reklam
  *
- * Reddedildi halde non-personalized ads (NPA) gosterir → kanunen guvenli +
- * AdSense reklamlari calismaya devam eder (sadece kisisellestirilmemis).
+ * Bu sinyaller etiket davranışını sınırlar. EEA/UK/İsviçre kişiselleştirilmiş
+ * reklam trafiği için ayrıca Google sertifikalı TCF CMP gerekir.
  */
 function applyConsent(choice: "all" | "essential") {
   if (typeof window === "undefined") return;

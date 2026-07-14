@@ -45,12 +45,14 @@ export function LookupHero({ autoFocus = false, initialTab = "web" }: { autoFocu
 
   return (
     <div className="mx-auto w-full max-w-xl">
-      <div className="mb-2.5 flex gap-1 rounded-xl bg-muted p-1">
+      <div className="mb-2.5 flex gap-1 rounded-xl bg-muted p-1" role="tablist" aria-label="Sorgu türü">
         {TABS.map((t) => {
           const Icon = t.icon;
           return (
             <button
               key={t.key}
+              type="button"
+              role="tab"
               onClick={() => {
                 setTab(t.key);
                 setQ("");

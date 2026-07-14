@@ -3,6 +3,7 @@ import { Flame } from "lucide-react";
 import { listRecentFraud } from "@/modules/lookup/server/queries";
 import { RecentFraudFeed } from "@/components/risk/recent-fraud-feed";
 import { LookupHero } from "@/components/risk/lookup-hero";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
   title: "Son bildirilen dolandırıcılıklar — GerçekVeri",
   description: "Topluluğun son bildirdiği sahte siteler ve dolandırıcılık adresleri.",
   alternates: { canonical: "/son-dolandiriciliklar" },
+  robots: { index: false, follow: true },
 };
 
 export default async function RecentPage() {
@@ -27,6 +29,14 @@ export default async function RecentPage() {
       </div>
 
       <RecentFraudFeed items={items} />
+
+      <div className="mt-5 rounded-lg border border-border bg-muted/30 p-4 text-sm leading-relaxed text-muted-foreground">
+        Bu kayıtlar kullanıcı bildirimleridir; resmi suç tespiti değildir. Bir adres hakkında karar
+        vermeden önce teknik sinyalleri incele ve ödeme alıcısını bağımsız kanaldan doğrula.{" "}
+        <Link href="/rehber" className="font-medium text-foreground hover:underline">
+          Korunma rehberlerini oku.
+        </Link>
+      </div>
 
       <div className="mt-10">
         <h2 className="mb-3 text-base font-medium">Bir adresi sorgula</h2>

@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Dolandırıcılık ihbarı — GerçekVeri",
   description: "Bir sahte site, IBAN veya numara mı gördün? Anonim bildir, başkalarını koru.",
   alternates: { canonical: "/ihbar" },
+  robots: { index: false, follow: true },
 };
 
 type SearchParams = Promise<{ kind?: string; value?: string }>;

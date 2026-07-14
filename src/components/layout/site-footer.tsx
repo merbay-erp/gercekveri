@@ -193,7 +193,7 @@ export function SiteFooter() {
                 >
                   mustafaerbay.com.tr
                 </a>{" "}
-                <span className="text-muted-foreground/60">(970+ post · TR + EN)</span>
+                <span className="text-muted-foreground/60">(teknik yazılar · TR + EN)</span>
               </p>
               <div className="flex items-center gap-2 pt-0.5 text-[10px] text-muted-foreground">
                 <a
@@ -258,11 +258,9 @@ export function SiteFooter() {
               Sorgular bilgilendirme amaçlıdır; kesin hüküm değildir.
             </p>
             <p className="inline-flex items-center gap-1.5">
-              Made with{" "}
+              Türkiye&apos;de bağımsız olarak geliştirildi{" "}
               <Heart className="h-3 w-3 fill-rose-500 text-rose-500" />
-              <span className="opacity-50">&</span>
-              <span className="opacity-70">☕</span>
-              {" "}in Türkiye 🇹🇷
+              <span className="sr-only">özenle</span>
             </p>
           </div>
         </div>

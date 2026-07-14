@@ -8,11 +8,6 @@ import {
   BarChart3,
   Smartphone,
   GitBranch,
-  Lightbulb,
-  AlertCircle,
-  Mail,
-  Settings,
-  Trash2,
 } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
@@ -64,13 +59,14 @@ const QAS: QA[] = [
     category: "para",
     q: "Sorgu ücretli mi? Site nasıl para kazanıyor?",
     aText:
-      "Sorgu da ihbar da tamamen ücretsiz. Hiçbir kişisel veri toplamıyoruz, satılacak veri yok. Site yalnızca Google AdSense reklamlarıyla finanse ediliyor.",
+      "Sorgu ve ihbar ücretsizdir. Hesap, e-posta veya kimlik istenmez; kötüye kullanım önlemi için teknik değerler tek yönlü hash'lenir. Platformun sürdürülebilirliği için içerik sayfalarında reklam gösterilmesi planlanır.",
     a: (
       <>
-        Hem sorgu hem ihbar herkese <strong>ücretsiz</strong>. Hiçbir kişisel
-        veri toplamadığımız için satılacak veri de yok. Site yalnızca{" "}
-        <strong>Google AdSense</strong> reklamlarıyla finanse ediliyor; ödeme
-        duvarı ya da gizli ücret yok.
+        Hem sorgu hem ihbar herkese <strong>ücretsiz</strong>. Hesap, e-posta
+        veya kimlik talep edilmez; kötüye kullanım önlemi için teknik değerler
+        tek yönlü hash&apos;lenir. Platformun sürdürülebilirliği için yayıncı
+        içeriği bulunan sayfalarda reklam gösterilmesi planlanır; ödeme duvarı
+        ya da gizli ücret yoktur.
       </>
     ),
   },
@@ -119,11 +115,11 @@ const QAS: QA[] = [
     category: "veri",
     q: "Risk skoru nasıl hesaplanıyor?",
     aText:
-      "Skor 0-100 arası. Domain yaşı (RDAP), kara liste (Google Safe Browsing), internet geçmişi (Wayback), barındırma ülkesi, mail altyapısı (MX/DMARC) gibi ücretsiz teknik sinyaller ve topluluğun yaptığı anonim ihbarlar birleşip tek bir skora dönüşür.",
+      "Skor 0-100 arası. Domain yaşı (RDAP), tehdit listesi (Google Cloud Web Risk), internet geçmişi (Wayback), barındırma ülkesi, mail altyapısı (MX/DMARC) gibi teknik sinyaller ve topluluğun yaptığı anonim ihbarlar birleşip tek bir skora dönüşür.",
     a: (
       <>
         Skor 0-100 arası. <strong>Domain yaşı</strong> (RDAP),{" "}
-        <strong>kara liste</strong> (Google Safe Browsing),{" "}
+        <strong>tehdit listesi</strong> (Google Cloud Web Risk),{" "}
         <strong>internet geçmişi</strong> (Wayback), barındırma ülkesi ve mail
         altyapısı (MX/DMARC) gibi ücretsiz teknik sinyaller, topluluğun yaptığı
         anonim <strong>halk ihbarlarıyla</strong> birleşip tek bir risk skoruna
@@ -205,15 +201,19 @@ const QAS: QA[] = [
   },
   {
     category: "diger",
-    q: "IBAN, telefon ve ilan sorgusu ne zaman gelecek?",
+    q: "Web sitesi, IBAN, telefon ve ilan sorguları aktif mi?",
     aText:
-      "Şu an web sitesi (domain) sorgusu canlı. IBAN (mod-97 + banka + ihbar), telefon ve ilan dikeyleri yakında ekleniyor; motor aynı, sadece veri tipi değişiyor.",
+      "Evet, dört sorgu türü de aktif. Her tür farklı sinyal kullanır: web sitesi teknik kaynaklara; IBAN biçim ve banka koduna; telefon hat türü ve ihbara; ilan ise platform ve bağlantı analizine bakar.",
     a: (
       <>
-        Şu an <strong>web sitesi (domain)</strong> sorgusu tam canlı.{" "}
-        <strong>IBAN</strong> (mod-97 + banka + ihbar), <strong>telefon</strong>{" "}
-        ve <strong>ilan</strong> dikeyleri yakında ekleniyor — motor aynı,
-        yalnızca veri tipi değişiyor. Önerin varsa{" "}
+        Dört sorgu türü de aktif. <strong>Web sitesi</strong> teknik kaynaklara,
+        <strong> IBAN</strong> biçim ve banka koduna, <strong>telefon</strong> hat
+        türü ile ihbara, <strong>ilan</strong> ise platform ve bağlantı analizine
+        bakar. Her türün sınırlarını{" "}
+        <Link href="/rehber/risk-skoru-nasil-hesaplaniyor" className="font-medium underline-offset-2 hover:underline">
+          metodoloji rehberinde
+        </Link>{" "}
+        görebilirsin. Önerin varsa{" "}
         <Link href="/iletisim" className="font-medium underline-offset-2 hover:underline">
           /iletisim
         </Link>

@@ -1,170 +1,71 @@
-# GerçekVeri Launch Kit
+# GerçekVeri yayın kiti
 
-Bu doküman ilk kullanıcı kampanyası ve sosyal paylaşım için hazır şablonları
-içerir. Hepsi Türkçe, gerçek olduğun gibi yaz — hype'lı dil itici geliyor.
+Bu metinler mevcut ürün kimliğine göre hazırlanmıştır. Paylaşımda garanti veya kesin suç tespiti iddiası kullanılmamalıdır.
 
-## 1. Tweet / X paylaşımları
+## Kısa tanım
 
-### A. Genel launch (tek tweet)
+> GerçekVeri; web sitesi, IBAN, telefon ve ilan bağlantılarındaki risk sinyallerini açıkça gösteren ücretsiz bir sorgu ve dolandırıcılıktan korunma platformudur.
 
-```
-Türkiye'nin maaş, kira, internet ve aidat verilerini emlakçı/şirket
-penceresinden değil, gerçek kullanıcılardan toplayan bir veri platformu
-yaptım: gercekveri.com
+## X / kısa paylaşım
 
-%100 anonim. Hesap yok, e-posta yok. Sadece gerçek rakam.
+```text
+Bir site profesyonel görünebilir, bir IBAN matematiksel olarak geçerli olabilir.
+Bu, güvenli oldukları anlamına gelmez.
 
-Veri arttıkça doğruluk artıyor — sen de paylaş 🤝
-```
-
-### B. Şişkinlik tweet'i (en viral)
-
-```
-Türkiye'de kira ilanları gerçeği yansıtıyor mu?
-
-Şu an İstanbul'da:
-İlan medyanı: 60.154 TL
-Gerçek ödenen: 47.000 TL
-Şişkinlik: %28
-
-7 ilden veri var, daha fazlası geliyor 👇
-gercekveri.com/kira/sisme
+GerçekVeri; alan adı geçmişi, tehdit listeleri ve topluluk bildirimlerini tek
+kartta, gerekçeleriyle gösteriyor. Ücretsiz ve hesap gerektirmiyor:
+https://gercekveri.com
 ```
 
-(Sayılar canlı veriden — paylaşım sırasında güncel rakamı bak.)
+## LinkedIn
 
-### C. Maaş kıyas tweet'i
+```text
+Dolandırıcılık kontrol araçlarında beni en çok rahatsız eden şey tek kelimelik
+“güvenli” sonuçlardı. Kullanıcı o sonucun hangi veriden geldiğini göremiyor.
 
-```
-Maaşının Türkiye ortalamasının üstünde mi altında mı olduğunu 30 saniyede
-gör — pozisyon + şehir + tutar yaz, anonim verilerden hesaplanmış medyan
-ile kıyasla.
+GerçekVeri'yi bu yüzden açıklanabilir bir karar destek aracı olarak yeniledim:
 
-gercekveri.com/karsilastir/maas
-```
+- Web sitesi, IBAN, telefon ve ilan sorgusu
+- Her risk sinyalini ayrı gösteren 0–100 kart
+- Veri yoksa “güvenli” yerine “doğrulanmadı” sonucu
+- Alan adı kayıt yaşı, Web Risk, internet geçmişi ve DNS kontrolleri
+- Anonim topluluk bildirimi ve itiraz kanalı
+- Resmi kaynaklara dayanan kapsamlı korunma rehberleri
 
-### D. Sektörel tweet (tekstil B2B)
+Sonuç bir garanti veya resmi suç tespiti değil. Ama ödeme öncesinde hangi
+soruları sormanız gerektiğini görünür kılıyor.
 
-```
-Tekstil sektöründe fiyatlar telefon üzerinden geziyor.
-
-Bursa'da boyahane kg fiyatı, İstanbul'da dikim parça fiyatı, Çorlu denim
-kesimi — hepsi piyasada belirsiz.
-
-Anonim üretici verisinden yeni bir referans katmanı: gercekveri.com/tekstil
-
-Sektör arkadaşlarına da yolla 🧵
+https://gercekveri.com
 ```
 
-### E. AI özet teaser
+## Rehber odaklı paylaşım
 
-```
-gercekveri.com'da her şehrin maaş/kira sayfasının başında "AI Yorumu" var.
+```text
+Sahte siteyi anlamak için yalnızca HTTPS kilidine bakmak yetmez.
 
-Veriden ne çıkıyor, neyi gözden kaçırma, hangi açı eksik — Gemini'nin
-agregat istatistiklerden çıkardığı analiz.
-
-Tablodan değil, hikâyeden okuyacaksın.
-```
-
-## 2. LinkedIn (uzun-form)
-
-### F. LinkedIn launch post
-
-```
-Bir hobi projem var: gercekveri.com.
-
-Türkiye'de maaş tablolarını, kira ortalamalarını, fatura sayılarını arıyoruz
-ama hep şirket beklentisi, emlakçı ilanı veya tahmini rakam buluyoruz. Ben
-şunu yapmak istedim: gerçekten ödeyen / kazanan kullanıcı ne diyor?
-
-Platform tamamen anonim. E-posta, hesap, telefon yok. Bir paylaşım
-yaparken sadece kategori (maaş/kira/aidat/fatura/internet/tekstil), şehir
-ve tutar gibi tanımlayıcı olmayan veriler işleniyor. IP adresi spam
-korumak için tek yönlü hash'leniyor — orijinal IP saklanmıyor.
-
-Şu anda canlı:
-- 6 kategori, 81 ilde toplanan veri
-- Şehir bazlı medyan + ortalama + dağılım grafiği
-- "Sen nerede duruyorsun?" anlık karşılaştırma
-- Türkiye geneli ısı haritası
-- AI yorumu (Gemini, sadece agregat sayılar)
-- Kira için "İlan vs gerçek" şişkinlik paneli
-- Güven skoru sistemi (sayfa başına)
-
-Veriyi büyütmek için sektör / lokasyon arkadaşlarınla paylaşabilirsen ben
-mutlu olurum. Geri bildirim için DM açık.
-
-#gercekveri #ürün #veri #anonim
+Alan adı, şirket izi, ödeme yöntemi ve teknik sinyalleri birlikte kontrol etmek
+için 12 maddelik uygulamalı bir rehber hazırladım:
+https://gercekveri.com/rehber/sahte-site-nasil-anlasilir
 ```
 
-## 3. Reddit / forum
+## Acil durum paylaşımı
 
-### G. r/Turkey veya r/CodingTR
+```text
+Dolandırıcılık sonrası ilk saat önemli:
 
-```
-[Pet project] Türkiye'nin anonim veri platformu — gercekveri.com
+1. Bankayı resmi kanaldan ara
+2. Hesap erişimlerini güvene al
+3. Mesaj/dekont/URL kanıtlarını silme
+4. Kolluk veya savcılık başvurusu için zaman çizelgesi çıkar
 
-Selam, son birkaç haftadır Next.js + Postgres + Gemini ile bir
-"Türkiye'nin gerçek verisi" platformu yapıyorum.
-
-Stack: Next.js 16 + React 19 + Tailwind 4 + Prisma 7 + Neon Postgres +
-Vercel Hobby + Gemini Flash Lite (free tier). Tüm yığın $0.
-
-Özellikler:
-- 6 kategori (maaş, kira, internet, aidat, fatura, tekstil B2B)
-- Anonim paylaşım (IP/UA hash + spam guard, hesap yok)
-- 81 il × 6 kategori ısı haritası
-- Şişkinlik paneli (kira için ilan vs gerçek)
-- AI özetler (free Gemini quota)
-- Programmatic SEO (~150 sayfa, /istanbul-kira-endeksi gibi rewrite)
-
-Geri bildirime açığım — ne çalışmıyor / neresi sıkıcı / hangi kategori
-bence önce gelmeli, hepsini duymak isterim.
+Adım adım plan:
+https://gercekveri.com/rehber/dolandirildim-ne-yapmaliyim
 ```
 
-## 4. WhatsApp / kişisel network mesajı
+## Yayın öncesi kontrol
 
-### H. Kısa mesaj template'i
-
-```
-Selam! Bir hobi projem var, dakikanı alır. gercekveri.com — Türkiye'de
-maaş, kira, fatura vs. anonim toplanan gerçek rakamların platformu.
-
-Sen sadece bir veri (ör. son ödediğin kira) paylaşırsan, sayfa daha
-hassas oluyor. Hesap yok, e-posta yok, hiçbir şey kayıt edilmiyor.
-
-Linki yolladım, beklerim 🤝
-```
-
-### I. Sektör (tekstil) için özel
-
-```
-Selam, bir veri platformu yapıyorum — gercekveri.com/tekstil
-
-Boyahane / kesim / dikim fiyatları piyasada şu an telefon üzerinden
-yürüyor. Anonim olarak (firma adı yok) kg veya parça başına fiyat
-paylaşırsan herkesin yararına bir referans çıkıyor.
-
-5 dakikalık iş. Yardımcı olur musun?
-```
-
-## 5. Hangi kanaldan başlayalım?
-
-Önerim sıralama:
-1. **WhatsApp / kişisel network** — 5-10 yakın, "ilk veriyi sen at" kıvılcımı.
-   Gerçek-vs-ilan paneli için kira veya tekstil ilk hedef.
-2. **Twitter/X** (B-tipi şişkinlik tweet) — paylaşım kartı (OG) hazır,
-   `gercekveri.com/api/og/inflation?city=istanbul` şeklinde sosyal
-   medyaya direkt çekiyor.
-3. **LinkedIn (F)** — sektörel + ürün arkadaşları için, B2B akış.
-4. **Reddit (G)** — son aşama, sadece veri çoğaldıktan sonra.
-
-## 6. Sayım / takip
-
-Vercel Analytics ücretsiz tier ziyaret sayısını gösterir. Adsense onayı
-sonrası RPM gözle takip edilir.
-
-İlk 7 gün hedef: 30+ gerçek paylaşım (demo seed dışı). Trust score badge'leri
-yeşile döner, harita boş illerden sıyrılır, "Şu an ne oluyor?" panelinde
-delta sayıları görünür.
+- Sayılar canlı siteden doğrulanmadan paylaşılmamalı.
+- “Dolandırıcıdır”, “kesin güvenli” veya “garanti” ifadeleri kullanılmamalı.
+- Örnek IBAN/telefon gerçek kişiye ait olmamalı.
+- Her paylaşım, sorgu veya ilgili rehber gibi tek bir yararlı sayfaya gitmeli.
+- Ücretli ya da teşvikli trafik kullanılmamalı.

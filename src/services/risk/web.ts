@@ -4,7 +4,7 @@ import { bandForScore, scoreFromSignals } from "./score";
 // =============================================================================
 // Web sitesi (domain) risk taraması — TAMAMI ÜCRETSİZ, anahtarsız kaynaklar.
 // RDAP (domain yaşı) · Cloudflare DoH (MX/DMARC) · Wayback CDX (ilk görülme)
-// · ipwho.is (barındırma ülkesi) · Google Safe Browsing (varsa anahtar).
+// · ipwho.is (barındırma ülkesi) · Google Cloud Web Risk (varsa anahtar).
 // Her kaynak bağımsız, zaman-aşımlı ve hata-toleranslı; biri düşse tarama sürer.
 // =============================================================================
 
@@ -134,29 +134,33 @@ async function signalHosting(domain: string): Promise<Signal> {
   };
 }
 
-// --- Google Safe Browsing (anahtar varsa) ------------------------------------
+// --- Google Cloud Web Risk (ticari kullanıma uygun Lookup API) ---------------
 async function signalBlacklist(domain: string): Promise<Signal> {
-  const key = process.env.GOOGLE_SAFE_BROWSING_API_KEY;
+  const key = process.env.GOOGLE_WEB_RISK_API_KEY;
   if (!key) {
-    return { icon: "ban", label: "Kara liste", value: "Anahtar tanımlı değil", status: "info", pill: "Atlandı", weight: 0 };
+    return { icon: "ban", label: "Web Risk", value: "Anahtar tanımlı değil", status: "info", pill: "Atlandı", weight: 0 };
   }
-  const body = {
-    client: { clientId: "gercekveri", clientVersion: "1.0" },
-    threatInfo: {
-      threatTypes: ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE"],
-      platformTypes: ["ANY_PLATFORM"],
-      threatEntryTypes: ["URL"],
-      threatEntries: [{ url: `http://${domain}` }, { url: `https://${domain}` }],
-    },
+
+  const lookup = async (uri: string) => {
+    const params = new URLSearchParams({ uri, key });
+    params.append("threatTypes", "MALWARE");
+    params.append("threatTypes", "SOCIAL_ENGINEERING");
+    params.append("threatTypes", "UNWANTED_SOFTWARE");
+    return (await getJson(`https://webrisk.googleapis.com/v1/uris:search?${params}`)) as
+      | { threat?: { threatTypes?: string[] } }
+      | null;
   };
-  const data = (await getJson(
-    `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${key}`,
-    { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) },
-  )) as { matches?: unknown[] } | null;
-  const flagged = !!data?.matches?.length;
+
+  const [httpResult, httpsResult] = await Promise.all([
+    lookup(`http://${domain}`),
+    lookup(`https://${domain}`),
+  ]);
+  const flagged = [httpResult, httpsResult].some(
+    (result) => (result?.threat?.threatTypes?.length ?? 0) > 0,
+  );
   return flagged
-    ? { icon: "ban", label: "Kara liste", value: "Safe Browsing'de işaretli", status: "bad", pill: "Tehlikeli", weight: 45 }
-    : { icon: "ban", label: "Kara liste", value: "Temiz", status: "good", pill: "Temiz", weight: 0 };
+    ? { icon: "ban", label: "Web Risk", value: "Tehdit listesinde eşleşme", status: "bad", pill: "Tehlikeli", weight: 45 }
+    : { icon: "ban", label: "Web Risk", value: "Eşleşme bulunmadı", status: "good", pill: "Eşleşme yok", weight: 0 };
 }
 
 /** Bir domaini paralel ücretsiz sinyallerle tarar → skor + bant. */

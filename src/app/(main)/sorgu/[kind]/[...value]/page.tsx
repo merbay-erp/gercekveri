@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title: def.metaTitle(display),
     description: def.metaDescription(display),
     alternates: { canonical: `/sorgu/${kind}/${key ?? raw}` },
-    robots: { index: true, follow: true },
+    robots: { index: false, follow: true },
   };
 }
 
@@ -44,6 +44,18 @@ export default async function LookupPage({ params }: { params: Params }) {
       </Link>
 
       <RiskCard entity={entity} />
+
+      <section className="mt-6 rounded-xl border border-border bg-muted/25 p-5">
+        <h2 className="text-base font-medium">Bu sonuç ne anlama gelmez?</h2>
+        <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
+          <li>• Düşük puan, ödeme veya kişisel bilgi paylaşımı için garanti değildir.</li>
+          <li>• Yüksek puan, mahkeme kararı ya da kesin suç tespiti değildir.</li>
+          <li>• Liste eşleşmesi olmaması, yeni bir tehdidin bulunmadığını kanıtlamaz.</li>
+        </ul>
+        <Link href="/rehber/risk-skoru-nasil-hesaplaniyor" className="mt-4 inline-flex text-sm font-medium hover:underline">
+          Puanlama metodolojisini ve sınırları oku
+        </Link>
+      </section>
 
       <div className="mt-10">
         <h2 className="mb-3 text-base font-medium">Başka bir şey sorgula</h2>

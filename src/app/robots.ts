@@ -5,19 +5,16 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gercekveri.com";
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      // Generic bots — tum public sayfalar acik, sadece /api/admin/ kapali
+      // Render kaynakları dahil tüm public sayfalar açık; yalnız özel uçlar kapalı.
       {
         userAgent: "*",
         allow: "/",
         disallow: [
           "/api/",
           "/admin/",
-          "/_next/",
         ],
       },
-      // AdSense crawler — TUM sayfalara erisim sart, aksi halde Auto Ads
-      // calismaz. Sadece /admin/ ve /api/ kapali (gercek admin alani).
-      // ÖNEMLI: form sayfalari da acik → AdSense kalite analizi.
+      // AdSense crawler; özel yönetim ve API uçları dışında erişebilir.
       {
         userAgent: "Mediapartners-Google",
         allow: "/",

@@ -113,7 +113,7 @@ export function organizationSchema() {
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
-      email: "info@gercekveri.com",
+      email: "iletisim@gercekveri.com",
       areaServed: "TR",
       availableLanguage: ["Turkish"],
     },
@@ -238,6 +238,54 @@ export function breadcrumbSchema(items: BreadcrumbItem[]) {
   };
 }
 
+// ============ Article / guide ============
+export function articleSchema(input: {
+  headline: string;
+  description: string;
+  path: string;
+  datePublished: string;
+  dateModified: string;
+  section: string;
+}) {
+  const url = input.path.startsWith("http") ? input.path : `${SITE_URL}${input.path}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: input.headline,
+    description: input.description,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    url,
+    inLanguage: "tr-TR",
+    articleSection: input.section,
+    datePublished: input.datePublished,
+    dateModified: input.dateModified,
+    author: { "@id": PERSON_ID },
+    publisher: { "@id": ORG_ID },
+    image: `${SITE_URL}/opengraph-image`,
+    isAccessibleForFree: true,
+  };
+}
+
+export function itemListSchema(input: {
+  name: string;
+  description: string;
+  items: Array<{ name: string; url: string }>;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: input.name,
+    description: input.description,
+    numberOfItems: input.items.length,
+    itemListElement: input.items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      url: item.url.startsWith("http") ? item.url : `${SITE_URL}${item.url}`,
+    })),
+  };
+}
+
 // ============ AggregateRating (stats > threshold) ============
 // Bir kategori sayfasinda yeterli sayida submission varsa,
 // "ratingCount" olarak gosterilebilir (review sayisi).
@@ -286,7 +334,8 @@ export function jsonLdGraph(...schemas: object[]) {
     "@context": "https://schema.org",
     "@graph": schemas.map((s) => {
       // strip outer @context to avoid duplication
-      const { ["@context"]: _ctx, ...rest } = s as Record<string, unknown>;
+      const rest = { ...(s as Record<string, unknown>) };
+      delete rest["@context"];
       return rest;
     }),
   };

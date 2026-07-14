@@ -20,6 +20,7 @@ export const siteConfig = {
 
 export const mainNav = [
   { label: "Sorgula", href: "/" },
+  { label: "Rehber", href: "/rehber" },
   { label: "İhbar et", href: "/ihbar" },
   { label: "Son dolandırıcılıklar", href: "/son-dolandiriciliklar" },
   { label: "Nasıl çalışır", href: "/hakkinda" },
@@ -28,17 +29,17 @@ export const mainNav = [
 
 export const footerNav = {
   product: [
-    { label: "Web sitesi sorgula", href: "/" },
-    { label: "IBAN sorgula", href: "/" },
-    { label: "Telefon sorgula", href: "/" },
-    { label: "İlan sorgula", href: "/" },
+    { label: "Risk sorgulama", href: "/#sorgula" },
     { label: "Dolandırıcılık ihbar et", href: "/ihbar" },
     { label: "Son dolandırıcılıklar", href: "/son-dolandiriciliklar" },
   ],
   economy: [
+    { label: "Korunma rehberleri", href: "/rehber" },
+    { label: "Sahte siteyi anlama", href: "/rehber/sahte-site-nasil-anlasilir" },
+    { label: "Dolandırıldım: ilk adımlar", href: "/rehber/dolandirildim-ne-yapmaliyim" },
+    { label: "Risk skoru metodolojisi", href: "/rehber/risk-skoru-nasil-hesaplaniyor" },
     { label: "Nasıl çalışır", href: "/hakkinda" },
     { label: "Sık sorulan sorular", href: "/sss" },
-    { label: "Son dolandırıcılıklar", href: "/son-dolandiriciliklar" },
   ],
   legal: [
     { label: "Gizlilik Politikası", href: "/gizlilik" },

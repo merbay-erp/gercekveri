@@ -1,49 +1,35 @@
 import type { MetadataRoute } from "next";
-import { db } from "@/lib/db";
-import { kindFromEntity } from "@/services/risk/registry";
-import { lookupPath } from "@/lib/lookup-path";
+
+import { guides } from "@/content/guides";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gercekveri.com";
 
-export const revalidate = 3600;
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const u = (
+  const entry = (
     path: string,
     priority: number,
-    changeFrequency: "daily" | "weekly" | "monthly" = "weekly",
-  ) => ({ url: `${SITE_URL}${path}`, lastModified: now, changeFrequency, priority });
+    changeFrequency: "daily" | "weekly" | "monthly" = "monthly",
+    lastModified: Date | string = now,
+  ) => ({ url: `${SITE_URL}${path}`, lastModified, changeFrequency, priority });
 
   const staticEntries: MetadataRoute.Sitemap = [
-    u("/", 1.0, "daily"),
-    u("/ihbar", 0.8, "weekly"),
-    u("/son-dolandiriciliklar", 0.9, "daily"),
-    u("/hakkinda", 0.4, "monthly"),
-    u("/sss", 0.5, "monthly"),
-    u("/iletisim", 0.3, "monthly"),
-    u("/gizlilik", 0.2, "monthly"),
-    u("/kvkk", 0.2, "monthly"),
-    u("/sartlar", 0.2, "monthly"),
-    u("/cerez", 0.2, "monthly"),
+    entry("/", 1, "daily"),
+    entry("/rehber", 0.95, "weekly"),
+    entry("/hakkinda", 0.7),
+    entry("/sss", 0.7),
+    entry("/iletisim", 0.5),
+    entry("/gizlilik", 0.4),
+    entry("/kvkk", 0.4),
+    entry("/sartlar", 0.4),
+    entry("/cerez", 0.4),
   ];
 
-  // En çok ihbar alan sorgu sayfaları — SEO yüzeyi ("X dolandırıcı mı").
-  const entities = await db.fraudEntity
-    .findMany({
-      where: { reportCount: { gt: 0 } },
-      orderBy: { reportCount: "desc" },
-      take: 5000,
-      select: { kind: true, key: true, updatedAt: true },
-    })
-    .catch(() => [] as { kind: string; key: string; updatedAt: Date }[]);
+  const guideEntries: MetadataRoute.Sitemap = guides.map((guide) =>
+    entry(`/rehber/${guide.slug}`, 0.85, "monthly", guide.reviewedAt),
+  );
 
-  const entityEntries: MetadataRoute.Sitemap = entities.map((e) => ({
-    url: `${SITE_URL}${lookupPath(kindFromEntity(e.kind).kind, e.key)}`,
-    lastModified: e.updatedAt,
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
-
-  return [...staticEntries, ...entityEntries];
+  // Kullanıcı sorguları, ihbar formu ve topluluk akışı bilerek sitemap'e alınmaz.
+  // Bunlar araç ekranlarıdır; indekslenecek yayıncı içeriği rehber katmanındadır.
+  return [...staticEntries, ...guideEntries];
 }

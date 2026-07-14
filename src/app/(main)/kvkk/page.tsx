@@ -237,7 +237,7 @@ export default function KvkkPage() {
                 icon: Server,
                 term: "Risk sinyali servisleri (ücretsiz)",
                 description:
-                  "RDAP (rdap.org), Cloudflare DNS-over-HTTPS (cloudflare-dns.com), Google Safe Browsing, Internet Archive / Wayback (web.archive.org) ve ipwho.is servislerine yalnızca sorgulanan kamuya açık değer (ör. web adresi) iletilir. Bu servislere sana ait hiçbir kişisel veri gönderilmez.",
+                  "RDAP (rdap.org), Cloudflare DNS-over-HTTPS (cloudflare-dns.com), Google Cloud Web Risk, Internet Archive / Wayback (web.archive.org) ve ipwho.is servislerine yalnızca sorgulanan kamuya açık değer (ör. web adresi) iletilir. Bu servislere kullanıcıya ait ek kişisel veri gönderilmez.",
               },
             ]}
           />

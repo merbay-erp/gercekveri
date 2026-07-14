@@ -61,11 +61,12 @@ export function ReportForm({
 
       <div>
         <label className="mb-1.5 block text-sm font-medium">Tür</label>
-        <div className="flex gap-1 rounded-lg bg-muted p-1">
+        <div className="flex gap-1 rounded-lg bg-muted p-1" role="tablist" aria-label="İhbar türü">
           {KIND_OPTIONS.map((k) => (
             <button
               key={k}
               type="button"
+              role="tab"
               onClick={() => onKindChange(k)}
               aria-selected={kind === k}
               className={
