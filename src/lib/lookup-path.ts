@@ -8,3 +8,18 @@ export function lookupPath(kind: string, key: string): string {
     .join("/");
   return `/sorgu/${kind}/${path}`;
 }
+
+// Next.js catch-all parametreleri bazı ortamlarda `%20` gibi kaçışları çözmeden
+// döndürebilir. Her segmenti ayrı çözüp sonra birleştirmek, ilan URL'lerindeki
+// gerçek slash sınırlarını da korur.
+export function lookupValueFromSegments(segments: readonly string[]): string {
+  return segments
+    .map((segment) => {
+      try {
+        return decodeURIComponent(segment);
+      } catch {
+        return segment;
+      }
+    })
+    .join("/");
+}

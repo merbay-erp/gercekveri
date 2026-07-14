@@ -36,6 +36,12 @@ export function LookupHero({ autoFocus = false, initialTab = "web" }: { autoFocu
       toast("Bu sorgu türü çok yakında", { description: `${active.label} sorgusu hazırlanıyor.` });
       return;
     }
+    if (tab === "phone") {
+      v = v.replace(/\D/g, "");
+    }
+    if (tab === "iban") {
+      v = v.replace(/\s+/g, "").toUpperCase();
+    }
     // ilan: bağlantıyı temizle (protokol/www/query) → host/path slash'leri segment olur
     if (tab === "ilan") {
       v = v.replace(/^https?:\/\//i, "").replace(/^www\./i, "").split("#")[0]!.split("?")[0]!;

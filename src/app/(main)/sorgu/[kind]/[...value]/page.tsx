@@ -7,6 +7,7 @@ import { kindFromSlug } from "@/services/risk/registry";
 import { RiskCard } from "@/components/risk/risk-card";
 import { LookupHero } from "@/components/risk/lookup-hero";
 import { RecentFraudFeed } from "@/components/risk/recent-fraud-feed";
+import { lookupPath, lookupValueFromSegments } from "@/lib/lookup-path";
 
 export const dynamic = "force-dynamic";
 
@@ -15,14 +16,14 @@ type Params = Promise<{ kind: string; value: string[] }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { kind, value } = await params;
   const def = kindFromSlug(kind);
-  const raw = (value ?? []).join("/");
+  const raw = lookupValueFromSegments(value ?? []);
   if (!def) return { title: "Sorgu — GerçekVeri" };
   const key = def.normalize(raw);
   const display = key ? def.display(key) : raw;
   return {
     title: def.metaTitle(display),
     description: def.metaDescription(display),
-    alternates: { canonical: `/sorgu/${kind}/${key ?? raw}` },
+    alternates: { canonical: lookupPath(kind, key ?? raw) },
     robots: { index: false, follow: true },
   };
 }
@@ -32,7 +33,8 @@ export default async function LookupPage({ params }: { params: Params }) {
   const def = kindFromSlug(kind);
   if (!def) notFound();
 
-  const entity = await getOrScanEntity(kind, (value ?? []).join("/"));
+  const raw = lookupValueFromSegments(value ?? []);
+  const entity = await getOrScanEntity(kind, raw);
   if (!entity) notFound();
   const recent = await listRecentFraud({ limit: 6 });
 
